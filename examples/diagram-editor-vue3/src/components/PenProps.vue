@@ -89,6 +89,11 @@
       </t-form-item>
 
       <t-divider />
+      <t-form-item label="状态" name="status">
+        <t-select v-model="pen.showChild" @change="changeValue('showChild')">
+          <t-option v-for="(item, index) in statusList" :key="item.value" :value="index" :label="item.label"></t-option>
+        </t-select>
+      </t-form-item>
 
       <t-space>
         <t-button @click="top">置顶</t-button>
@@ -101,7 +106,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch, computed, } from 'vue';
 import { useSelection } from '@/services/selections';
 
 const { selections } = useSelection();
@@ -122,6 +127,17 @@ const getPen = () => {
 
   rect.value = meta2d.getPenRect(pen.value);
 };
+
+const statusList = computed(() => {
+  if (pen.value?.name != 'combine') return [];
+  return pen.value.children.map((id: string, index: number) => {
+    return {
+      label: `状态${index + 1}`,
+      value: id,
+    };
+  })
+})
+
 
 // 监听选中不同图元
 // @ts-ignore

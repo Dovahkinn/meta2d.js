@@ -1,39 +1,56 @@
 <template>
   <div id="meta2d"></div>
+  <ContextMenu v-bind="contextMenuParams" @hide="hideContextMenu"/>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, reactive, } from "vue";
 import {
   Meta2d,
   Pen,
   register,
   registerAnchors,
   registerCanvasDraw,
-} from '@meta2d/core';
-import { flowPens, flowAnchors } from '@meta2d/flow-diagram';
+} from "@meta2d/core";
+import { flowPens, flowAnchors } from "@meta2d/flow-diagram";
 import {
   activityDiagram,
   activityDiagramByCtx,
-} from '@meta2d/activity-diagram';
-import { classPens } from '@meta2d/class-diagram';
-import { sequencePens, sequencePensbyCtx } from '@meta2d/sequence-diagram';
-import { register as registerEcharts } from '@meta2d/chart-diagram';
-import { formPens } from '@meta2d/form-diagram';
-import { chartsPens } from '@meta2d/le5le-charts';
-import { ftaPens, ftaPensbyCtx, ftaAnchors } from '@meta2d/fta-diagram';
+} from "@meta2d/activity-diagram";
+import { classPens } from "@meta2d/class-diagram";
+import { sequencePens, sequencePensbyCtx } from "@meta2d/sequence-diagram";
+import { register as registerEcharts } from "@meta2d/chart-diagram";
+import { formPens } from "@meta2d/form-diagram";
+import { chartsPens } from "@meta2d/le5le-charts";
+import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
+import ContextMenu from "./ContextMenu.vue";
+import { useSelection } from "@/services/selections";
 
-import { useSelection } from '@/services/selections';
-
-const { select } = useSelection();
+const { select, selections, } = useSelection();
 
 const meta2dOptions: any = {
   rule: true,
 };
 
+
+const contextMenuParams = reactive({
+  x: 0,
+  y: 0,
+  visible: false,
+})
+const showContextMenu = (event: any) => {
+  if (selections.mode === 0) return
+  contextMenuParams.x = event.e.clientX;
+  contextMenuParams.y = event.e.clientY;
+  contextMenuParams.visible = true;
+};
+const hideContextMenu = () => {
+  contextMenuParams.visible = false;
+};
+
 onMounted(() => {
   // 创建实例
-  new Meta2d('meta2d', meta2dOptions);
+  new Meta2d("meta2d", meta2dOptions);
   meta2d.store.options.grid = true; // 开启网格
   // 按需注册图形库
   // 以下为自带基础图形库
@@ -55,12 +72,12 @@ onMounted(() => {
   // ...
 
   // 读取本地存储
-  let data: any = localStorage.getItem('meta2d');
+  let data: any = localStorage.getItem("meta2d");
   if (data) {
     data = JSON.parse(data);
 
     // 判断是否为运行查看，是-设置为预览模式
-    if (location.pathname === '/preview') {
+    if (location.pathname === "/preview") {
       data.locked = 1;
     } else {
       data.locked = 0;
@@ -68,8 +85,12 @@ onMounted(() => {
     meta2d.open(data);
   }
 
-  meta2d.on('active', active);
-  meta2d.on('inactive', inactive);
+  meta2d.on("active", active);
+  meta2d.on("inactive", inactive);
+  // 右键菜单
+  meta2d.on("contextmenu", showContextMenu);
+  // 点击画布
+  meta2d.on("click", hideContextMenu);
 });
 
 const active = (pens?: Pen[]) => {

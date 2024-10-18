@@ -95,13 +95,22 @@
       <a> 帮助 </a>
       <t-dropdown-menu>
         <t-dropdown-item v-for="item in assets.helps" :divider="item.divider">
-          <a v-if="item.url" :href="item.url" target="_blank">{{ item.name }}</a>
+          <a v-if="item.url" :href="item.url" target="_blank">{{
+            item.name
+          }}</a>
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-    <a class="logo" @click="assetClick">
-      <span>导入</span>
-    </a>
+    <t-popconfirm
+      :visible="visible"
+      theme="default"
+      content="是否导入 ElectricEditor 生成的 JSON 文件?"
+      @visible-change="onVisibleChange"
+    >
+      <a class="logo">
+        <span>导入</span>
+      </a>
+    </t-popconfirm>
   </div>
   <div class="app-header">
     <t-tooltip content="撤销">
@@ -250,50 +259,60 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { Pen, PenType, deepClone } from '@meta2d/core';
+import { onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import { Pen, PenType, deepClone } from "@meta2d/core";
 // @ts-ignore
-import FileSaver from 'file-saver';
-import { MessagePlugin } from 'tdesign-vue-next';
-import { loadElectricJson } from '../utils'
+import FileSaver from "file-saver";
+import { MessagePlugin } from "tdesign-vue-next";
+import { loadElectricJson } from "../utils";
 
 const router = useRouter();
 
 const assets = reactive({
-  home: 'https://le5le.com',
+  home: "https://le5le.com",
   helps: [
     {
-      name: '产品介绍',
-      url: 'https://doc.le5le.com/document/118756411',
+      name: "产品介绍",
+      url: "https://doc.le5le.com/document/118756411",
     },
     {
-      name: '快速上手',
-      url: 'https://doc.le5le.com/document/119363000',
+      name: "快速上手",
+      url: "https://doc.le5le.com/document/119363000",
     },
     {
-      name: '使用手册',
-      url: 'https://doc.le5le.com/document/118764244',
+      name: "使用手册",
+      url: "https://doc.le5le.com/document/118764244",
     },
     {
-      name: '快捷键',
-      url: 'https://doc.le5le.com/document/119620214',
+      name: "快捷键",
+      url: "https://doc.le5le.com/document/119620214",
       divider: true,
     },
     {
-      name: '企业服务与支持',
-      url: 'https://doc.le5le.com/document/119296274',
+      name: "企业服务与支持",
+      url: "https://doc.le5le.com/document/119296274",
       divider: true,
     },
     {
-      name: '关于我们',
-      url: 'https://le5le.com/about.html',
+      name: "关于我们",
+      url: "https://le5le.com/about.html",
     },
   ],
 });
 
-const assetClick = (item: any) => {
-  loadElectricJson(item)
+const visible = ref(false);
+const onVisibleChange = (val: boolean, context: any = {}) => {
+  // trigger 表示触发来源，可以根据触发来源自由控制 visible
+  if (context && context.trigger === "confirm") {
+    assetClick()
+    visible.value = false;
+  } else {
+    visible.value = val;
+  }
+};
+const assetClick = (item?: any) => {
+  loadElectricJson(item);
 };
 
 const isDrawLine = ref<boolean>(false);
@@ -309,7 +328,7 @@ onMounted(() => {
 
       // 监听缩放
       // @ts-ignore
-      meta2d.on('scale', scaleSubscriber);
+      meta2d.on("scale", scaleSubscriber);
     }
   }, 200);
 });
@@ -332,12 +351,12 @@ const drawLine = () => {
 };
 
 const lineTypes = reactive([
-  { name: '曲线', icon: '#l-curve2', value: 'curve' },
-  { name: '线段', icon: '#l-polyline', value: 'polyline' },
-  { name: '直线', icon: '#l-line', value: 'line' },
-  { name: '脑图曲线', icon: '#l-mind', value: 'mind' },
+  { name: "曲线", icon: "#l-curve2", value: "curve" },
+  { name: "线段", icon: "#l-polyline", value: "polyline" },
+  { name: "直线", icon: "#l-line", value: "line" },
+  { name: "脑图曲线", icon: "#l-mind", value: "mind" },
 ]);
-const currentLineType = ref('curve');
+const currentLineType = ref("curve");
 
 const changeLineType = (value: string) => {
   currentLineType.value = value;
@@ -350,31 +369,31 @@ const changeLineType = (value: string) => {
   }
 };
 
-const fromArrow = ref('');
+const fromArrow = ref("");
 const fromArrows = [
-  { icon: '#l-line', value: '' },
-  { icon: '#l-from-triangle', value: 'triangle' },
-  { icon: '#l-from-diamond', value: 'diamond' },
-  { icon: '#l-from-circle', value: 'circle' },
-  { icon: '#l-from-lineDown', value: 'lineDown' },
-  { icon: '#l-from-lineUp', value: 'lineUp' },
-  { icon: '#l-from-triangleSolid', value: 'triangleSolid' },
-  { icon: '#l-from-diamondSolid', value: 'diamondSolid' },
-  { icon: '#l-from-circleSolid', value: 'circleSolid' },
-  { icon: '#l-from-line', value: 'line' },
+  { icon: "#l-line", value: "" },
+  { icon: "#l-from-triangle", value: "triangle" },
+  { icon: "#l-from-diamond", value: "diamond" },
+  { icon: "#l-from-circle", value: "circle" },
+  { icon: "#l-from-lineDown", value: "lineDown" },
+  { icon: "#l-from-lineUp", value: "lineUp" },
+  { icon: "#l-from-triangleSolid", value: "triangleSolid" },
+  { icon: "#l-from-diamondSolid", value: "diamondSolid" },
+  { icon: "#l-from-circleSolid", value: "circleSolid" },
+  { icon: "#l-from-line", value: "line" },
 ];
-const toArrow = ref('');
+const toArrow = ref("");
 const toArrows = [
-  { icon: '#l-line', value: '' },
-  { icon: '#l-to-triangle', value: 'triangle' },
-  { icon: '#l-to-diamond', value: 'diamond' },
-  { icon: '#l-to-circle', value: 'circle' },
-  { icon: '#l-to-lineDown', value: 'lineDown' },
-  { icon: '#l-to-lineUp', value: 'lineUp' },
-  { icon: '#l-to-triangleSolid', value: 'triangleSolid' },
-  { icon: '#l-to-diamondSolid', value: 'diamondSolid' },
-  { icon: '#l-to-circleSolid', value: 'circleSolid' },
-  { icon: '#l-to-line', value: 'line' },
+  { icon: "#l-line", value: "" },
+  { icon: "#l-to-triangle", value: "triangle" },
+  { icon: "#l-to-diamond", value: "diamond" },
+  { icon: "#l-to-circle", value: "circle" },
+  { icon: "#l-to-lineDown", value: "lineDown" },
+  { icon: "#l-to-lineUp", value: "lineUp" },
+  { icon: "#l-to-triangleSolid", value: "triangleSolid" },
+  { icon: "#l-to-diamondSolid", value: "diamondSolid" },
+  { icon: "#l-to-circleSolid", value: "circleSolid" },
+  { icon: "#l-to-line", value: "line" },
 ];
 
 const changeFromArrow = (value: string) => {
@@ -426,7 +445,7 @@ const changeToArrow = (value: string) => {
 };
 
 const newFile = () => {
-  meta2d.open({ name: '新建项目', pens: [] } as any);
+  meta2d.open({ name: "新建项目", pens: [] } as any);
 };
 
 function readFile(file: Blob) {
@@ -442,8 +461,8 @@ function readFile(file: Blob) {
 
 const openFile = () => {
   // 1. 显示选择文件对话框
-  const input = document.createElement('input');
-  input.type = 'file';
+  const input = document.createElement("input");
+  input.type = "file";
   input.onchange = async (event) => {
     const elem = event.target as HTMLInputElement;
     if (elem.files && elem.files[0]) {
@@ -467,16 +486,16 @@ const downloadJson = () => {
   const data: any = meta2d.data();
   FileSaver.saveAs(
     new Blob([JSON.stringify(data)], {
-      type: 'text/plain;charset=utf-8',
+      type: "text/plain;charset=utf-8",
     }),
-    `${data.name || 'le5le.meta2d'}.json`
+    `${data.name || "le5le.meta2d"}.json`
   );
 };
 
 const downloadPng = () => {
   let name = (meta2d.store.data as any).name;
   if (name) {
-    name += '.png';
+    name += ".png";
   }
   meta2d.downloadPng(name);
 };
@@ -500,7 +519,7 @@ function isShowChild(pen: any, store: any) {
 
 const downloadSvg = () => {
   if (!C2S) {
-    MessagePlugin.error('请先加载乐吾乐官网下的canvas2svg.js');
+    MessagePlugin.error("请先加载乐吾乐官网下的canvas2svg.js");
     return;
   }
 
@@ -508,7 +527,7 @@ const downloadSvg = () => {
   rect.x -= 10;
   rect.y -= 10;
   const ctx = new C2S(rect.width + 20, rect.height + 20);
-  ctx.textBaseline = 'middle';
+  ctx.textBaseline = "middle";
   for (const pen of meta2d.store.data.pens) {
     if (pen.visible == false || !isShowChild(pen, meta2d.store)) {
       continue;
@@ -518,30 +537,30 @@ const downloadSvg = () => {
 
   let mySerializedSVG = ctx.getSerializedSvg();
   if (meta2d.store.data.background) {
-    mySerializedSVG = mySerializedSVG.replace('{{bk}}', '');
+    mySerializedSVG = mySerializedSVG.replace("{{bk}}", "");
     mySerializedSVG = mySerializedSVG.replace(
-      '{{bkRect}}',
+      "{{bkRect}}",
       `<rect x="0" y="0" width="100%" height="100%" fill="${meta2d.store.data.background}"></rect>`
     );
   } else {
-    mySerializedSVG = mySerializedSVG.replace('{{bk}}', '');
-    mySerializedSVG = mySerializedSVG.replace('{{bkRect}}', '');
+    mySerializedSVG = mySerializedSVG.replace("{{bk}}", "");
+    mySerializedSVG = mySerializedSVG.replace("{{bkRect}}", "");
   }
 
-  mySerializedSVG = mySerializedSVG.replace(/--le5le--/g, '&#x');
+  mySerializedSVG = mySerializedSVG.replace(/--le5le--/g, "&#x");
 
   const urlObject: any = (window as any).URL || window;
   const export_blob = new Blob([mySerializedSVG]);
   const url = urlObject.createObjectURL(export_blob);
 
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.setAttribute(
-    'download',
-    `${(meta2d.store.data as any).name || 'le5le.meta2d'}.svg`
+    "download",
+    `${(meta2d.store.data as any).name || "le5le.meta2d"}.svg`
   );
-  a.setAttribute('href', url);
-  const evt = document.createEvent('MouseEvents');
-  evt.initEvent('click', true, true);
+  a.setAttribute("href", url);
+  const evt = document.createEvent("MouseEvents");
+  evt.initEvent("click", true, true);
   a.dispatchEvent(evt);
 };
 
@@ -576,25 +595,25 @@ const onDelete = () => {
 const onAddShape = (event: DragEvent | MouseEvent, name: string) => {
   event.stopPropagation();
   let data: any;
-  if (name === 'text') {
+  if (name === "text") {
     // 构建一个文本图元
     data = {
-      text: 'text',
+      text: "text",
       width: 100,
       height: 20,
-      name: 'text',
+      name: "text",
     };
-  } else if (name === 'line') {
+  } else if (name === "line") {
     // 构建一个直线图元
     data = {
       anchors: [
-        { id: '0', x: 1, y: 0 },
-        { id: '1', x: 0, y: 1 },
+        { id: "0", x: 1, y: 0 },
+        { id: "1", x: 0, y: 1 },
       ],
       width: 100,
       height: 100,
-      name: 'line',
-      lineName: 'line',
+      name: "line",
+      lineName: "line",
       type: 1,
     };
   }
@@ -603,7 +622,7 @@ const onAddShape = (event: DragEvent | MouseEvent, name: string) => {
     meta2d.canvas.addCaches = deepClone([data]);
   } else {
     // 支持拖拽添加
-    (event as DragEvent).dataTransfer?.setData('Meta2d', JSON.stringify(data));
+    (event as DragEvent).dataTransfer?.setData("Meta2d", JSON.stringify(data));
   }
 };
 
@@ -621,12 +640,12 @@ const onView = () => {
   meta2d.stopAnimate();
   // 本地存储
   const data: any = meta2d.data();
-  localStorage.setItem('meta2d', JSON.stringify(data));
+  localStorage.setItem("meta2d", JSON.stringify(data));
   // 跳转到预览页面
   router.push({
-    path: '/preview',
+    path: "/preview",
     query: {
-      r: Date.now() + '',
+      r: Date.now() + "",
       id: data._id,
     },
   });
