@@ -1,0 +1,194 @@
+{
+    "Components": [
+        {
+            "isMirror": "0",
+            "name": "*",
+            "num": "1",
+            "offsetX": "0",
+            "offsetY": "0",
+            "posX": "190",
+            "posY": "80",
+            "rotateAngel": "3",
+            "type": "GND",
+            "uuid": "900ba8ad-bfec-493b-9b8e-69f26e9a896c",
+            "v10": "",
+            "v12": ""
+        },
+        {
+            "isMirror": "0",
+            "name": "LS",
+            "num": "1",
+            "offsetX": "11",
+            "offsetY": "-26",
+            "posX": "520",
+            "posY": "250",
+            "rotateAngel": "1",
+            "type": "Switch",
+            "uuid": "87263bc3-1411-4ef9-801c-860befee36bb",
+            "v10": "off",
+            "v12": "0",
+            "v14": "",
+            "v16": ""
+        },
+        {
+            "isMirror": "0",
+            "name": "81S13",
+            "num": "1",
+            "offsetX": "-16",
+            "offsetY": "-53",
+            "posX": "370",
+            "posY": "200",
+            "rotateAngel": "3",
+            "type": "MultipleContact",
+            "uuid": "d79452ad-9d03-482e-a0ea-66f64f55419a",
+            "v10": "2",
+            "v12": "0",
+            "v14": "1",
+            "v16": "0",
+            "v18": "注释"
+        },
+        {
+            "isMirror": "0",
+            "name": "2713",
+            "num": "1",
+            "offsetX": "9",
+            "offsetY": "14",
+            "posX": "740",
+            "posY": "80",
+            "rotateAngel": "0",
+            "type": "Output",
+            "uuid": "bcca9153-b034-4769-8eda-384230a88ae8",
+            "v10": "",
+            "v12": ""
+        },
+        {
+            "isMirror": "0",
+            "name": "V",
+            "num": "1",
+            "offsetX": "-26",
+            "offsetY": "18",
+            "posX": "220",
+            "posY": "80",
+            "rotateAngel": "0",
+            "type": "Vdc",
+            "uuid": "63e73050-2aec-48f8-bd77-c0d3cfb0b261",
+            "v10": "60,4#_60,3#V",
+            "v12": "V",
+            "v14": "",
+            "v16": ""
+        },
+        {
+            "isMirror": "0",
+            "name": "LSXH",
+            "num": "1",
+            "offsetX": "22",
+            "offsetY": "-26",
+            "posX": "520",
+            "posY": "490",
+            "rotateAngel": "0",
+            "type": "Coil",
+            "uuid": "29bd532d-1e7a-459a-aee9-1f36b5d06b7f",
+            "v10": "",
+            "v12": ""
+        },
+        {
+            "isMirror": "0",
+            "name": "*",
+            "num": "1",
+            "offsetX": "0",
+            "offsetY": "0",
+            "posX": "520",
+            "posY": "590",
+            "rotateAngel": "0",
+            "type": "GND",
+            "uuid": "8f67eca7-4c17-4544-b664-fbcd80e39d54",
+            "v10": "",
+            "v12": ""
+        }
+    ],
+    "Paintings": [
+    ],
+    "Wires": [
+        {
+            "endX": "520",
+            "endY": "220",
+            "name": "2713",
+            "startX": "520",
+            "startY": "80",
+            "uuid": "0075ba6b-fa2b-4f2f-b448-63a80526bbd9"
+        },
+        {
+            "endX": "520",
+            "endY": "400",
+            "name": "165165",
+            "startX": "520",
+            "startY": "280",
+            "uuid": "f624f408-a14b-4611-93e0-eda956a013ed"
+        },
+        {
+            "endX": "520",
+            "endY": "80",
+            "name": "2713",
+            "startX": "370",
+            "startY": "80",
+            "uuid": "6bf66751-b565-45ec-a10e-22561b0ebe64"
+        },
+        {
+            "endX": "370",
+            "endY": "160",
+            "name": "2713",
+            "startX": "370",
+            "startY": "80",
+            "uuid": "7e36c449-9995-472c-a54c-514d1a804415"
+        },
+        {
+            "endX": "360",
+            "endY": "400",
+            "name": "165165",
+            "startX": "360",
+            "startY": "240",
+            "uuid": "3daa549a-b494-4901-98a7-728de906b28e"
+        },
+        {
+            "endX": "520",
+            "endY": "400",
+            "name": "165165",
+            "startX": "360",
+            "startY": "400",
+            "uuid": "f6e2f944-3fed-4932-9931-f033600c8010"
+        },
+        {
+            "endX": "710",
+            "endY": "80",
+            "name": "2713",
+            "startX": "520",
+            "startY": "80",
+            "uuid": "bac9b4e3-d163-42a8-8542-0b3965d034a7"
+        },
+        {
+            "endX": "370",
+            "endY": "80",
+            "name": "2713",
+            "startX": "250",
+            "startY": "80",
+            "uuid": "18f0d707-aa33-423c-be4d-e806f5684a3d"
+        },
+        {
+            "endX": "520",
+            "endY": "460",
+            "name": "165165",
+            "startX": "520",
+            "startY": "400",
+            "uuid": "9f08b603-0d11-43fc-9d85-fedb12365d78"
+        },
+        {
+            "endX": "520",
+            "endY": "590",
+            "name": "",
+            "startX": "520",
+            "startY": "520",
+            "uuid": "ca404c7b-39f4-42f5-8131-fdbe53a28bf5"
+        }
+       
+    ]
+}

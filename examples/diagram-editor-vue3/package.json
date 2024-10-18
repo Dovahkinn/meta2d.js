@@ -25,14 +25,14 @@
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.5",
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^5.1.0",
     "autoprefixer": "^10.4.13",
     "path": "^0.12.7",
     "postcss": "^8.4.6",
     "postcss-import": "^14.1.0",
     "postcss-nested": "^6.0.1",
     "typescript": "latest",
-    "vite": "^4.4.2",
+    "vite": "^5.1.0",
     "vue-tsc": "^1.8.3"
   }
 }

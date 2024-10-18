@@ -95,10 +95,13 @@
       <a> 帮助 </a>
       <t-dropdown-menu>
         <t-dropdown-item v-for="item in assets.helps" :divider="item.divider">
-          <a :href="item.url" target="_blank">{{ item.name }}</a>
+          <a v-if="item.url" :href="item.url" target="_blank">{{ item.name }}</a>
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
+    <a class="logo" @click="assetClick">
+      <span>导入</span>
+    </a>
   </div>
   <div class="app-header">
     <t-tooltip content="撤销">
@@ -253,6 +256,7 @@ import { Pen, PenType, deepClone } from '@meta2d/core';
 // @ts-ignore
 import FileSaver from 'file-saver';
 import { MessagePlugin } from 'tdesign-vue-next';
+import { loadElectricJson } from '../utils'
 
 const router = useRouter();
 
@@ -287,6 +291,10 @@ const assets = reactive({
     },
   ],
 });
+
+const assetClick = (item: any) => {
+  loadElectricJson(item)
+};
 
 const isDrawLine = ref<boolean>(false);
 

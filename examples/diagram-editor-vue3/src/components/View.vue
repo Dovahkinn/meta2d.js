@@ -34,7 +34,7 @@ const meta2dOptions: any = {
 onMounted(() => {
   // 创建实例
   new Meta2d('meta2d', meta2dOptions);
-
+  meta2d.store.options.grid = true; // 开启网格
   // 按需注册图形库
   // 以下为自带基础图形库
   register(flowPens());
