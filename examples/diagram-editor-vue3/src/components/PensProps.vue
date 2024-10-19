@@ -72,8 +72,14 @@
           <t-option key="bottom" value="bottom" label="底部对齐"></t-option>
         </t-select>
       </t-form-item>
-
       <t-divider />
+      <t-collapse expand-icon borderless>
+        <t-collapse-panel value="0" header="对齐">
+          <t-button v-for="(item, index) in alginOptions" :key="index" shape="square" variant="outline" style="margin-right: 4px;" @click="align(item)">
+            <t-icon :name="item.icon" />            
+          </t-button>
+        </t-collapse-panel>
+      </t-collapse>
     </t-form>
   </div>
 </template>
@@ -113,15 +119,31 @@ const changeValue = (prop: string) => {
     const newValue = pen.value[prop];
     selections.pens.forEach((pen: any) => {
       const v: any = { id: pen.id };
-      v[prop] = newValue
+      v[prop] = newValue;
       if (prop === "dash") {
         v.lineDash = lineDashs[v[prop]];
       }
       meta2d.setValue(v, { render: true });
     });
   }
-
 };
+
+const alginOptions = [
+  { label: "左对齐", value: "left", icon: "format-vertical-align-left", },
+  { label: "右对齐", value: "right", icon: "format-vertical-align-right", },
+  { label: "顶部对齐", value: "top", icon: "format-horizontal-align-top", },
+  { label: "底部对齐", value: "bottom", icon: "format-horizontal-align-bottom", },
+  { label: "垂直居中", value: "center", icon: "format-vertical-align-center", },
+  { label: "水平居中", value: "middle", icon: "format-horizontal-align-center", },
+]
+// 对齐方式: left, right, top, bottom, center, middle 
+const align = (item: any) => {
+  const nodes = selections.pens
+  if (nodes?.length) {
+    meta2d.alignNodes(item.value, nodes);
+  }
+}
+
 
 onUnmounted(() => {
   watcher();
@@ -147,6 +169,10 @@ onUnmounted(() => {
 
     .t-space {
       gap: 4px;
+    }
+
+    .t-collapse-panel__wrapper .t-collapse-panel__content {
+      padding-left: 10px;
     }
   }
 }

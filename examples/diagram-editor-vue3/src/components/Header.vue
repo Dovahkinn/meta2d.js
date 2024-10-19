@@ -2,7 +2,7 @@
   <div class="app-header">
     <a class="logo" href="https://le5le.com" target="_blank">
       <img src="/favicon.ico" />
-      <span>乐吾乐</span>
+      <span>Meta2D</span>
     </a>
     <t-dropdown
       :minColumnWidth="200"

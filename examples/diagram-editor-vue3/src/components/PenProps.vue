@@ -89,11 +89,12 @@
       </t-form-item>
 
       <t-divider />
-      <t-form-item label="状态" name="status">
+      <t-form-item v-if="pen.name == 'combine'" label="状态" name="status">
         <t-select v-model="pen.showChild" @change="changeValue('showChild')">
           <t-option v-for="(item, index) in statusList" :key="item.value" :value="index" :label="item.label"></t-option>
         </t-select>
       </t-form-item>
+      <t-divider />
 
       <t-space>
         <t-button @click="top">置顶</t-button>
