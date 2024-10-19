@@ -50,7 +50,7 @@ onMounted(() => {
 
   .designer {
     display: grid;
-    grid-template-columns: 300px 1fr 301px;
+    grid-template-columns: 300px 1fr 350px;
     height: calc(100vh - 80px);
   }
 }
