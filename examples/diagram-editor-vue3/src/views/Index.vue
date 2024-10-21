@@ -1,18 +1,17 @@
 <template>
   <div class="app-page">
-    <Header />
+    <Header @view="toView"/>
 
     <div class="designer">
       <Graphics />
-      <View />
+      <View @ready="ready" />
       <Props />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
-
+import { onMounted, defineEmits, } from 'vue';
 import Header from '../components/Header.vue';
 import Graphics from '../components/Graphics.vue';
 import View from '../components/View.vue';
@@ -28,6 +27,15 @@ function save() {
     localStorage.setItem('meta2d', JSON.stringify(data));
     timer = undefined;
   }, 1000);
+}
+
+const emit = defineEmits(['view', 'ready']);
+const toView = (data) => {
+  emit('view', data);
+}
+
+const ready = (data: any) => {
+  emit('ready', data);
 }
 
 onMounted(() => {

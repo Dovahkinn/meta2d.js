@@ -259,13 +259,15 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, defineEmits } from "vue";
 import { useRouter } from "vue-router";
 import { Pen, PenType, deepClone } from "@meta2d/core";
 // @ts-ignore
 import FileSaver from "file-saver";
 import { MessagePlugin } from "tdesign-vue-next";
 import { loadElectricJson } from "../utils";
+
+const emit = defineEmits(["view"]);
 
 const router = useRouter();
 
@@ -305,7 +307,7 @@ const visible = ref(false);
 const onVisibleChange = (val: boolean, context: any = {}) => {
   // trigger 表示触发来源，可以根据触发来源自由控制 visible
   if (context && context.trigger === "confirm") {
-    assetClick()
+    assetClick();
     visible.value = false;
   } else {
     visible.value = val;
@@ -641,14 +643,22 @@ const onView = () => {
   // 本地存储
   const data: any = meta2d.data();
   localStorage.setItem("meta2d", JSON.stringify(data));
-  // 跳转到预览页面
-  router.push({
-    path: "/preview",
-    query: {
-      r: Date.now() + "",
-      id: data._id,
-    },
-  });
+  emit("view", data);
+
+  if (globalThis.$_meta2d_singleton) {
+    // 跳转到预览页面
+    router
+      .push({
+        path: "/preview",
+        query: {
+          r: Date.now() + "",
+          id: data._id,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 };
 </script>
 <style lang="postcss" scoped>

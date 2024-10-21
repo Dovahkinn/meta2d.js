@@ -157,7 +157,7 @@
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch, computed } from "vue";
-import { useSelection } from "@/services/selections";
+import { useSelection } from "../services/selections";
 
 const { selections } = useSelection();
 

@@ -17,7 +17,7 @@
 </template>
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
-import { useSelection } from "@/services/selections";
+import { useSelection } from "../services/selections";
 
 const props = defineProps({
   x: {

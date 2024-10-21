@@ -5,6 +5,7 @@ import App from './App.vue';
 import router from './router.ts';
 import TDesign from 'tdesign-vue-next';
 
+globalThis.$_meta2d_singleton = true;
 const app = createApp(App);
 
 // 加载基础服务

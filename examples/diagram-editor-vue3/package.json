@@ -5,8 +5,14 @@
   "scripts": {
     "start": "vite",
     "build": "vue-tsc && vite build",
+    "build:lib": "vite build",
     "preview": "vite preview"
   },
+  "files": ["dist"],
+  "main": "./src/index.ts",
+  "main-": "./dist/diagram-editor-vue3.umd.js",
+  "module-": "./dist/diagram-editor-vue3.mjs",
+  
   "dependencies": {
     "@meta2d/activity-diagram": "^1.0.0",
     "@meta2d/chart-diagram": "^1.0.3",

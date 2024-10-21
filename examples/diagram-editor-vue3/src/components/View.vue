@@ -24,7 +24,7 @@ import { formPens } from "@meta2d/form-diagram";
 import { chartsPens } from "@meta2d/le5le-charts";
 import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
-import { useSelection } from "@/services/selections";
+import { useSelection } from "../services/selections";
 
 const { select, selections, } = useSelection();
 
@@ -48,10 +48,12 @@ const hideContextMenu = () => {
   contextMenuParams.visible = false;
 };
 
+const emit = defineEmits(['ready']);
+
 onMounted(() => {
   // 创建实例
   new Meta2d("meta2d", meta2dOptions);
-  meta2d.store.options.grid = true; // 开启网格
+  // meta2d.store.options.grid = true; // 开启网格
   // 按需注册图形库
   // 以下为自带基础图形库
   register(flowPens());
@@ -70,6 +72,7 @@ onMounted(() => {
 
   // 注册其他自定义图形库
   // ...
+  emit("ready", meta2d);
 
   // 读取本地存储
   let data: any = localStorage.getItem("meta2d");

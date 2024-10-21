@@ -33,3 +33,15 @@ pnpm build
 # License
 
 MIT © le5le.com
+
+
+"exports": {
+    ".": {
+      "import": "./dist/diagram-editor-vue3.mjs",
+      "require": "./dist/diagram-editor-vue3.umd.js"
+    },
+    "./dist/*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },

@@ -10,14 +10,11 @@
 import FileProps from './FileProps.vue';
 import PenProps from './PenProps.vue';
 import PensProps from './PensProps.vue';
-import { useSelection, SelectionMode } from '@/services/selections';
+import { useSelection, SelectionMode } from '../services/selections';
 import { watch } from 'vue';
 
 const { selections } = useSelection();
 
-watch(() => selections.mode, (mode) => {
-  console.log('select: ', mode);
-});
 
 </script>
 <style lang="postcss" scoped>
