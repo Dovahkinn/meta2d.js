@@ -111,6 +111,10 @@
         <span>导入</span>
       </a>
     </t-popconfirm>
+
+    <a class="logo">
+      <span @click="customToolbarClick()">添加/删除锚点</span>
+    </a>
   </div>
   <div class="app-header">
     <t-tooltip content="撤销">
@@ -290,15 +294,6 @@ const assets = reactive({
       name: "快捷键",
       url: "https://doc.le5le.com/document/119620214",
       divider: true,
-    },
-    {
-      name: "企业服务与支持",
-      url: "https://doc.le5le.com/document/119296274",
-      divider: true,
-    },
-    {
-      name: "关于我们",
-      url: "https://le5le.com/about.html",
     },
   ],
 });
@@ -592,6 +587,11 @@ const onAll = () => {
 
 const onDelete = () => {
   meta2d.delete();
+};
+
+const customToolbarClick = (code?: string) => {
+  meta2d.toggleAnchorMode();
+  // TODO: 其他操作
 };
 
 const onAddShape = (event: DragEvent | MouseEvent, name: string) => {

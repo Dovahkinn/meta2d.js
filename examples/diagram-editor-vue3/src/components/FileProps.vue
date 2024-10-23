@@ -63,6 +63,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive } from 'vue';
+import { } from '@meta2d/utils'
 
 // 图纸数据
 const data = reactive<any>({
