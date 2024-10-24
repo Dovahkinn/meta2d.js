@@ -353,7 +353,7 @@ const lineTypes = reactive([
   { name: "直线", icon: "#l-line", value: "line" },
   { name: "脑图曲线", icon: "#l-mind", value: "mind" },
 ]);
-const currentLineType = ref("curve");
+const currentLineType = ref("line");
 
 const changeLineType = (value: string) => {
   currentLineType.value = value;

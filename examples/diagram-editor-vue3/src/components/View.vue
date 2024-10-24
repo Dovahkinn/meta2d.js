@@ -30,6 +30,7 @@ const { select, selections, } = useSelection();
 
 const meta2dOptions: any = {
   rule: true,
+  drawingLineName: 'line',
 };
 
 
@@ -69,7 +70,6 @@ onMounted(() => {
   register(ftaPens());
   registerCanvasDraw(ftaPensbyCtx());
   registerAnchors(ftaAnchors());
-
   // 注册其他自定义图形库
   // ...
   emit("ready", meta2d);

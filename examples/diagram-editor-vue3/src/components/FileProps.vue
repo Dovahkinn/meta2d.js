@@ -57,19 +57,26 @@
           @change="onChangeData"
         />
       </t-form-item>
+      <!-- 连线相交弯曲  -->
+      <t-form-item label="连线相交弯曲" name="lineCross">
+        <t-tooltip content="当直线或折线两两相交时，其中相交的交点会自动弯曲显示">
+          <t-switch v-model="data.lineCross" @change="onChangeData" />
+        </t-tooltip>
+      </t-form-item>
     </t-form>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
-import { } from '@meta2d/utils'
+import { onMounted, reactive } from "vue";
+import { lineCross, handleLineCross, clearLineCross } from "@meta2d/utils";
 
 // 图纸数据
 const data = reactive<any>({
-  name: '',
+  name: "",
   background: undefined,
   color: undefined,
+  lineCross: false,
 });
 
 // 画布选项
@@ -83,14 +90,20 @@ const options = reactive<any>({
 
 onMounted(() => {
   const d: any = meta2d.data();
-  data.name = d.name || '';
+  data.name = d.name || "";
   data.background = d.background;
   data.color = d.color;
-
+  data.lineCross = d.lineCross;
   Object.assign(options, meta2d.getOptions());
 });
 
 const onChangeData = () => {
+  if (data.lineCross) {
+    lineCross(true);
+  } else {
+    clearLineCross();
+  }
+
   Object.assign(meta2d.store.data, data);
   meta2d.store.patchFlagsBackground = true;
   meta2d.render();
