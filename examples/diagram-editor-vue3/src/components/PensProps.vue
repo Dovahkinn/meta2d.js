@@ -73,7 +73,7 @@
         </t-select>
       </t-form-item>
       <t-divider />
-      <t-collapse expand-icon borderless>
+      <t-collapse expand-icon borderless defaultExpandAll>
         <t-collapse-panel value="0" header="对齐">
           <t-button v-for="(item, index) in alginOptions" :key="index" shape="square" variant="outline" style="margin-right: 4px;" @click="align(item)">
             <t-icon :name="item.icon" />            

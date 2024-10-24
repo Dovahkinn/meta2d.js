@@ -139,10 +139,54 @@
               ></t-option>
             </t-select>
           </t-form-item>
-
           <t-form-item label="反向流动" name="reverse">
             <t-switch v-model="pen.animateReverse" @change="changeValue('animateReverse')" />
           </t-form-item>
+          <t-form-item label="线宽" name="animateLineWidth">
+            <t-input-number
+              v-model="pen.animateLineWidth"
+              @change="changeValue('animateLineWidth')"
+            />
+          </t-form-item>
+         
+          <t-form-item label="速度" name="animateSpan">
+            <t-input-number
+              v-model="pen.animateSpan"
+              :min="1"
+              :max="5"
+              @change="changeValue('animateSpan')"
+            />
+          </t-form-item>
+          <t-form-item label="颜色" name="color">
+            <t-color-picker
+              class="w-full"
+              v-model="pen.animateColor"
+              :show-primary-color-preview="false"
+              format="CSS"
+              :color-modes="['monochrome']"
+              @change="changeValue('animateColor')"
+            />
+          </t-form-item>
+          <!-- 动画发光 -->
+          <t-form-item label="动画发光" name="animateShadow">
+            <t-switch v-model="pen.animateShadow" @change="changeValue('animateShadow')" />
+          </t-form-item>
+          <!-- 发光颜色 -->
+          <t-form-item label="发光颜色" name="animateShadowColor"> 
+            <t-color-picker 
+              class="w-full"
+              v-model="pen.animateShadowColor"
+              :show-primary-color-preview="false"
+              format="CSS"
+              :color-modes="['monochrome']"
+              @change="changeValue('animateShadowColor')"
+            />
+          </t-form-item>
+
+          <t-form-item label="自动播放" name="autoPlay">
+            <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
+          </t-form-item>
+
 
           <t-divider />
           <t-space>
@@ -203,6 +247,14 @@ const animateTypeList = computed(() => {
     {
       label: "圆点",
       value: 2,
+    },
+    {
+      label: "箭头",
+      value: 3,
+    },
+    {
+      label: "水滴",
+      value: 4,
     },
   ];
 });

@@ -149,5 +149,9 @@ const menuOptions = [
   :deep(.t-card__body) {
     padding: 0;
   }
+
+  .t-button {
+    justify-content: start;
+  }
 }
 </style>
