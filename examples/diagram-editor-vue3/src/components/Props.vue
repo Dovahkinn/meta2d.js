@@ -1,8 +1,8 @@
 <template>
   <div class="app-props">
-    <FileProps v-if="selections.mode === SelectionMode.File" />
-    <PenProps v-else-if="selections.mode === SelectionMode.Pen" />
-    <PensProps v-else-if="selections.mode === SelectionMode.Pens" />
+    <FileProps v-if="selections.mode === SelectionMode.File" v-bind="$attrs" />
+    <PenProps v-else-if="selections.mode === SelectionMode.Pen" v-bind="$attrs" />
+    <PensProps v-else-if="selections.mode === SelectionMode.Pens" v-bind="$attrs" />
   </div>
 </template>
 

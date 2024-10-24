@@ -1,11 +1,11 @@
 <template>
   <div class="app-page">
-    <Header @view="toView"/>
+    <Header v-bind="$attrs" @view="toView"/>
 
     <div class="designer">
-      <Graphics />
-      <View @ready="ready" />
-      <Props />
+      <Graphics v-bind="$attrs" />
+      <View v-bind="$attrs" @ready="ready" />
+      <Props uploadUrl="http://localhost:3000/api/action" v-bind="$attrs" />
     </div>
   </div>
 </template>
@@ -30,7 +30,7 @@ function save() {
 }
 
 const emit = defineEmits(['view', 'ready']);
-const toView = (data) => {
+const toView = (data: any) => {
   emit('view', data);
 }
 

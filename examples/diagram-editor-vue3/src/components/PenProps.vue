@@ -1,9 +1,8 @@
 <template>
-  <t-tabs v-if="pen" :defaultValue="1">
+  <t-tabs v-if="pen" v-model:value="activePanel">
     <t-tab-panel :value="1" label="图元">
       <div class="props-panel">
         <t-form label-align="left">
-
           <t-form-item label="颜色" name="color">
             <t-color-picker
               class="w-full"
@@ -122,7 +121,11 @@
             />
           </t-form-item>
           <t-form-item label="文本" name="text">
-            <t-input v-model="pen.text" clearable @change="changeValue('text')" />
+            <t-input
+              v-model="pen.text"
+              clearable
+              @change="changeValue('text')"
+            />
           </t-form-item>
 
           <t-form-item label="字体" name="fontSize">
@@ -133,18 +136,18 @@
           </t-form-item>
 
           <t-form-item label="文字颜色类型" name="textType">
-            <t-select
-              v-model="pen.textType"
-              @change="changeValue('textType')"
-            >
+            <t-select v-model="pen.textType" @change="changeValue('textType')">
               <t-option key="hex" :value="0" label="纯色"></t-option>
               <t-option key="rgb" :value="1" label="线性渐变"></t-option>
               <t-option key="rgba" :value="2" label="径向渐变"></t-option>
             </t-select>
           </t-form-item>
 
-          
-          <t-form-item v-if="[1, 2].includes(pen.textType)" label="文字渐变" name="textGradientColors">
+          <t-form-item
+            v-if="[1, 2].includes(pen.textType)"
+            label="文字渐变"
+            name="textGradientColors"
+          >
             <t-color-picker
               class="w-full"
               v-model="pen.textGradientColors"
@@ -155,7 +158,7 @@
               @change="changeValue('textGradientColors')"
             />
           </t-form-item>
-          
+
           <t-form-item v-else label="文字颜色" name="textColor">
             <t-color-picker
               class="w-full"
@@ -197,16 +200,21 @@
             >
               <t-option key="normal" value="normal" label="常规"></t-option>
               <t-option key="nowrap" value="nowrap" label="不换行"></t-option>
-              <t-option key="pre-line" value="pre-line" label="换行符换行"></t-option>
-              <t-option key="break-all" value="break-all" label="永远换行"></t-option>
+              <t-option
+                key="pre-line"
+                value="pre-line"
+                label="换行符换行"
+              ></t-option>
+              <t-option
+                key="break-all"
+                value="break-all"
+                label="永远换行"
+              ></t-option>
             </t-select>
           </t-form-item>
 
           <t-form-item label="超出省略" name="ellipsis">
-            <t-switch
-              v-model="pen.ellipsis"
-              @change="changeValue('ellipsis')"
-            >
+            <t-switch v-model="pen.ellipsis" @change="changeValue('ellipsis')">
             </t-switch>
           </t-form-item>
 
@@ -247,7 +255,6 @@
               @change="changeValue('textStrickoutColor')"
             />
           </t-form-item>
-
 
           <t-form-item label="文字水平对齐" name="textAlign">
             <t-select
@@ -291,10 +298,7 @@
             />
           </t-form-item>
           <t-form-item label="锁定宽高比" name="ratio">
-            <t-switch
-              v-model="pen.ratio"
-              @change="changeValue('ratio')"
-            />
+            <t-switch v-model="pen.ratio" @change="changeValue('ratio')" />
           </t-form-item>
           <t-form-item label="旋转角度" name="rotate">
             <t-input-number
@@ -349,22 +353,14 @@
             />
           </t-form-item>
           <t-form-item label="水平翻转" name="flipX">
-            <t-switch
-              v-model="pen.flipX"
-              @change="changeValue('flipX')"
-            />
+            <t-switch v-model="pen.flipX" @change="changeValue('flipX')" />
           </t-form-item>
 
           <t-form-item label="垂直翻转" name="flipY">
-            <t-switch
-              v-model="pen.flipY"
-              @change="changeValue('flipY')"
-            />
+            <t-switch v-model="pen.flipY" @change="changeValue('flipY')" />
           </t-form-item>
 
-
           <t-divider />
-
 
           <t-form-item v-if="pen.name == 'combine'" label="状态" name="status">
             <t-select
@@ -407,7 +403,10 @@
             </t-select>
           </t-form-item>
           <t-form-item label="反向流动" name="reverse">
-            <t-switch v-model="pen.animateReverse" @change="changeValue('animateReverse')" />
+            <t-switch
+              v-model="pen.animateReverse"
+              @change="changeValue('animateReverse')"
+            />
           </t-form-item>
           <t-form-item label="线宽" name="animateLineWidth">
             <t-input-number
@@ -415,7 +414,7 @@
               @change="changeValue('animateLineWidth')"
             />
           </t-form-item>
-         
+
           <t-form-item label="速度" name="animateSpan">
             <t-input-number
               v-model="pen.animateSpan"
@@ -436,11 +435,14 @@
           </t-form-item>
           <!-- 动画发光 -->
           <t-form-item label="动画发光" name="animateShadow">
-            <t-switch v-model="pen.animateShadow" @change="changeValue('animateShadow')" />
+            <t-switch
+              v-model="pen.animateShadow"
+              @change="changeValue('animateShadow')"
+            />
           </t-form-item>
           <!-- 发光颜色 -->
-          <t-form-item label="发光颜色" name="animateShadowColor"> 
-            <t-color-picker 
+          <t-form-item label="发光颜色" name="animateShadowColor">
+            <t-color-picker
               class="w-full"
               v-model="pen.animateShadowColor"
               :show-primary-color-preview="false"
@@ -451,9 +453,11 @@
           </t-form-item>
 
           <t-form-item label="自动播放" name="autoPlay">
-            <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
+            <t-switch
+              v-model="pen.autoPlay"
+              @change="changeValue('autoPlay')"
+            />
           </t-form-item>
-
 
           <t-divider />
           <t-space>
@@ -463,11 +467,46 @@
         </t-form>
       </div>
     </t-tab-panel>
+
+    <t-tab-panel v-if="['image'].includes(pen.name)" :value="2" label="图片">
+      <div class="props-panel">
+        <t-form label-align="left">
+          <t-form-item label="图片上传" name="image">
+            <t-upload
+              ref="uploadRef"
+              v-model="imageFile"
+              :action="$attrs.uploadUrl || 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'"
+              :sizeLimit="sizeLimit"
+              theme="image"
+              tips="请选择单张小于5MB的图片上传"
+              accept="image/*"
+              @fail="handleFail"
+              @success="handleSuccess"
+            />
+          </t-form-item>
+
+          <t-form-item label="图片地址" name="image">
+            <t-input
+              v-model="pen.image"
+              clearable
+              @change="changeValue('image')"
+            />
+          </t-form-item>
+
+          <t-form-item label="保持比例" name="imageRatio">
+            <t-switch
+              v-model="pen.imageRatio"
+              @change="changeValue('imageRatio')"
+            />
+          </t-form-item>
+        </t-form>
+      </div>
+    </t-tab-panel>
   </t-tabs>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, computed } from "vue";
+import { onMounted, onUnmounted, ref, watch, computed, useAttrs, } from "vue";
 import { useSelection } from "../services/selections";
 
 const { selections } = useSelection();
@@ -475,6 +514,7 @@ const { selections } = useSelection();
 const pen = ref<any>();
 // 位置数据。当前版本位置需要动态计算获取
 const rect = ref<any>();
+const activePanel = ref(1)
 
 onMounted(() => {
   getPen();
@@ -487,6 +527,7 @@ const getPen = () => {
   }
 
   rect.value = meta2d.getPenRect(pen.value);
+  activePanel.value = 1
 };
 
 // 状态组合列表
@@ -526,19 +567,6 @@ const animateTypeList = computed(() => {
   ];
 });
 
-// 设置动画属性
-// 动画类型：默认 - 水流； 1 - （水珠流动）虚线段；2 - 圆点 3. 箭头 4.水滴
-// pen.lineAnimateType = 1;
-// 轨迹速度，默认1
-// pen.animateSpan = 1;
-// 轨迹颜色
-// pen.animateColor = 'red';
-// 虚线段，pen.lineAnimateType = 1 有效
-// pen.animateLineDash = [5, 5];
-// 圆点大小，pen.lineAnimateType = 2 有效，最小值 6
-// pen.animateDotSize = 20;
-// 反向播放
-// pen.animateReverse = false;
 
 const animate = (play: boolean = false) => {
   console.log("animate: ", play, pen.value);
@@ -590,6 +618,31 @@ const down = () => {
 onUnmounted(() => {
   watcher();
 });
+
+
+// * 文件上传
+const uploadRef = ref();
+const imageFile = ref([]);
+const sizeLimit = {
+  limit: 1024 * 5,
+  unit: "KB",
+}
+
+const handleSuccess = (context: any) => {
+  console.log("upload success: ", context);
+  if (context.response) {
+    pen.value.image = context.response.url;
+    changeValue('image');
+  }
+}
+
+const handleFail = (e: any) => {
+  console.log("upload fail: ", e);
+}
+
+const attrs = useAttrs();
+console.log('rrrrrrrrrrrr', attrs)
+
 </script>
 <style lang="postcss" scoped>
 .props-panel {

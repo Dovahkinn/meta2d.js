@@ -1,7 +1,5 @@
-// import testJson from './electric.json';
 import ConfigList from './electric-config.json';
 import { Pen } from '@meta2d/core';
-import { testData2 } from './data';
 
 const rotateAngelMap: {
   [key: string]: number;
