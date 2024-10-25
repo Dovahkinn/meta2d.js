@@ -28,5 +28,14 @@ const { selections } = useSelection();
   z-index: 2;
   height: calc(100vh - 80px);
   overflow-y: auto;
+
+  .t-tabs {
+    height: 100%;
+
+    :deep(.t-tabs__content) {
+      overflow: auto;
+      height: calc(100% - 50px);
+    }
+  }
 }
 </style>

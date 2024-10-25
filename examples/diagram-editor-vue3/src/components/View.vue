@@ -29,7 +29,7 @@ import { useSelection } from "../services/selections";
 const { select, selections, } = useSelection();
 
 const meta2dOptions: any = {
-  rule: true,
+  rule: false,
   drawingLineName: 'line',
   rotateCursor: 'rotate.cur',
 };

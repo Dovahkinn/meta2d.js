@@ -8,6 +8,10 @@
     :icon="icon"
     @click="click"
   >
+    <template #label="{ node }">
+      <span> {{ node.label }} - {{ node.data.text }}</span
+      >
+    </template>
     <template #operations="{ node }">
       <div class="tdesign-demo-block-row">
         <t-icon
@@ -32,13 +36,13 @@ const pensTree = computed(() => {
   return pens.filter((pen) => {
     if (!pen.parentId) {
       if (pen.children) {
-        const children = []
+        const children = [];
         pen.children.forEach((id: string) => {
           const child = pens.find((pen) => pen.id === id);
           if (child) {
             children.push(child);
           }
-        })
+        });
         pen.children = children;
       }
 
@@ -70,14 +74,14 @@ const toggleVisible = (node: TreeNodeModel) => {
   });
 };
 
-
-const click = (context: { node: TreeNodeModel, e: MouseEvent }) => {
-    console.log(context);
-    const pen = meta2d.findOne(context.node.data.id);
-    if (pen) {
-        meta2d.active([pen]);
-    }
+const click = (context: { node: TreeNodeModel; e: MouseEvent }) => {
+  console.log(context);
+  const pen = meta2d.findOne(context.node.data.id);
+  if (pen) {
+    meta2d.active([pen]);
+    meta2d.render();
+    meta2d.gotoView(pen);
+  }
 };
-
 </script>
 <style lang="scss" scoped></style>
