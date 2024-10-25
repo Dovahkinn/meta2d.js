@@ -18,6 +18,7 @@ import View from '../components/View.vue';
 import Props from '../components/Props.vue';
 
 let timer: any;
+
 function save() {
   if (timer) {
     clearTimeout(timer);
@@ -26,7 +27,7 @@ function save() {
     const data: any = meta2d.data();
     localStorage.setItem('meta2d', JSON.stringify(data));
     timer = undefined;
-  }, 1000);
+  }, 100);
 }
 
 const emit = defineEmits(['view', 'ready']);

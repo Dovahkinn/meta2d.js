@@ -640,8 +640,7 @@ const handleFail = (e: any) => {
   console.log("upload fail: ", e);
 }
 
-const attrs = useAttrs();
-console.log('rrrrrrrrrrrr', attrs)
+// const attrs = useAttrs();
 
 </script>
 <style lang="postcss" scoped>
