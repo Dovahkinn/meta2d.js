@@ -1,21 +1,25 @@
 <template>
   <div class="app-props">
     <FileProps v-if="selections.mode === SelectionMode.File" v-bind="$attrs" />
-    <PenProps v-else-if="selections.mode === SelectionMode.Pen" v-bind="$attrs" />
-    <PensProps v-else-if="selections.mode === SelectionMode.Pens" v-bind="$attrs" />
+    <PenProps
+      v-else-if="selections.mode === SelectionMode.Pen"
+      v-bind="$attrs"
+    />
+    <PensProps
+      v-else-if="selections.mode === SelectionMode.Pens"
+      v-bind="$attrs"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import FileProps from './FileProps.vue';
-import PenProps from './PenProps.vue';
-import PensProps from './PensProps.vue';
-import { useSelection, SelectionMode } from '../services/selections';
-import { watch } from 'vue';
+import FileProps from "./FileProps.vue";
+import PenProps from "./PenProps.vue";
+import PensProps from "./PensProps.vue";
+import { useSelection, SelectionMode } from "../services/selections";
+import { watch } from "vue";
 
 const { selections } = useSelection();
-
-
 </script>
 <style lang="postcss" scoped>
 .app-props {

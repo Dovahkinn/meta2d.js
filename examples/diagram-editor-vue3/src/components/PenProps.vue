@@ -502,12 +502,19 @@
         </t-form>
       </div>
     </t-tab-panel>
+
+    <!-- 结构 -->
+    <t-tab-panel :value="3" label="结构">
+      <Structure :pen="pen" />
+    </t-tab-panel>
+    
   </t-tabs>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch, computed, useAttrs, } from "vue";
 import { useSelection } from "../services/selections";
+import Structure from "./Structure.vue";
 
 const { selections } = useSelection();
 
@@ -517,6 +524,7 @@ const rect = ref<any>();
 const activePanel = ref(1)
 
 onMounted(() => {
+  activePanel.value = 1
   getPen();
 });
 
@@ -527,7 +535,14 @@ const getPen = () => {
   }
 
   rect.value = meta2d.getPenRect(pen.value);
-  activePanel.value = 1
+
+  if (activePanel.value == 2) {
+    // 非 图片 或 线
+    if (!['image', 'line'].includes(pen.value.name)) {
+      activePanel.value = 1
+    }
+  }
+
 };
 
 // 状态组合列表

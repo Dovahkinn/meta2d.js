@@ -31,6 +31,7 @@ const { select, selections, } = useSelection();
 const meta2dOptions: any = {
   rule: true,
   drawingLineName: 'line',
+  rotateCursor: 'rotate.cur',
 };
 
 

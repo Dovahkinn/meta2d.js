@@ -105,6 +105,11 @@
         </t-form>
       </div>
     </template>
+
+    <template #struct-props>
+      <Structure />
+    </template>
+
   </PropsTab>
 </template>
 
@@ -112,6 +117,7 @@
 import { onMounted, reactive, ref, } from "vue";
 import { lineCross, handleLineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
+import Structure from "./Structure.vue";
 
 // 图纸数据
 const data = reactive<any>({
