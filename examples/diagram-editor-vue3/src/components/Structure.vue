@@ -9,7 +9,7 @@
     @click="click"
   >
     <template #label="{ node }">
-      <span> {{ node.label }} - {{ node.data.text }} - {{ node.data.type }}</span>
+      <span> {{ node.label }} - {{ node.data.text }}</span>
     </template>
     <template #operations="{ node }">
       <div class="tdesign-demo-block-row">

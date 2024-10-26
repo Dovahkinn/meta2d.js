@@ -84,6 +84,8 @@
                 $attrs.uploadUrl ||
                 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
               "
+              :headers="headers"
+              name="object"
               :sizeLimit="sizeLimit"
               theme="image"
               tips="请选择单张小于5MB的图片上传"
@@ -119,7 +121,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, useAttrs, } from "vue";
 import { lineCross, handleLineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
 import Structure from "./Structure.vue";
@@ -229,11 +231,15 @@ const sizeLimit = {
   limit: 1024 * 5,
   unit: "KB",
 };
+const attrs = useAttrs();
+const headers = {
+  Authorization: attrs.token
+};
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
   if (context.response) {
-    data.bkImage = context.response.url;
+    data.bkImage = context.response.url || context.response.data?.fileurl;
     onChangeData("bkImage");
   }
 };

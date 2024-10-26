@@ -476,6 +476,8 @@
               ref="uploadRef"
               v-model="imageFile"
               :action="$attrs.uploadUrl || 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'"
+              :headers="headers"
+              name="object"
               :sizeLimit="sizeLimit"
               theme="image"
               tips="请选择单张小于5MB的图片上传"
@@ -646,7 +648,7 @@ const sizeLimit = {
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
   if (context.response) {
-    pen.value.image = context.response.url;
+    pen.value.image = context.response.url || context.response.data?.fileurl;
     changeValue('image');
   }
 }
@@ -655,7 +657,10 @@ const handleFail = (e: any) => {
   console.log("upload fail: ", e);
 }
 
-// const attrs = useAttrs();
+const attrs = useAttrs();
+const headers = {
+  Authorization: attrs.token
+};
 
 </script>
 <style lang="postcss" scoped>
