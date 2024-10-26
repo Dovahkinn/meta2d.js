@@ -51,7 +51,7 @@ const pensTree = computed(() => {
   });
 });
 
-console.log("pens: ", pensTree);
+// console.log("pens: ", pensTree);
 const icon = (h: Function, node: TreeNodeModel) => {
   const iconMap: Record<string | number, string> = {
     1: "git-commit",
@@ -75,7 +75,7 @@ const toggleVisible = (node: TreeNodeModel) => {
 };
 
 const click = (context: { node: TreeNodeModel; e: MouseEvent }) => {
-  console.log(context);
+  // console.log(context);
   const pen = meta2d.findOne(context.node.data.id);
   if (pen) {
     meta2d.active([pen]);

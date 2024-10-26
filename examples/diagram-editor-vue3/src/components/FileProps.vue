@@ -80,7 +80,10 @@
             <t-upload
               ref="uploadRef"
               v-model="imageFile"
-              :action="$attrs.uploadUrl || 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'"
+              :action="
+                $attrs.uploadUrl ||
+                'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+              "
               :sizeLimit="sizeLimit"
               theme="image"
               tips="请选择单张小于5MB的图片上传"
@@ -90,9 +93,12 @@
             />
           </t-form-item>
           <t-form-item label="背景图片地址" name="bkImage">
-            <t-input v-model="data.bkImage" clearable @change="onChangeData('bkImage')" />
+            <t-input
+              v-model="data.bkImage"
+              clearable
+              @change="onChangeData('bkImage')"
+            />
           </t-form-item>
-
 
           <!-- 连线相交弯曲  -->
           <t-form-item label="连线相交弯曲" name="lineCross">
@@ -109,12 +115,11 @@
     <template #struct-props>
       <Structure />
     </template>
-
   </PropsTab>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { lineCross, handleLineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
 import Structure from "./Structure.vue";
@@ -183,22 +188,35 @@ const onChangeData = (prop?: string) => {
 
   Object.assign(meta2d.store.data, data);
   meta2d.store.patchFlagsBackground = true;
-  meta2d.render();
 
-  options.grid = data.grid;
-  options.gridSize = data.gridSize;
-  onChangeOptions()
+  console.log("change data: ", data);
+  // options.grid = data.grid;
+  // options.gridSize = data.gridSize;
 
-  if (prop == 'bkImage') {
+  meta2d.setGrid({
+    grid: data.grid,
+    gridSize: data.gridSize,
+    gridRotate: data.gridRotate,
+    gridColor: data.gridColor,
+  });
+  meta2d.setRule({
+    rule: data.rule,
+    ruleColor: data.ruleColor,
+  });
+
+  if (prop == "bkImage") {
     meta2d.setBackgroundImage(data.bkImage);
   }
+
+  meta2d.render();
 };
 
 /**
  * @description 修改网格等属性需要执行，否则不会即时渲染
+ * @deprecated
  */
 const onChangeOptions = () => {
-  console.log('onChangeOptions ', options);
+  console.log("onChangeOptions ", options);
   meta2d.setOptions(options);
   meta2d.store.patchFlagsTop = true;
   meta2d.store.patchFlagsBackground = true;
@@ -210,20 +228,19 @@ const imageFile = ref([]);
 const sizeLimit = {
   limit: 1024 * 5,
   unit: "KB",
-}
+};
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
   if (context.response) {
     data.bkImage = context.response.url;
-    onChangeData('bkImage');
+    onChangeData("bkImage");
   }
-}
+};
 
 const handleFail = (e: any) => {
   console.log("upload fail: ", e);
-}
-
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {

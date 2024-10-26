@@ -25,7 +25,7 @@ export const useSelection = () => {
       return;
     }
 
-    console.log('select pens: ', pens);
+    // console.log('select pens: ', pens);
     if (pens.length === 1) {
       selections.mode = SelectionMode.Pen;
       selections.pen = pens[0];
