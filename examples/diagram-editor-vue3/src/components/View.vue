@@ -1,5 +1,5 @@
 <template>
-  <div id="meta2d"></div>
+  <div id="meta2d" :class="{ 'is--preview': preview }"></div>
   <ContextMenu v-bind="contextMenuParams" @hide="hideContextMenu"/>
 </template>
 
@@ -25,6 +25,14 @@ import { chartsPens } from "@meta2d/le5le-charts";
 import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
+
+const props = defineProps({
+  preview: {
+    type: Boolean,
+    default: false,
+  },
+})
+
 
 const { select, selections, } = useSelection();
 
@@ -81,7 +89,7 @@ onMounted(() => {
     data = JSON.parse(data);
 
     // 判断是否为运行查看，是-设置为预览模式
-    if (location.pathname === "/preview") {
+    if (location.pathname === "/preview" || props.preview) {
       data.locked = 1;
     } else {
       data.locked = 0;
@@ -113,5 +121,10 @@ onUnmounted(() => {
 #meta2d {
   height: calc(100vh - 80px);
   z-index: 1;
+
+  &.is--preview {
+    height: 100%;
+  }
+
 }
 </style>

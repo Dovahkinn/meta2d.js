@@ -134,10 +134,7 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-
-
   </div>
-
 
   <div class="app-header header__bottom">
     <t-tooltip content="撤销">
@@ -670,24 +667,28 @@ const onView = () => {
 
   if (globalThis.$_meta2d_singleton) {
     // 跳转到预览页面
-    router
-      .push({
-        path: "/preview",
-        query: {
-          r: Date.now() + "",
-          id: data._id,
-        },
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // router
+    //   .push({
+    //     path: "/preview",
+    //     query: {
+    //       r: Date.now() + "",
+    //       id: data._id,
+    //     },
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+
+    // 新窗口打开
+    // 新窗口打开预览页面
+    window.open(`/preview?r=${Date.now()}&id=${data._id}`, "_blank");
   }
 };
 
 const selectPens = (type?: number | string) => {
-  if (type == 'none') {
-    meta2d.inactive()
-    return
+  if (type == "none") {
+    meta2d.inactive();
+    return;
   }
   const data = meta2d.data();
   const pens = data.pens.filter((pen: Pen) => {
@@ -696,19 +697,18 @@ const selectPens = (type?: number | string) => {
     } else {
       return pen.type != 1;
     }
-  })
+  });
 
   // * 数据量大时，频繁查找会导致卡顿，但官方没有批量查询的 api，暂时无法解决
-  const penList: Pen[] = []
+  const penList: Pen[] = [];
   pens.forEach((pen: Pen) => {
     if (meta2d.findOne(pen.id as string)) {
-      penList.push(meta2d.findOne(pen.id as string) as Pen)
+      penList.push(meta2d.findOne(pen.id as string) as Pen);
     }
-  })
+  });
 
   meta2d.active(penList);
 };
-
 </script>
 <style lang="postcss" scoped>
 .app-header {

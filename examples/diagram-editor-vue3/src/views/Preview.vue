@@ -1,6 +1,6 @@
 <template>
-  <div class="app-page">
-    <View v-bind="$attrs" @ready="emit('ready', $event)" />
+  <div class="app-page is--preview">
+    <View v-bind="$attrs" preview @ready="emit('ready', $event)" />
   </div>
 </template>
 
