@@ -1,5 +1,5 @@
 <template>
-  <div class="app-header">
+  <div class="app-header header__top">
     <a class="logo" href="https://le5le.com" target="_blank">
       <img src="/favicon.ico" />
       <span>Meta2D</span>
@@ -115,8 +115,31 @@
     <a class="logo">
       <span @click="customToolbarClick()">添加/删除锚点</span>
     </a>
+
+    <t-dropdown
+      :minColumnWidth="200"
+      :maxHeight="560"
+      overlayClassName="header-dropdown"
+    >
+      <a> 批量选择图元 </a>
+      <t-dropdown-menu>
+        <t-dropdown-item @click="selectPens()">
+          <a>节点</a>
+        </t-dropdown-item>
+        <t-dropdown-item @click="selectPens(1)" divider="true">
+          <a>连线</a>
+        </t-dropdown-item>
+        <t-dropdown-item @click="selectPens('none')">
+          <a>取消</a>
+        </t-dropdown-item>
+      </t-dropdown-menu>
+    </t-dropdown>
+
+
   </div>
-  <div class="app-header">
+
+
+  <div class="app-header header__bottom">
     <t-tooltip content="撤销">
       <svg class="l-icon" aria-hidden="true" @click="onUndo">
         <use xlink:href="#l-undo"></use>
@@ -660,6 +683,32 @@ const onView = () => {
       });
   }
 };
+
+const selectPens = (type?: number | string) => {
+  if (type == 'none') {
+    meta2d.inactive()
+    return
+  }
+  const data = meta2d.data();
+  const pens = data.pens.filter((pen: Pen) => {
+    if (type) {
+      return pen.type === type;
+    } else {
+      return pen.type != 1;
+    }
+  })
+
+  // * 数据量大时，频繁查找会导致卡顿，但官方没有批量查询的 api，暂时无法解决
+  const penList: Pen[] = []
+  pens.forEach((pen: Pen) => {
+    if (meta2d.findOne(pen.id as string)) {
+      penList.push(meta2d.findOne(pen.id as string) as Pen)
+    }
+  })
+
+  meta2d.active(penList);
+};
+
 </script>
 <style lang="postcss" scoped>
 .app-header {

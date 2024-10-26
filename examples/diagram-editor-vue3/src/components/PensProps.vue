@@ -121,7 +121,9 @@ const tabs = [
 
 const { selections } = useSelection();
 
-const pen = ref<any>();
+const pen = ref<any>({
+  globalAlpha: 1,
+});
 // 位置数据。当前版本位置需要动态计算获取
 const rect = ref<any>();
 
@@ -130,11 +132,6 @@ onMounted(() => {
 });
 
 const getPen = () => {
-  pen.value = selections.pens?.[0] || {};
-  if (pen.value.globalAlpha == undefined) {
-    pen.value.globalAlpha = 1;
-  }
-
   rect.value = meta2d.getPenRect(pen.value);
 };
 
@@ -145,7 +142,7 @@ const watcher = watch(() => selections.pens, getPen);
 const lineDashs = [undefined, [5, 5]];
 
 const changeValue = (prop: string) => {
-  console.log("change value: ", prop, pen.value, selections.pens);
+  // console.log("change value: ", prop, pen.value, selections.pens);
   if (selections.pens?.length) {
     const newValue = pen.value[prop];
     selections.pens.forEach((pen: any) => {
