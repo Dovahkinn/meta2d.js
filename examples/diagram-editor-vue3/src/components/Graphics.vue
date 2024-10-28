@@ -1,6 +1,6 @@
 <template>
   <div class="graphics">
-    <t-collapse :defaultExpandAll="true">
+    <t-collapse :defaultValue="[0, 6]">
       <t-collapse-panel
         :header="item.name"
         v-for="item in graphicGroups"
@@ -13,7 +13,14 @@
             @dragstart="dragStart($event, elem)"
             @click.prevent="dragStart($event, elem)"
           >
-            <svg class="l-icon" aria-hidden="true">
+            <img
+              v-if="elem.icon.endsWith('svg')"
+              class="icon__image"
+              :src="elem.icon"
+              alt=""
+              srcset=""
+            />
+            <svg v-else class="l-icon" aria-hidden="true">
               <use :xlink:href="'#' + elem.icon"></use>
             </svg>
             <p :title="elem.name">{{ elem.name }}</p>
@@ -25,561 +32,563 @@
 </template>
 
 <script lang="ts" setup>
+import { parseSvgStr } from "../utils/svgParser";
+
 const graphicGroups = [
   {
-    name: '基本形状',
+    name: "基本形状",
     show: true,
     list: [
       {
-        name: '正方形',
-        icon: 'l-rect',
+        name: "正方形",
+        icon: "l-rect",
         id: 1,
         data: {
           width: 100,
           height: 100,
-          name: 'square',
+          name: "square",
         },
       },
       {
-        name: '矩形',
-        icon: 'l-rectangle',
+        name: "矩形",
+        icon: "l-rectangle",
         id: 2,
         data: {
           width: 200,
           height: 50,
           borderRadius: 0.1,
-          name: 'rectangle',
+          name: "rectangle",
         },
       },
       {
-        name: '圆',
-        icon: 'l-circle',
+        name: "圆",
+        icon: "l-circle",
         id: 3,
         data: {
           width: 100,
           height: 100,
-          name: 'circle',
+          name: "circle",
         },
       },
       {
-        name: '三角形',
-        icon: 'l-triangle',
+        name: "三角形",
+        icon: "l-triangle",
         id: 4,
         data: {
           width: 100,
           height: 100,
-          name: 'triangle',
+          name: "triangle",
         },
       },
       {
-        name: '菱形',
-        icon: 'l-diamond',
+        name: "菱形",
+        icon: "l-diamond",
         id: 5,
         data: {
           width: 100,
           height: 100,
-          name: 'diamond',
+          name: "diamond",
         },
       },
       {
-        name: '五边形',
-        icon: 'l-pentagon',
+        name: "五边形",
+        icon: "l-pentagon",
         id: 6,
         data: {
           width: 100,
           height: 100,
-          name: 'pentagon',
+          name: "pentagon",
         },
       },
       {
-        name: '六边形',
-        icon: 'l-hexagon',
+        name: "六边形",
+        icon: "l-hexagon",
         id: 7,
         data: {
           width: 100,
           height: 100,
-          name: 'hexagon',
+          name: "hexagon",
         },
       },
       {
-        name: '五角星',
-        icon: 'l-pentagram',
+        name: "五角星",
+        icon: "l-pentagram",
         id: 8,
         data: {
           width: 100,
           height: 100,
-          name: 'pentagram',
+          name: "pentagram",
         },
       },
       {
-        name: '左箭头',
-        icon: 'l-arrow-left',
+        name: "左箭头",
+        icon: "l-arrow-left",
         id: 9,
         data: {
           width: 120,
           height: 60,
-          name: 'leftArrow',
+          name: "leftArrow",
         },
       },
       {
-        name: '右箭头',
-        icon: 'l-arrow-right',
+        name: "右箭头",
+        icon: "l-arrow-right",
         id: 10,
         data: {
           width: 120,
           height: 60,
-          name: 'rightArrow',
+          name: "rightArrow",
         },
       },
       {
-        name: '双向箭头',
-        icon: 'l-twoway-arrow',
+        name: "双向箭头",
+        icon: "l-twoway-arrow",
         id: 11,
         data: {
           width: 150,
           height: 60,
-          name: 'twowayArrow',
+          name: "twowayArrow",
         },
       },
       {
-        name: '云',
-        icon: 'l-cloud',
+        name: "云",
+        icon: "l-cloud",
         id: 13,
         data: {
           width: 100,
           height: 100,
-          name: 'cloud',
+          name: "cloud",
         },
       },
       {
-        name: '消息框',
-        icon: 'l-msg',
+        name: "消息框",
+        icon: "l-msg",
         id: 14,
         data: {
           textTop: -0.1,
           width: 100,
           height: 100,
-          name: 'message',
+          name: "message",
         },
       },
       {
-        name: '文件',
-        icon: 'l-file',
+        name: "文件",
+        icon: "l-file",
         id: 15,
         data: {
           width: 80,
           height: 100,
-          name: 'file',
+          name: "file",
         },
       },
       {
-        name: '立方体',
-        icon: 'l-cube',
+        name: "立方体",
+        icon: "l-cube",
         id: 18,
         data: {
           width: 60,
           height: 100,
-          name: 'cube',
+          name: "cube",
           z: 0.25,
           props: {
             custom: [
               {
-                key: 'z',
-                label: 'Z',
-                type: 'number',
+                key: "z",
+                label: "Z",
+                type: "number",
                 min: 0,
-                placeholder: '<= 1 即宽度的比例',
+                placeholder: "<= 1 即宽度的比例",
               },
               {
-                key: 'backgroundFront',
-                label: '前背景色',
-                type: 'color',
+                key: "backgroundFront",
+                label: "前背景色",
+                type: "color",
               },
               {
-                key: 'backgroundUp',
-                label: '顶背景色',
-                type: 'color',
+                key: "backgroundUp",
+                label: "顶背景色",
+                type: "color",
               },
               {
-                key: 'backgroundRight',
-                label: '右背景色',
-                type: 'color',
+                key: "backgroundRight",
+                label: "右背景色",
+                type: "color",
               },
             ],
           },
         },
       },
       {
-        name: '人',
-        icon: 'l-people',
+        name: "人",
+        icon: "l-people",
         id: 19,
         data: {
           width: 70,
           height: 100,
-          name: 'people',
+          name: "people",
         },
       },
       {
-        name: '图片',
-        icon: 'l-picture',
+        name: "图片",
+        icon: "l-picture",
         id: 20,
         data: {
           width: 100,
           height: 100,
-          name: 'image',
-          image: '/favicon.ico',
+          name: "image",
+          image: "/favicon.ico",
           // crossOrigin: 'undefined', // 没啥用
         },
       },
     ],
   },
   {
-    name: '流程图',
-    show: true,
+    name: "流程图",
+    show: false,
     list: [
       {
-        name: '开始/结束',
-        icon: 'l-flow-start',
+        name: "开始/结束",
+        icon: "l-flow-start",
         id: 21,
         data: {
-          text: '开始/结束',
+          text: "开始/结束",
           width: 120,
           height: 40,
           borderRadius: 0.5,
-          name: 'rectangle',
+          name: "rectangle",
         },
       },
       {
-        name: '流程',
-        icon: 'l-rectangle',
+        name: "流程",
+        icon: "l-rectangle",
         id: 22,
         data: {
-          text: '流程',
+          text: "流程",
           width: 120,
           height: 40,
-          name: 'rectangle',
+          name: "rectangle",
         },
       },
       {
-        name: '判定',
-        icon: 'l-diamond',
+        name: "判定",
+        icon: "l-diamond",
         id: 23,
         data: {
-          text: '判定',
+          text: "判定",
           width: 120,
           height: 60,
-          name: 'diamond',
+          name: "diamond",
         },
       },
       {
-        name: '数据',
-        icon: 'l-flow-data',
+        name: "数据",
+        icon: "l-flow-data",
         id: 24,
         data: {
-          text: '数据',
+          text: "数据",
           width: 120,
           height: 50,
-          name: 'flowData',
+          name: "flowData",
           offsetX: 0.14,
         },
       },
       {
-        name: '准备',
-        icon: 'l-flow-ready',
+        name: "准备",
+        icon: "l-flow-ready",
         id: 25,
         data: {
-          text: '准备',
+          text: "准备",
           width: 120,
           height: 50,
-          name: 'hexagon',
+          name: "hexagon",
         },
       },
       {
-        name: '子流程',
-        icon: 'l-flow-subprocess',
+        name: "子流程",
+        icon: "l-flow-subprocess",
         id: 26,
         data: {
-          text: '子流程',
+          text: "子流程",
           width: 120,
           height: 50,
-          name: 'flowSubprocess',
+          name: "flowSubprocess",
         },
       },
       {
-        name: '数据库',
-        icon: 'l-db',
+        name: "数据库",
+        icon: "l-db",
         id: 27,
         data: {
-          text: '数据库',
+          text: "数据库",
           width: 80,
           height: 120,
-          name: 'flowDb',
+          name: "flowDb",
         },
       },
       {
-        name: '文档',
-        icon: 'l-flow-document',
+        name: "文档",
+        icon: "l-flow-document",
         id: 28,
         data: {
-          text: '文档',
+          text: "文档",
           width: 120,
           height: 100,
-          name: 'flowDocument',
+          name: "flowDocument",
         },
       },
       {
-        name: '内部存储',
-        icon: 'l-internal-storage',
+        name: "内部存储",
+        icon: "l-internal-storage",
         id: 29,
         data: {
-          text: '内部存储',
+          text: "内部存储",
           width: 120,
           height: 80,
-          name: 'flowInternalStorage',
+          name: "flowInternalStorage",
         },
       },
       {
-        name: '外部存储',
-        icon: 'l-extern-storage',
+        name: "外部存储",
+        icon: "l-extern-storage",
         id: 30,
         data: {
-          text: '外部存储',
+          text: "外部存储",
           width: 120,
           height: 80,
-          name: 'flowExternStorage',
+          name: "flowExternStorage",
         },
       },
       {
-        name: '队列',
-        icon: 'l-flow-queue',
+        name: "队列",
+        icon: "l-flow-queue",
         id: 31,
         data: {
-          text: '队列',
+          text: "队列",
           width: 100,
           height: 100,
-          name: 'flowQueue',
+          name: "flowQueue",
         },
       },
       {
-        name: '手动输入',
-        icon: 'l-flow-manually',
+        name: "手动输入",
+        icon: "l-flow-manually",
         id: 32,
         data: {
-          text: '手动输入',
+          text: "手动输入",
           width: 120,
           height: 80,
-          name: 'flowManually',
+          name: "flowManually",
         },
       },
       {
-        name: '展示',
-        icon: 'l-flow-display',
+        name: "展示",
+        icon: "l-flow-display",
         id: 33,
         data: {
-          text: '展示',
+          text: "展示",
           width: 120,
           height: 80,
-          name: 'flowDisplay',
+          name: "flowDisplay",
         },
       },
       {
-        name: '并行模式',
-        icon: 'l-flow-parallel',
+        name: "并行模式",
+        icon: "l-flow-parallel",
         id: 34,
         data: {
-          text: '并行模式',
+          text: "并行模式",
           width: 120,
           height: 50,
-          name: 'flowParallel',
+          name: "flowParallel",
         },
       },
       {
-        name: '注释',
-        icon: 'l-flow-comment',
+        name: "注释",
+        icon: "l-flow-comment",
         id: 35,
         data: {
-          text: '注释',
+          text: "注释",
           width: 100,
           height: 100,
-          name: 'flowComment',
+          name: "flowComment",
         },
       },
     ],
   },
   {
-    name: '活动图',
-    show: true,
+    name: "活动图",
+    show: false,
     list: [
       {
-        name: '开始',
-        icon: 'l-inital',
+        name: "开始",
+        icon: "l-inital",
         id: 36,
         data: {
-          text: '',
+          text: "",
           width: 30,
           height: 30,
-          name: 'circle',
-          background: '#555',
+          name: "circle",
+          background: "#555",
           lineWidth: 0,
         },
       },
       {
-        name: '结束',
-        icon: 'l-final',
+        name: "结束",
+        icon: "l-final",
         id: 37,
         data: {
           width: 30,
           height: 30,
-          name: 'activityFinal',
+          name: "activityFinal",
         },
       },
       {
-        name: '活动',
-        icon: 'l-action',
+        name: "活动",
+        icon: "l-action",
         id: 38,
         data: {
-          text: '活动',
+          text: "活动",
           width: 120,
           height: 50,
           borderRadius: 0.25,
-          name: 'rectangle',
+          name: "rectangle",
         },
       },
       {
-        name: '决策/合并',
-        icon: 'l-diamond',
+        name: "决策/合并",
+        icon: "l-diamond",
         id: 39,
         data: {
-          text: '决策/合并',
+          text: "决策/合并",
           width: 120,
           height: 50,
-          name: 'diamond',
+          name: "diamond",
         },
       },
       {
-        name: '垂直泳道',
-        icon: 'l-swimlane-v',
+        name: "垂直泳道",
+        icon: "l-swimlane-v",
         id: 40,
         data: {
-          text: '垂直泳道',
+          text: "垂直泳道",
           width: 200,
           height: 500,
-          name: 'swimlaneV',
-          textBaseline: 'top',
+          name: "swimlaneV",
+          textBaseline: "top",
           textTop: 20,
           // textHeight: ,
           lineTop: 0.08,
         },
       },
       {
-        name: '水平泳道',
-        icon: 'l-swimlane-h',
+        name: "水平泳道",
+        icon: "l-swimlane-h",
         id: 41,
         data: {
-          text: '水平泳道',
+          text: "水平泳道",
           width: 500,
           height: 200,
-          name: 'swimlaneH',
+          name: "swimlaneH",
           textWidth: 0.01,
           textLeft: 0.04,
-          textAlign: 'left',
+          textAlign: "left",
           lineLeft: 0.08,
         },
       },
       {
-        name: '垂直分岔/汇合',
-        icon: 'l-fork-v',
+        name: "垂直分岔/汇合",
+        icon: "l-fork-v",
         id: 42,
         data: {
-          text: '垂直分岔/汇合',
+          text: "垂直分岔/汇合",
           width: 10,
           height: 150,
-          name: 'forkV',
-          fillStyle: '#555',
-          strokeStyle: 'transparent',
+          name: "forkV",
+          fillStyle: "#555",
+          strokeStyle: "transparent",
         },
       },
       {
-        name: '水平分岔/汇合',
-        icon: 'l-fork',
+        name: "水平分岔/汇合",
+        icon: "l-fork",
         id: 43,
         data: {
-          text: '水平分岔/汇合',
+          text: "水平分岔/汇合",
           width: 150,
           height: 10,
-          name: 'forkH',
-          fillStyle: '#555',
-          strokeStyle: 'transparent',
+          name: "forkH",
+          fillStyle: "#555",
+          strokeStyle: "transparent",
         },
       },
     ],
   },
   {
-    name: '时序图和类图',
-    show: true,
+    name: "时序图和类图",
+    show: false,
     list: [
       {
-        name: '生命线',
-        icon: 'l-lifeline',
+        name: "生命线",
+        icon: "l-lifeline",
         id: 44,
         data: {
-          text: '生命线',
+          text: "生命线",
           width: 150,
           height: 400,
           textHeight: 50,
-          name: 'lifeline',
+          name: "lifeline",
         },
       },
       {
-        name: '激活',
-        icon: 'l-focus',
+        name: "激活",
+        icon: "l-focus",
         id: 45,
         data: {
-          text: '激活',
+          text: "激活",
           width: 12,
           height: 200,
-          name: 'sequenceFocus',
+          name: "sequenceFocus",
         },
       },
       {
-        name: '简单类',
-        icon: 'l-simple-class',
+        name: "简单类",
+        icon: "l-simple-class",
         id: 46,
         data: {
-          text: 'Topolgoy',
+          text: "Topolgoy",
           width: 270,
           height: 200,
           textHeight: 200,
-          name: 'simpleClass',
-          textAlign: 'center',
-          textBaseline: 'top',
+          name: "simpleClass",
+          textAlign: "center",
+          textBaseline: "top",
           textTop: 10,
           list: [
             {
-              text: '- name: string\n+ setName(name: string): void',
+              text: "- name: string\n+ setName(name: string): void",
             },
           ],
         },
       },
       {
-        name: '类',
-        icon: 'l-class',
+        name: "类",
+        icon: "l-class",
         id: 47,
         data: {
-          text: 'Topolgoy',
+          text: "Topolgoy",
           width: 270,
           height: 200,
           textHeight: 200,
-          name: 'interfaceClass',
-          textAlign: 'center',
-          textBaseline: 'top',
+          name: "interfaceClass",
+          textAlign: "center",
+          textBaseline: "top",
           textTop: 10,
           list: [
             {
-              text: '- name: string',
+              text: "- name: string",
             },
             {
-              text: '+ setName(name: string): void',
+              text: "+ setName(name: string): void",
             },
           ],
         },
@@ -587,113 +596,113 @@ const graphicGroups = [
     ],
   },
   {
-    name: '故障树',
-    show: true,
+    name: "故障树",
+    show: false,
     list: [
       {
-        name: '与门',
-        icon: 'l-ANDmen',
+        name: "与门",
+        icon: "l-ANDmen",
         data: {
-          name: 'andGate',
+          name: "andGate",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '基本事件',
-        icon: 'l-jibenshijian',
+        name: "基本事件",
+        icon: "l-jibenshijian",
         data: {
-          name: 'basicEvent',
+          name: "basicEvent",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '未展开事件',
-        icon: 'l-weizhankaishijian',
+        name: "未展开事件",
+        icon: "l-weizhankaishijian",
         data: {
-          name: 'unexpandedEvent',
+          name: "unexpandedEvent",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '优先AND门',
-        icon: 'l-youxianANDmen',
+        name: "优先AND门",
+        icon: "l-youxianANDmen",
         data: {
-          name: 'priorityAndGate',
+          name: "priorityAndGate",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '禁止门',
-        icon: 'l-jinzhimen',
+        name: "禁止门",
+        icon: "l-jinzhimen",
         data: {
-          name: 'forbiddenGate',
+          name: "forbiddenGate",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '事件',
-        icon: 'l-shijian',
+        name: "事件",
+        icon: "l-shijian",
         data: {
-          name: 'event',
+          name: "event",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '开关事件',
-        icon: 'l-kaiguanshijian',
+        name: "开关事件",
+        icon: "l-kaiguanshijian",
         data: {
-          name: 'switchEvent',
+          name: "switchEvent",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '条件事件',
-        icon: 'l-tiaojianshijian',
+        name: "条件事件",
+        icon: "l-tiaojianshijian",
         data: {
-          name: 'conditionalEvent',
+          name: "conditionalEvent",
           width: 150,
           height: 100,
         },
       },
       {
-        name: '转移符号',
-        icon: 'l-zhuanyifuhao',
+        name: "转移符号",
+        icon: "l-zhuanyifuhao",
         data: {
-          name: 'transferSymbol',
+          name: "transferSymbol",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '或门',
-        icon: 'l-ORmen',
+        name: "或门",
+        icon: "l-ORmen",
         data: {
-          name: 'orGate',
+          name: "orGate",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '异或门',
-        icon: 'l-yihuomen',
+        name: "异或门",
+        icon: "l-yihuomen",
         data: {
-          name: 'xorGate',
+          name: "xorGate",
           width: 100,
           height: 150,
         },
       },
       {
-        name: '表决门',
-        icon: 'l-biaojuemen',
+        name: "表决门",
+        icon: "l-biaojuemen",
         data: {
-          name: 'votingGate',
+          name: "votingGate",
           width: 100,
           height: 150,
         },
@@ -701,53 +710,124 @@ const graphicGroups = [
     ],
   },
   {
-    name: '脑图',
+    name: "脑图",
     show: true,
     list: [
       {
-        name: '主题',
-        icon: 'l-zhuti',
+        name: "主题",
+        icon: "l-zhuti",
         data: {
-          text: '主题',
+          text: "主题",
           width: 200,
           height: 50,
-          name: 'mindNode',
+          name: "mindNode",
           borderRadius: 0.5,
         },
       },
       {
-        name: '子主题',
-        icon: 'l-zizhuti',
+        name: "子主题",
+        icon: "l-zizhuti",
         data: {
-          text: '子主题',
+          text: "子主题",
           width: 160,
           height: 40,
-          name: 'mindLine',
+          name: "mindLine",
+        },
+      },
+    ],
+  },
+  {
+    name: "自定义",
+    show: true,
+    list: [
+      {
+        name: "常开",
+        icon: "svg/常开.svg",
+        data: {
+          text: "",
+          // width: 160,
+          // height: 40,
+          name: "image",
+          image: "svg/常开.svg",
+        },
+      },
+      {
+        name: "常闭",
+        icon: "svg/常闭.svg",
+        data: {
+          text: "",
+          // width: 160,
+          // height: 40,
+          name: "image",
+          image: "svg/常闭.svg",
+        },
+      },
+      {
+        name: "图框",
+        icon: "svg/图框.svg",
+        data: {
+          text: "",
+          // width: 160,
+          // height: 40,
+          name: "image",
+          image: "svg/图框.svg",
+        },
+      },
+      {
+        name: "指示灯",
+        icon: "svg/指示灯.svg",
+        data: {
+          text: "",
+          // width: 160,
+          // height: 40,
+          name: "image",
+          image: "svg/指示灯.svg",
         },
       },
     ],
   },
 ];
 
+const loadSvg = (svgUrl: string) => {
+  
+fetch(svgUrl).then((res) => {
+  const text = res.text();
+  // 解析 svg 文本
+  text.then((svgString) => {
+    // console.log("parseSvgStr: ", svgString);
+    parseSvgStr(svgString);
+  });
+});
+
+}
+
 const dragStart = (e: any, elem: any) => {
   if (!elem) {
     return;
   }
   e.stopPropagation();
+  if (elem.icon.endsWith("svg")) {
+    // 创建 svg 图元对象
+    loadSvg(elem.icon);
+    return
+  }
 
   // 拖拽事件
   if (e instanceof DragEvent) {
     // 设置拖拽数据
-    e.dataTransfer?.setData('Meta2d', JSON.stringify(elem.data));
+    e.dataTransfer?.setData("Meta2d", JSON.stringify(elem.data));
   } else {
     // 支持单击添加图元。平板模式
+    // 需要单击画布
     meta2d.canvas.addCaches = [elem.data];
   }
 };
+
+
 </script>
 <style lang="postcss" scoped>
 .graphics {
-  height: calc(100vh - 80px);
+  height: calc(100vh - 80px - 50px);
   overflow-y: auto;
   border-right: 1px solid var(--color-border);
   z-index: 2;
@@ -793,6 +873,11 @@ const dragStart = (e: any, elem: any) => {
         height: 28px;
         width: 100%;
         margin: auto;
+      }
+
+      .icon__image {
+        height: 28px;
+        width: 100%;
       }
     }
   }

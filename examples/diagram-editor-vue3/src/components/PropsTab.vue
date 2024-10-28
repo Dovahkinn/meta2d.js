@@ -22,10 +22,14 @@ const props = defineProps({
     tabs: {
         type: Array as () => Tab[],
         default: () => ([]),
+    },
+    defaultValue: {
+        type: Number,
+        default: 1,
     }
 })
 
-const activePanel = ref(1)
+const activePanel = ref(props.defaultValue)
 
 </script>
 <style lang="scss" scoped>

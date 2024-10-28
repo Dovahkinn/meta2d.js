@@ -134,6 +134,10 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
+
+    <a class="logo">
+      <span @click="customToolbarClick('svg')">导入 SVG</span>
+    </a>
   </div>
 
   <div class="app-header header__bottom">
@@ -289,7 +293,8 @@ import { Pen, PenType, deepClone } from "@meta2d/core";
 // @ts-ignore
 import FileSaver from "file-saver";
 import { MessagePlugin } from "tdesign-vue-next";
-import { loadElectricJson } from "../utils";
+import { loadElectricJson, readSVGFile, } from "../utils";
+import { parseSvgStr } from '../utils/svgParser'
 
 const emit = defineEmits(["view"]);
 
@@ -610,6 +615,13 @@ const onDelete = () => {
 };
 
 const customToolbarClick = (code?: string) => {
+  if (code == 'svg') {
+    readSVGFile((res: { data: string }) => {
+      parseSvgStr(res.data)
+    })
+    return
+  }
+
   meta2d.toggleAnchorMode();
   // TODO: 其他操作
 };
@@ -666,20 +678,6 @@ const onView = () => {
   emit("view", data);
 
   if (globalThis.$_meta2d_singleton) {
-    // 跳转到预览页面
-    // router
-    //   .push({
-    //     path: "/preview",
-    //     query: {
-    //       r: Date.now() + "",
-    //       id: data._id,
-    //     },
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-
-    // 新窗口打开
     // 新窗口打开预览页面
     window.open(`/preview?r=${Date.now()}&id=${data._id}`, "_blank");
   }

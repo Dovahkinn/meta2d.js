@@ -26,6 +26,7 @@ import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
 
+
 const props = defineProps({
   preview: {
     type: Boolean,

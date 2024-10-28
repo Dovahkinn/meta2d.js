@@ -226,3 +226,28 @@ export const readJSONFile = (callback: Function | null = null) => {
   };
   input.click();
 };
+
+
+export const readSVGFile = (callback: Function | null = null) => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.svg';
+  input.onchange = async () => {
+    if (!input.files || !input.files.length) return;
+    const file = input.files[0];
+    const { name, } = file;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = reader.result as string;
+        const eventObj = { fileName: name, data };
+        callback && callback(eventObj);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+};

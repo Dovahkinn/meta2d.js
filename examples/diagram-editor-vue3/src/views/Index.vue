@@ -3,9 +3,9 @@
     <Header v-bind="$attrs" @view="toView"/>
 
     <div class="designer">
-      <Graphics v-bind="$attrs" />
+      <GraphicsManager v-bind="$attrs" />
       <View v-bind="$attrs" @ready="ready" />
-      <Props uploadUrl="http://localhost:3000/api/action" v-bind="$attrs" />
+      <Props v-bind="$attrs" />
     </div>
   </div>
 </template>
@@ -13,9 +13,10 @@
 <script lang="ts" setup>
 import { onMounted, defineEmits, } from 'vue';
 import Header from '../components/Header.vue';
-import Graphics from '../components/Graphics.vue';
 import View from '../components/View.vue';
 import Props from '../components/Props.vue';
+import GraphicsManager from '../components/GraphicsManager.vue';
+
 
 let timer: any;
 
