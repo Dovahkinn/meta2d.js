@@ -1,6 +1,6 @@
 <template>
   <div class="app-header header__top">
-    <a class="logo" href="https://le5le.com" target="_blank">
+    <a class="logo" href="https://doc.le5le.com/document/119359590" target="_blank">
       <img src="/favicon.ico" />
       <span>Meta2D</span>
     </a>
@@ -136,7 +136,9 @@
     </t-dropdown>
 
     <a class="logo">
-      <span @click="customToolbarClick('svg')">导入 SVG</span>
+      <t-tooltip content="选择 .svg 文件导入，单击画布摆放到鼠标指针位置">
+        <span @click="customToolbarClick('svg')">导入 SVG</span>
+      </t-tooltip>
     </a>
   </div>
 
@@ -723,6 +725,7 @@ const selectPens = (type?: number | string) => {
     font-size: 14px;
     font-weight: 500;
     padding-left: 0;
+    cursor: pointer;
 
     img {
       height: 20px;
