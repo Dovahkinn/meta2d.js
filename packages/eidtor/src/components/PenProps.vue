@@ -516,7 +516,6 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch, computed, useAttrs, } from "vue";
 import { useSelection } from "../services/selections";
-import Structure from "./Structure.vue";
 
 const { selections } = useSelection();
 

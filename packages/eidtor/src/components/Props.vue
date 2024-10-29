@@ -51,6 +51,7 @@ const shouldRender = computed(() => {
     :deep(.t-tabs__content) {
       overflow: auto;
       height: calc(100% - 50px);
+
     }
   }
 }

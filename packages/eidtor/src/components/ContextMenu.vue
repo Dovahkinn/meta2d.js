@@ -18,6 +18,7 @@
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
 import { useSelection } from "../services/selections";
+import { useData } from '../services/useGraphics'
 
 const props = defineProps({
   x: {
@@ -44,6 +45,7 @@ const style = computed(() => {
 const emit = defineEmits(["hide"]);
 
 const { selections } = useSelection();
+const { saveComponent } = useData(true);
 
 const menuOptions = [
   {
@@ -137,7 +139,19 @@ const menuOptions = [
     show: () => {
         return selections.mode == 1 && selections.pen?.name == "combine"
     }
+  },
+
+  {
+    label: '保存为组件',
+    icon: 'save',
+    action: () => {
+      // console.log("save as component ", selections);
+      saveComponent(selections);
+      emit("hide", false);
+    },
   }
+
+
 ];
 </script>
 <style lang="postcss" scoped>

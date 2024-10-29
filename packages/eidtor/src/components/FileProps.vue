@@ -122,9 +122,8 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, useAttrs, } from "vue";
-import { lineCross, handleLineCross, clearLineCross } from "@meta2d/utils";
+import { lineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
-import Structure from "./Structure.vue";
 
 // 图纸数据
 const data = reactive<any>({

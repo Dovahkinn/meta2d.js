@@ -103,7 +103,6 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { useSelection } from "../services/selections";
-import Structure from "./Structure.vue";
 import PropsTab from "./PropsTab.vue";
 
 const tabs = [
