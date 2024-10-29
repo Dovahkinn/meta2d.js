@@ -773,17 +773,7 @@ const graphicGroups = [
           image: "svg/图框.svg",
         },
       },
-      {
-        name: "指示灯",
-        icon: "svg/指示灯.svg",
-        data: {
-          text: "",
-          // width: 160,
-          // height: 40,
-          name: "image",
-          image: "svg/指示灯.svg",
-        },
-      },
+     
     ],
   },
 ];

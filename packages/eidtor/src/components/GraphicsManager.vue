@@ -4,7 +4,67 @@
       <Graphics />
     </template>
 
-    <template #diagrams> diagrams </template>
+    <template #diagrams> 
+      <div class="panel__wrapper">
+        <t-button block variant="outline" @click="showAddFolder">
+          <t-icon name="add" slot="icon"></t-icon>
+          新建文件夹
+        </t-button>
+        <br />
+        <t-collapse defaultExpandAll>
+          <t-collapse-panel
+            v-for="item in myPensGroup"
+            :value="item.value"
+            :header="item.label"
+          >
+            <template #headerRightContent>
+
+              <t-tooltip content="新建图纸">
+                <t-button
+                  size="small"
+                  variant="outline"
+                  :style="{ marginLeft: '8px' }"
+                >
+                  <t-icon name="chart-add"></t-icon>
+                </t-button>
+              </t-tooltip>
+
+              <t-tooltip content="删除目录">
+                <t-button
+                  size="small"
+                  variant="outline"
+                  :style="{ marginLeft: '8px' }"
+                >
+                  <t-icon name="delete"></t-icon>
+                </t-button>
+              </t-tooltip>
+            </template>
+
+            <t-row :gutter="[10, 10]">
+              <t-col v-for="(v, index) in item.children" :key="index" :span="6">
+                <t-image
+                  src="https://tdesign.gtimg.com/demo/demo-image-1.png"
+                  overlayTrigger="hover"
+                  fit="cover"
+                  :style="{ width: '100px', height: '100px' }"
+                >
+                  <template #overlayContent>
+                    <t-button
+                      size="small"
+                      variant="outline"
+                      :style="{ float: 'right' }"
+                      @click="deleteMyPen(v)"
+                    >
+                      <t-icon name="delete"></t-icon>
+                    </t-button>
+                  </template>
+                </t-image>
+              </t-col>
+            </t-row>
+          </t-collapse-panel>
+        </t-collapse>
+      </div>  
+    </template>
 
     <template #my-pens>
       <div class="panel__wrapper">
@@ -109,7 +169,7 @@ const tabs = [
 
 const myPensGroup = reactive([
   {
-    label: "我的组件",
+    label: "我的目录",
     value: "1",
     folder: true,
     children: [
@@ -167,6 +227,8 @@ const close = () => {
 const deleteMyPen = (item: any) => {
   console.log("del: ", item);
 };
+
+
 </script>
 <style lang="postcss" scoped>
 .panel__wrapper {
