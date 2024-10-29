@@ -95,7 +95,7 @@
       </div>
     </template>
     <template #struct-props>
-      <structure />
+      <slot name="struct" :pen="pen"></slot>
     </template>
   </props-tab>
 </template>

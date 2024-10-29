@@ -42,14 +42,14 @@ export function svgPath(pen: Pen, ctx?: CanvasRenderingContext2D): Path2D {
     pen.calculative.worldRect.y - rect.y
   );
 
-  console.log('svg path: ', pathText, path);
+  // console.log('svg path: ', pathText, path);
   // ! 有 bug, 曲线转换后变形了
   const pathStr = pathToString(path);
   if (ctx) {
     (ctx as any).svgPath?.(pathStr);
     return;
   }
-  console.log('pathStr: ', pathStr);
+  // console.log('pathStr: ', pathStr);
   const path2D = new Path2D(pathStr);
   // TODO: 为何要闭合曲线
   // path2D.closePath();

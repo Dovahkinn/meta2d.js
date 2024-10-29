@@ -1,14 +1,21 @@
 <template>
-  <div class="app-props">
-    <FileProps v-if="selections.mode === SelectionMode.File" v-bind="$attrs" />
-    <PenProps
-      v-else-if="selections.mode === SelectionMode.Pen"
-      v-bind="$attrs"
-    />
-    <PensProps
-      v-else-if="selections.mode === SelectionMode.Pens"
-      v-bind="$attrs"
-    />
+  <div v-if="shouldRender" class="app-props">
+    <FileProps v-show="selections.mode === SelectionMode.File" key="file" v-bind="$attrs">
+      <template #struct>
+        <Structure v-bind="$attrs" />
+      </template>
+    </FileProps>
+    <PenProps v-show="selections.mode === SelectionMode.Pen" key="pen" v-bind="$attrs">
+      <template #struct>
+        <Structure v-bind="$attrs" />
+      </template>
+    </PenProps>
+
+    <PensProps v-show="selections.mode === SelectionMode.Pens" key="pens" v-bind="$attrs">
+      <template #struct>
+        <Structure v-bind="$attrs" />
+      </template>
+    </PensProps>
   </div>
 </template>
 
@@ -17,9 +24,18 @@ import FileProps from "./FileProps.vue";
 import PenProps from "./PenProps.vue";
 import PensProps from "./PensProps.vue";
 import { useSelection, SelectionMode } from "../services/selections";
-import { watch } from "vue";
+import { computed, watch } from "vue";
+import Structure from "./Structure.vue";
 
 const { selections } = useSelection();
+
+console.log("selections: ", selections);
+
+const shouldRender = computed(() => {
+  return [SelectionMode.File, SelectionMode.Pen, SelectionMode.Pens].includes(
+    selections.mode
+  );
+});
 </script>
 <style lang="postcss" scoped>
 .app-props {

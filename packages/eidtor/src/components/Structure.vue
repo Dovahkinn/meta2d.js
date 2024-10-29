@@ -4,52 +4,67 @@
     line
     expand-all
     :data="pensTree"
-    :keys="{ label: 'name', value: 'id' }"
+    :keys="{ label: 'name', value: 'id', children: 'list' }"
     :icon="icon"
     style="padding: 10px;"
-    @click="click"
+    
   >
     <template #label="{ node }">
-      <span> {{ node.label }} - {{ node.data.text || node.value }}</span>
+      <span @click="click(node)"> {{ node.label }} - {{ node.data.text || node.value }}</span>
     </template>
     <template #operations="{ node }">
       <div class="tdesign-demo-block-row">
         <t-icon
           :name="node.data.visible !== false ? 'browse' : 'browse-off'"
-          @click="toggleVisible(node)"
+          @click ="toggleVisible(node)"
         ></t-icon>
       </div>
     </template>
   </t-tree>
 </template>
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
+import { defineProps, computed, onMounted, ref, onUnmounted, } from "vue";
 import { Icon, TreeNodeModel } from "tdesign-vue-next";
 
 const props = defineProps({});
 
 // 获取画布组件
-const data = meta2d.data();
+let data = ref(meta2d.data());
 
 const pensTree = computed(() => {
-  const pens = data.pens;
-  return pens.filter((pen) => {
+  const pens = data.value.pens;
+  return pens.filter((pen: any) => {
     if (!pen.parentId) {
       if (pen.children) {
-        const children = [];
+        const children: any[] = [];
         pen.children.forEach((id: string) => {
           const child = pens.find((pen) => pen.id === id);
           if (child) {
             children.push(child);
           }
         });
-        pen.children = children;
+        pen.list = children;
       }
 
       return true;
     }
   });
 });
+
+const updateData = () => {
+  data.value = meta2d.data();
+}
+
+onMounted(() => {
+  meta2d.on('add', updateData)
+  meta2d.on('delete',updateData)
+})
+
+onUnmounted(() => {
+  meta2d.off('add', updateData)
+  meta2d.off('delete',updateData)
+})
+
 
 // console.log("pens: ", pensTree);
 const icon = (h: Function, node: TreeNodeModel) => {
@@ -74,9 +89,9 @@ const toggleVisible = (node: TreeNodeModel) => {
   });
 };
 
-const click = (context: { node: TreeNodeModel; e: MouseEvent }) => {
+const click = (node: TreeNodeModel) => {
   // console.log(context);
-  const pen = meta2d.findOne(context.node.data.id);
+  const pen = meta2d.findOne(node.data.id);
   if (pen) {
     meta2d.active([pen]);
     meta2d.render();

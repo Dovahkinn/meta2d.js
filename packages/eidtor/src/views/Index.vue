@@ -5,13 +5,13 @@
     <div class="designer">
       <GraphicsManager v-bind="$attrs" />
       <View v-bind="$attrs" @ready="ready" />
-      <Props v-bind="$attrs" />
+      <Props v-if="renderProps" v-bind="$attrs" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, defineEmits, } from 'vue';
+import { onMounted, defineEmits, ref } from 'vue';
 import Header from '../components/Header.vue';
 import View from '../components/View.vue';
 import Props from '../components/Props.vue';
@@ -36,8 +36,11 @@ const toView = (data: any) => {
   emit('view', data);
 }
 
+const renderProps = ref(false);
+
 const ready = (data: any) => {
   emit('ready', data);
+  renderProps.value = true;
 }
 
 onMounted(() => {

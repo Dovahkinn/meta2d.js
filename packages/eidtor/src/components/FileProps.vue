@@ -115,7 +115,7 @@
     </template>
 
     <template #struct-props>
-      <Structure />
+      <slot name="struct"></slot>
     </template>
   </PropsTab>
 </template>
@@ -191,7 +191,7 @@ const onChangeData = (prop?: string) => {
   Object.assign(meta2d.store.data, data);
   meta2d.store.patchFlagsBackground = true;
 
-  console.log("change data: ", data);
+  // console.log("change data: ", data);
   // options.grid = data.grid;
   // options.gridSize = data.gridSize;
 

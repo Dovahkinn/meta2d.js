@@ -507,7 +507,7 @@
 
     <!-- 结构 -->
     <t-tab-panel :value="3" label="结构">
-      <Structure :pen="pen" />
+      <slot name="struct" :pen="pen"></slot>
     </t-tab-panel>
     
   </t-tabs>
@@ -531,7 +531,7 @@ onMounted(() => {
 });
 
 const getPen = () => {
-  pen.value = selections.pen;
+  pen.value = selections.pen || {};
   if (pen.value.globalAlpha == undefined) {
     pen.value.globalAlpha = 1;
   }
@@ -596,7 +596,7 @@ const animate = (play: boolean = false) => {
 
 // 监听选中不同图元
 // @ts-ignore
-const watcher = watch(() => selections.pen.id, getPen);
+const watcher = watch(() => selections.pen?.id, getPen);
 
 const lineDashs = [undefined, [5, 5]];
 
