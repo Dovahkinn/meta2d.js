@@ -79,7 +79,7 @@
           <t-form-item label="背景图片">
             <t-upload
               ref="uploadRef"
-              v-model="imageFile"
+              v-model="uploadValue"
               :action="
                 $attrs.uploadUrl ||
                 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
@@ -88,7 +88,7 @@
               name="object"
               :sizeLimit="sizeLimit"
               theme="image"
-              tips="请选择单张小于5MB的图片上传"
+              tips="请选择单张小于1MB的图片上传"
               accept="image/*"
               @fail="handleFail"
               @success="handleSuccess"
@@ -124,6 +124,7 @@
 import { onMounted, reactive, ref, useAttrs, } from "vue";
 import { lineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
+import { useUpload } from "../services/useUpload";
 
 // 图纸数据
 const data = reactive<any>({
@@ -225,15 +226,8 @@ const onChangeOptions = () => {
 };
 
 const uploadRef = ref();
-const imageFile = ref([]);
-const sizeLimit = {
-  limit: 1024 * 5,
-  unit: "KB",
-};
-const attrs = useAttrs();
-const headers = {
-  Authorization: attrs.token
-};
+const { uploadValue, sizeLimit, headers,  } = useUpload()
+
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);

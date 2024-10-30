@@ -45,7 +45,7 @@ const style = computed(() => {
 const emit = defineEmits(["hide"]);
 
 const { selections } = useSelection();
-const { saveComponent } = useData(true);
+const { saveComponentShow } = useData(true);
 
 const menuOptions = [
   {
@@ -146,7 +146,7 @@ const menuOptions = [
     icon: 'save',
     action: () => {
       // console.log("save as component ", selections);
-      saveComponent(selections);
+      saveComponentShow(selections);
       emit("hide", false);
     },
   }

@@ -58,6 +58,7 @@ const updateData = () => {
 onMounted(() => {
   meta2d.on('add', updateData)
   meta2d.on('delete',updateData)
+  meta2d.on('clear', updateData)
 })
 
 onUnmounted(() => {

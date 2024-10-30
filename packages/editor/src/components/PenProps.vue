@@ -474,13 +474,13 @@
           <t-form-item label="图片上传" name="image">
             <t-upload
               ref="uploadRef"
-              v-model="imageFile"
+              v-model="uploadValue"
               :action="$attrs.uploadUrl || 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'"
               :headers="headers"
               name="object"
               :sizeLimit="sizeLimit"
               theme="image"
-              tips="请选择单张小于5MB的图片上传"
+              tips="请选择单张小于1MB的图片上传"
               accept="image/*"
               @fail="handleFail"
               @success="handleSuccess"
@@ -516,6 +516,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch, computed, useAttrs, } from "vue";
 import { useSelection } from "../services/selections";
+import { useUpload } from "../services/useUpload";
 
 const { selections } = useSelection();
 
@@ -638,11 +639,7 @@ onUnmounted(() => {
 
 // * 文件上传
 const uploadRef = ref();
-const imageFile = ref([]);
-const sizeLimit = {
-  limit: 1024 * 5,
-  unit: "KB",
-}
+const { uploadValue, sizeLimit, headers,  } = useUpload()
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
@@ -655,11 +652,6 @@ const handleSuccess = (context: any) => {
 const handleFail = (e: any) => {
   console.log("upload fail: ", e);
 }
-
-const attrs = useAttrs();
-const headers = {
-  Authorization: attrs.token
-};
 
 </script>
 <style lang="postcss" scoped>

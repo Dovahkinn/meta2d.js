@@ -801,7 +801,7 @@ const dragStart = (e: any, elem: any) => {
     loadSvg(elem.icon);
     return
   }
-
+  console.log("elem: ", elem);
   // 拖拽事件
   if (e instanceof DragEvent) {
     // 设置拖拽数据

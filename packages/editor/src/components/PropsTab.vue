@@ -1,5 +1,5 @@
 <template>
-    <t-tabs v-model:value="activePanel">
+    <t-tabs v-model:value="activePanel" @change="changeValue">
         <t-tab-panel v-for="(item, index) in tabs" :key="index" :value="item.value" :label="item.label">
             <slot :name="item.slot"></slot>
         </t-tab-panel>
@@ -30,6 +30,11 @@ const props = defineProps({
 })
 
 const activePanel = ref(props.defaultValue)
+
+const emit = defineEmits(['change'])
+const changeValue = (value: number) => {
+    emit('change', value)
+}
 
 </script>
 <style lang="scss" scoped>
