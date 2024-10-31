@@ -6,7 +6,8 @@
     "start": "vite",
     "build": "vue-tsc && vite build",
     "build:lib": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "rel": "pnpm publish --registry=http://10.0.0.170:4873/"
   },
   "files": [
     "dist"
