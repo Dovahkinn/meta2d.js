@@ -71,10 +71,12 @@ function getJsonString(data: any) {
 }
 
 export const useData = (useSingle?: boolean) => {
-  const myPensGroup = ref([]);
+  const blueprintList = ref([]);
+  const componentList = ref([]);
   const visible = ref(false);
   const folderName = ref('');
   const selectMode = ref(false);
+  const selectType = ref('');
   const apiManager = proxyApi();
   const fileName = ref(''); // 图纸名称或组件名称
   let tempData: any = null;
@@ -183,6 +185,7 @@ export const useData = (useSingle?: boolean) => {
     visible.value = true;
     tempData = data;
     tempCode = 'component';
+    selectType.value = tempCode;
   };
 
   const saveBlueprintShow = () => {
@@ -190,7 +193,7 @@ export const useData = (useSingle?: boolean) => {
     visible.value = true;
     tempData = meta2d.data();
     tempCode = 'paper';
-    console.log('xxxxxxxxxxxx', tempData);
+    selectType.value = tempCode;
   };
 
   const deleteFolder = (item: any, code: string) => {
@@ -201,10 +204,14 @@ export const useData = (useSingle?: boolean) => {
     });
   };
 
-  const getTree = (data: any) => {
-    return apiManager.getTree(data).then((res: any) => {
+  const getTree = (code: string) => {
+    return apiManager.getTree(code).then((res: any) => {
       if (Array.isArray(res.data)) {
-        myPensGroup.value = res.data;
+        if (code == 'paper') {
+          blueprintList.value = res.data;
+        } else {
+          componentList.value = res.data;
+        }
       }
     });
   };
@@ -212,7 +219,8 @@ export const useData = (useSingle?: boolean) => {
   if (useSingle && cache) return cache;
 
   return (cache = {
-    myPensGroup,
+    blueprintList,
+    componentList,
     saveComponentShow,
     showAddFolder,
     deleteMyPen,
@@ -221,6 +229,7 @@ export const useData = (useSingle?: boolean) => {
     confirm,
     close,
     selectMode,
+    selectType,
     deleteFolder,
     getTree,
     fileName,

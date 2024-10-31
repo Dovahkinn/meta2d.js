@@ -1,5 +1,5 @@
 <template>
-  <PropsTab :default-value="2" :tabs="tabs" @change="tabChange">
+  <PropsTab v-model="activeTab" :tabs="tabs" @change="tabChange">
     <template #graphics>
       <Graphics />
     </template>
@@ -11,9 +11,9 @@
           新建目录
         </t-button>
         <br />
-        <t-collapse v-if="myPensGroup.length" defaultExpandAll>
+        <t-collapse v-if="blueprintList.length" defaultExpandAll>
           <t-collapse-panel
-            v-for="item in myPensGroup"
+            v-for="item in blueprintList"
             :value="item.id"
             :header="item.dictName"
           >
@@ -97,9 +97,9 @@
           新建目录
         </t-button>
         <br />
-        <t-collapse v-if="myPensGroup.length" defaultExpandAll>
+        <t-collapse v-if="componentList.length" defaultExpandAll>
           <t-collapse-panel
-            v-for="item in myPensGroup"
+            v-for="item in componentList"
             :value="item.id"
             :header="item.dictName"
           >
@@ -243,9 +243,11 @@ const tabs = [
     code: "component",
   },
 ];
+const activeTab = ref(2);
 
 const {
-  myPensGroup,
+  blueprintList,
+  componentList,
   visible,
   folderName,
   showAddFolder,
@@ -253,6 +255,7 @@ const {
   confirm,
   close,
   selectMode,
+  selectType,
   deleteFolder,
   getTree,
   fileName,
@@ -268,7 +271,13 @@ const tabChange = (value: number) => {
 };
 
 const folderOptions = computed(() => {
-  return myPensGroup.value.map((item: any) => {
+  let list = [];
+  if (selectType.value == "paper") {
+    list = blueprintList.value;
+  } else {
+    list = componentList.value;
+  }
+  return list.map((item: any) => {
     return {
       label: item.dictName,
       value: item.id,
@@ -347,8 +356,6 @@ const addDiagram = (item: any) => {
 };
 
 const openDiagram = (item: any) => {
-  console.log("openDiagram: ", item);
-
   const p = NotifyPlugin("warning", {
     content: "系统可能不会保存您所做的更改，是否继续？",
     title: "提示",
