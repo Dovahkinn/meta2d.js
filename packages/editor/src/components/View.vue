@@ -1,10 +1,10 @@
 <template>
   <div id="meta2d" :class="{ 'is--preview': preview }"></div>
-  <ContextMenu v-bind="contextMenuParams" @hide="hideContextMenu"/>
+  <ContextMenu v-bind="contextMenuParams" @hide="hideContextMenu" />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, reactive, } from "vue";
+import { onMounted, onUnmounted, reactive } from "vue";
 import {
   Meta2d,
   Pen,
@@ -26,31 +26,31 @@ import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
 
-
 const props = defineProps({
   preview: {
     type: Boolean,
     default: false,
   },
-})
+  data: {
+    type: Object,
+  },
+});
 
-
-const { select, selections, } = useSelection();
+const { select, selections } = useSelection();
 
 const meta2dOptions: any = {
   rule: false,
-  drawingLineName: 'line',
-  rotateCursor: 'rotate.cur',
+  drawingLineName: "line",
+  rotateCursor: "rotate.cur",
 };
-
 
 const contextMenuParams = reactive({
   x: 0,
   y: 0,
   visible: false,
-})
+});
 const showContextMenu = (event: any) => {
-  if (selections.mode === 0) return
+  if (selections.mode === 0) return;
   contextMenuParams.x = event.e.clientX;
   contextMenuParams.y = event.e.clientY;
   contextMenuParams.visible = true;
@@ -59,7 +59,7 @@ const hideContextMenu = () => {
   contextMenuParams.visible = false;
 };
 
-const emit = defineEmits(['ready']);
+const emit = defineEmits(["ready"]);
 
 onMounted(() => {
   // 创建实例
@@ -86,8 +86,8 @@ onMounted(() => {
 
   // 读取本地存储
   let data: any = localStorage.getItem("meta2d");
-  if (data) {
-    data = JSON.parse(data);
+  if (props.data || data) {
+    data = props.data || JSON.parse(data);
 
     // 判断是否为运行查看，是-设置为预览模式
     if (location.pathname === "/preview" || props.preview) {
@@ -126,6 +126,5 @@ onUnmounted(() => {
   &.is--preview {
     height: 100%;
   }
-
 }
 </style>

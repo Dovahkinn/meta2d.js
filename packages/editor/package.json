@@ -1,7 +1,7 @@
 {
   "name": "@meta2d/diagram-editor-vue3",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.1",
   "scripts": {
     "start": "vite",
     "build": "vue-tsc && vite build",
@@ -11,9 +11,9 @@
   "files": [
     "dist"
   ],
-  "main": "./src/index.ts",
-  "main-": "./dist/diagram-editor-vue3.umd.js",
-  "module-": "./dist/diagram-editor-vue3.mjs",
+  "main-": "./src/index.ts",
+  "main": "./dist/diagram-editor-vue3.umd.js",
+  "module": "./dist/diagram-editor-vue3.mjs",
   "dependencies": {
     "@meta2d/activity-diagram": "workspace:*",
     "@meta2d/chart-diagram": "workspace:*",

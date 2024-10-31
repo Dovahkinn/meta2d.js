@@ -9,7 +9,7 @@ export interface IApiManager {
     // 删除组件
     deleteComponent(data: any): Promise<any>;
     // 查询 json
-    getMetaJson(data: any): Promise<any>;
+    // getMetaJson(data: any): Promise<any>;
     // 查询树
     getTree(data: any): Promise<any>;
 }
@@ -37,11 +37,11 @@ const apiManager: IApiManager = {
             
         })
     },
-    getMetaJson(data: any) {
-        return new Promise((resolve, reject) => {
+    // getMetaJson(data: any) {
+    //     return new Promise((resolve, reject) => {
             
-        })
-    },
+    //     })
+    // },
 
     getTree(data: any) {
         return new Promise((resolve, reject) => {

@@ -1,14 +1,18 @@
 <template>
   <div class="app-page is--preview">
-    <View v-bind="$attrs" preview @ready="emit('ready', $event)" />
+    <View v-bind="$attrs" preview :data="data" @ready="emit('ready', $event)" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineEmits } from 'vue';
-import View from '../components/View.vue';
-const emit = defineEmits(['ready']);
-
+import { defineEmits, defineProps } from "vue";
+import View from "../components/View.vue";
+const emit = defineEmits(["ready"]);
+const props = defineProps({
+  data: {
+    type: Object,
+  },
+});
 </script>
 
 <style lang="postcss" scoped>
