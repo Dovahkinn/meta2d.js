@@ -1,6 +1,10 @@
 <template>
   <div class="app-header header__top">
-    <a class="logo" href="https://doc.le5le.com/document/119359590" target="_blank">
+    <a
+      class="logo"
+      href="https://doc.le5le.com/document/119359590"
+      target="_blank"
+    >
       <img src="/favicon.ico" />
       <span>Meta2D</span>
     </a>
@@ -139,6 +143,9 @@
       <t-tooltip content="选择 .svg 文件导入，单击画布摆放到鼠标指针位置">
         <span @click="customToolbarClick('svg')">导入 SVG</span>
       </t-tooltip>
+    </a>
+    <a class="logo">
+      <span @click="customToolbarClick('save')">保存图纸</span>
     </a>
   </div>
 
@@ -295,8 +302,9 @@ import { Pen, PenType, deepClone } from "@meta2d/core";
 // @ts-ignore
 import FileSaver from "file-saver";
 import { MessagePlugin } from "tdesign-vue-next";
-import { loadElectricJson, readSVGFile, } from "../utils";
-import { parseSvgStr } from '../utils/svgParser'
+import { loadElectricJson, readSVGFile } from "../utils";
+import { parseSvgStr } from "../utils/svgParser";
+import { useData } from "../services/useGraphics.ts";
 
 const emit = defineEmits(["view"]);
 
@@ -436,7 +444,7 @@ const changeFromArrow = (value: string) => {
           },
           {
             render: false,
-          }
+          },
         );
       }
     });
@@ -460,7 +468,7 @@ const changeToArrow = (value: string) => {
           },
           {
             render: false,
-          }
+          },
         );
       }
     });
@@ -512,7 +520,7 @@ const downloadJson = () => {
     new Blob([JSON.stringify(data)], {
       type: "text/plain;charset=utf-8",
     }),
-    `${data.name || "le5le.meta2d"}.json`
+    `${data.name || "le5le.meta2d"}.json`,
   );
 };
 
@@ -564,7 +572,7 @@ const downloadSvg = () => {
     mySerializedSVG = mySerializedSVG.replace("{{bk}}", "");
     mySerializedSVG = mySerializedSVG.replace(
       "{{bkRect}}",
-      `<rect x="0" y="0" width="100%" height="100%" fill="${meta2d.store.data.background}"></rect>`
+      `<rect x="0" y="0" width="100%" height="100%" fill="${meta2d.store.data.background}"></rect>`,
     );
   } else {
     mySerializedSVG = mySerializedSVG.replace("{{bk}}", "");
@@ -580,7 +588,7 @@ const downloadSvg = () => {
   const a = document.createElement("a");
   a.setAttribute(
     "download",
-    `${(meta2d.store.data as any).name || "le5le.meta2d"}.svg`
+    `${(meta2d.store.data as any).name || "le5le.meta2d"}.svg`,
   );
   a.setAttribute("href", url);
   const evt = document.createEvent("MouseEvents");
@@ -616,12 +624,18 @@ const onDelete = () => {
   meta2d.delete();
 };
 
+const { saveBlueprintShow } = useData(true);
 const customToolbarClick = (code?: string) => {
-  if (code == 'svg') {
+  if (code == "svg") {
     readSVGFile((res: { data: string }) => {
-      parseSvgStr(res.data)
-    })
-    return
+      parseSvgStr(res.data);
+    });
+    return;
+  }
+  if (code == "save") {
+    // 保存图纸
+    saveBlueprintShow();
+    return;
   }
 
   meta2d.toggleAnchorMode();

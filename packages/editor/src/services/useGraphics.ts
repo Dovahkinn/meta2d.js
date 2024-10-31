@@ -16,8 +16,8 @@ function base64ToFile(base64, fileName) {
   }
   return new File([u8arr], fileName, { type: mime });
 }
-function activePenToPng(name: string) {
-  const blob = meta2d.activeToPng();
+function activePenToPng(name: string, paper?: boolean) {
+  const blob = paper ? meta2d.toPng() : meta2d.activeToPng();
   if (!name?.endsWith('.png')) {
     name += '.png';
   }
@@ -45,6 +45,7 @@ function getJsonString(data: any) {
   } else if (data.mode == 2) {
     // 多选
     // 创建一个组合
+    // TODO: pens 中不含 combine 的 children
     const pens = data.pens;
     meta2d.combine(pens);
     const newPen = meta2d.store.active?.[0];
@@ -91,18 +92,26 @@ export const useData = (useSingle?: boolean) => {
     visible.value = false;
     if (!folderName.value) return;
     if (selectMode.value) {
-      // 保存组件
-      const data = getJsonString(tempData);
+      let data;
+      if (tempCode != 'paper') {
+        // 保存组件
+        data = getJsonString(tempData);
+      } else {
+        data = JSON.stringify(tempData);
+      }
       // *: get png file
-      const png = activePenToPng(fileName.value || 'image.png');
+      const png = activePenToPng(
+        fileName.value || 'image.png',
+        tempCode == 'paper',
+      );
       const saveFn = (cover: string) =>
         apiManager
           .saveComponent({
             nodeId: folderName.value,
             data,
-            type: tempCode,
+            type: tempCode, // image, component, paper,
             name: fileName.value,
-            label: 'component',
+            label: tempCode == 'paper' ? 'paper' : 'component',
             cover,
           })
           .then((res: any) => {
@@ -176,6 +185,14 @@ export const useData = (useSingle?: boolean) => {
     tempCode = 'component';
   };
 
+  const saveBlueprintShow = () => {
+    selectMode.value = true;
+    visible.value = true;
+    tempData = meta2d.data();
+    tempCode = 'paper';
+    console.log('xxxxxxxxxxxx', tempData);
+  };
+
   const deleteFolder = (item: any, code: string) => {
     apiManager.deleteFolder(item.id).then((res: any) => {
       if (res?.code == 200) {
@@ -208,5 +225,6 @@ export const useData = (useSingle?: boolean) => {
     getTree,
     fileName,
     saveImageComponent,
+    saveBlueprintShow,
   });
 };

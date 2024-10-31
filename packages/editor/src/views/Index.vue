@@ -1,6 +1,6 @@
 <template>
   <div class="app-page">
-    <Header v-bind="$attrs" @view="toView"/>
+    <Header v-if="renderProps" v-bind="$attrs" @view="toView" />
 
     <div class="designer">
       <GraphicsManager v-bind="$attrs" />
@@ -11,12 +11,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, defineEmits, ref } from 'vue';
-import Header from '../components/Header.vue';
-import View from '../components/View.vue';
-import Props from '../components/Props.vue';
-import GraphicsManager from '../components/GraphicsManager.vue';
-
+import { onMounted, defineEmits, ref } from "vue";
+import Header from "../components/Header.vue";
+import View from "../components/View.vue";
+import Props from "../components/Props.vue";
+import GraphicsManager from "../components/GraphicsManager.vue";
 
 let timer: any;
 
@@ -26,33 +25,33 @@ function save() {
   }
   timer = setTimeout(() => {
     const data: any = meta2d.data();
-    localStorage.setItem('meta2d', JSON.stringify(data));
+    localStorage.setItem("meta2d", JSON.stringify(data));
     timer = undefined;
   }, 100);
 }
 
-const emit = defineEmits(['view', 'ready']);
+const emit = defineEmits(["view", "ready"]);
 const toView = (data: any) => {
-  emit('view', data);
-}
+  emit("view", data);
+};
 
 const renderProps = ref(false);
 
 const ready = (data: any) => {
-  emit('ready', data);
+  emit("ready", data);
   renderProps.value = true;
-}
+};
 
 onMounted(() => {
-  meta2d.on('scale', save);
-  meta2d.on('add', save);
-  meta2d.on('opened', save);
-  meta2d.on('undo', save);
-  meta2d.on('redo', save);
-  meta2d.on('add', save);
-  meta2d.on('delete', save);
-  meta2d.on('rotatePens', save);
-  meta2d.on('translatePens', save);
+  meta2d.on("scale", save);
+  meta2d.on("add", save);
+  meta2d.on("opened", save);
+  meta2d.on("undo", save);
+  meta2d.on("redo", save);
+  meta2d.on("add", save);
+  meta2d.on("delete", save);
+  meta2d.on("rotatePens", save);
+  meta2d.on("translatePens", save);
 });
 </script>
 

@@ -47,17 +47,17 @@
               </t-tooltip>
             </template>
 
-            <t-row v-if="item.children.length" :gutter="[10, 10]">
+            <t-row v-if="item.data.length" :gutter="[10, 10]">
               <t-col
-                v-for="(v, index) in item.children"
+                v-for="(v, index) in item.data"
                 :key="index"
                 :span="6"
                 @click="openDiagram(v)"
               >
-                <t-tooltip :content="v.name">
+                <t-tooltip content="单击打开图纸">
                   <t-image
-                    src="https://tdesign.gtimg.com/demo/demo-image-1.png"
                     overlayTrigger="hover"
+                    :src="v.cover"
                     fit="contain"
                     :style="{ width: '100px', height: '100px' }"
                   >
@@ -366,12 +366,18 @@ const openDiagram = (item: any) => {
             Button,
             {
               onClick: () => {
-                // TODO: 查询 json 并打开
-                meta2d.clear();
+                let json;
+                try {
+                  json = JSON.parse(item.data);
+                } catch (error) {
+                  console.log("open diagram error: ", error);
+                }
+                meta2d.open(json);
                 meta2d.emit("clear");
-
+                meta2d.fitView();
                 p.then((instance) => {
                   instance.close();
+                  meta2d.render(true);
                 });
               },
             },
