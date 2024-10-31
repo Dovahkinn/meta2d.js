@@ -1,8 +1,32 @@
 import { reactive, ref } from 'vue';
 import { proxyApi } from './apiManager';
 import { deepClone } from '@meta2d/core';
+import { useUpload } from './useUpload.ts';
 
 let cache: any = null;
+
+function base64ToFile(base64, fileName) {
+  let arr = base64.split(',');
+  let mime = arr[0].match(/:(.*\/*?);/)?.[1] || 'image/png';
+  let bstr = atob(arr[1]);
+  let n = bstr.length;
+  let u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], fileName, { type: mime });
+}
+function activePenToPng(name: string) {
+  const blob = meta2d.activeToPng();
+  if (!name?.endsWith('.png')) {
+    name += '.png';
+  }
+  // blob 转 formData
+  if (blob) {
+    const file = base64ToFile(blob, name);
+    return file;
+  }
+}
 
 function getJsonString(data: any) {
   console.log('getJsonString: ', data);
@@ -10,20 +34,20 @@ function getJsonString(data: any) {
   let pen;
   if (data.mode == 1) {
     // 单选
-    if (data.pen.name == "combine") {
+    if (data.pen.name == 'combine') {
       const children = data.pen.children.map((id: string) => {
-        return meta2d.findOne(id)
-      })
+        return meta2d.findOne(id);
+      });
       pen = [...children, data.pen];
-    } else {      
+    } else {
       pen = data.pen;
     }
   } else if (data.mode == 2) {
     // 多选
     // 创建一个组合
-    const pens = data.pens
+    const pens = data.pens;
     meta2d.combine(pens);
-    const newPen = meta2d.store.active?.[0]
+    const newPen = meta2d.store.active?.[0];
     pen = [...pens, newPen];
   }
 
@@ -33,7 +57,7 @@ function getJsonString(data: any) {
     if (Array.isArray(copy)) {
       copy.forEach((v: any) => {
         v.calculative = undefined;
-      })
+      });
     } else {
       copy.calculative = undefined;
     }
@@ -61,6 +85,7 @@ export const useData = (useSingle?: boolean) => {
     tempCode = code;
   };
 
+  const { uploadFileFn } = useUpload();
   const confirm = () => {
     console.log('confirm: ', folderName.value, tempData);
     visible.value = false;
@@ -68,19 +93,36 @@ export const useData = (useSingle?: boolean) => {
     if (selectMode.value) {
       // 保存组件
       const data = getJsonString(tempData);
-
-      apiManager
-        .saveComponent({
-          nodeId: folderName.value,
-          data,
-          type: tempCode,
-          name: fileName.value,
-        })
-        .then((res: any) => {
+      // *: get png file
+      const png = activePenToPng(fileName.value || 'image.png');
+      const saveFn = (cover: string) =>
+        apiManager
+          .saveComponent({
+            nodeId: folderName.value,
+            data,
+            type: tempCode,
+            name: fileName.value,
+            label: 'component',
+            cover,
+          })
+          .then((res: any) => {
+            if (res?.code == 200) {
+              getTree(tempCode);
+            }
+          });
+      console.log('png file: ', png);
+      if (png) {
+        uploadFileFn(png).then((res) => {
+          console.log('upload file: ', res);
           if (res?.code == 200) {
-            getTree(tempCode);
+            const cover = res.data.fileurl;
+            saveFn(cover);
           }
         });
+        return;
+      }
+      // png 不存在
+      saveFn();
     } else {
       // 新增目录
       apiManager
@@ -97,13 +139,14 @@ export const useData = (useSingle?: boolean) => {
   };
 
   const saveImageComponent = (folder: any, data: any) => {
-    // data.type = 'component'
     apiManager
       .saveComponent({
         nodeId: folder.id,
         data: JSON.stringify(data),
         type: 'component',
         name: data.fileName,
+        cover: data.image,
+        label: 'iamge',
       })
       .then((res: any) => {
         if (res?.code == 200) {

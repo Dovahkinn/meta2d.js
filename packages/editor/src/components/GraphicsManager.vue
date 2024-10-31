@@ -54,30 +54,32 @@
                 :span="6"
                 @click="openDiagram(v)"
               >
-                <t-image
-                  src="https://tdesign.gtimg.com/demo/demo-image-1.png"
-                  overlayTrigger="hover"
-                  fit="cover"
-                  :style="{ width: '100px', height: '100px' }"
-                >
-                  <template #overlayContent>
-                    <t-popconfirm
-                      theme="danger"
-                      content="操作后无法恢复, 确定要删除吗?"
-                      @confirm="deleteMyPen(v, 'paper')"
-                    >
-                      <t-button
-                        size="small"
-                        variant="outline"
+                <t-tooltip :content="v.name">
+                  <t-image
+                    src="https://tdesign.gtimg.com/demo/demo-image-1.png"
+                    overlayTrigger="hover"
+                    fit="contain"
+                    :style="{ width: '100px', height: '100px' }"
+                  >
+                    <template #overlayContent>
+                      <t-popconfirm
                         theme="danger"
-                        :style="{ float: 'right' }"
-                        @click.stop="() => null"
+                        content="操作后无法恢复, 确定要删除吗?"
+                        @confirm="deleteMyPen(v, 'paper')"
                       >
-                        <t-icon name="delete"></t-icon>
-                      </t-button>
-                    </t-popconfirm>
-                  </template>
-                </t-image>
+                        <t-button
+                          size="small"
+                          variant="outline"
+                          theme="danger"
+                          :style="{ float: 'right' }"
+                          @click.stop="() => null"
+                        >
+                          <t-icon name="delete"></t-icon>
+                        </t-button>
+                      </t-popconfirm>
+                    </template>
+                  </t-image>
+                </t-tooltip>
               </t-col>
             </t-row>
 
@@ -156,30 +158,32 @@
                 :draggable="true"
                 @dragstart="dragStart($event, v)"
               >
-                <t-image
-                  src="https://tdesign.gtimg.com/demo/demo-image-1.png"
-                  overlayTrigger="hover"
-                  fit="cover"
-                  :style="{ width: '100px', height: '100px' }"
-                >
-                  <template #overlayContent>
-                    <t-popconfirm
-                      theme="danger"
-                      content="操作后无法恢复, 确定要删除吗?"
-                      @confirm="deleteMyPen(v, 'component')"
-                    >
-                      <t-button
-                        size="small"
-                        variant="outline"
+                <t-tooltip :content="v.name">
+                  <t-image
+                    :src="v.cover"
+                    overlayTrigger="hover"
+                    fit="contain"
+                    :style="{ width: '100px', height: '100px' }"
+                  >
+                    <template #overlayContent>
+                      <t-popconfirm
                         theme="danger"
-                        :style="{ float: 'right' }"
-                        @click.stop="() => null"
+                        content="操作后无法恢复, 确定要删除吗?"
+                        @confirm="deleteMyPen(v, 'component')"
                       >
-                        <t-icon name="delete"></t-icon>
-                      </t-button>
-                    </t-popconfirm>
-                  </template>
-                </t-image>
+                        <t-button
+                          size="small"
+                          variant="outline"
+                          theme="danger"
+                          :style="{ float: 'right' }"
+                          @click.stop="() => null"
+                        >
+                          <t-icon name="delete"></t-icon>
+                        </t-button>
+                      </t-popconfirm>
+                    </template>
+                  </t-image>
+                </t-tooltip>
               </t-col>
             </t-row>
             <t-empty v-else></t-empty>
@@ -298,7 +302,6 @@ const handleSuccess = (context: any) => {
   }
 };
 
-
 /**
  * @description 我的组件，拖拽
  * @param e
@@ -312,16 +315,16 @@ const dragStart = async (e: any, elem: any) => {
   // console.log("dragStart elem: ", elem);
   let data;
   try {
-    if (typeof elem.data === 'string') {
+    if (typeof elem.data === "string") {
       data = JSON.parse(elem.data);
-    } else if (typeof elem.data === 'object') {
+    } else if (typeof elem.data === "object") {
       data = elem.data;
     }
   } catch (error) {
     console.log("dragStart error: ", error);
   }
 
-  if (!data) return
+  if (!data) return;
 
   // 拖拽事件
   if (e instanceof DragEvent) {
@@ -372,9 +375,9 @@ const openDiagram = (item: any) => {
                 });
               },
             },
-            "确定"
+            "确定",
           ),
-        ]
+        ],
       );
     },
   });
@@ -386,6 +389,9 @@ const openDiagram = (item: any) => {
 
   :deep(.t-button) .t-button__text {
     align-items: center;
+  }
+  .t-image__wrapper {
+    border: #eee 1px solid;
   }
 }
 </style>

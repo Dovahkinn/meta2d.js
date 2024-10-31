@@ -16,10 +16,31 @@ export const useUpload = () => {
     console.log('upload fail: ', e);
   };
 
+  const uploadFileFn = (file: File) => {
+    if (!attrs.uploadUrl) return Promise.reject('文件上传地址不存在！');
+    const formData = new FormData();
+    formData.append('object', file);
+    return fetch(attrs.uploadUrl, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        // console.log('res: ', res);
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return {
     uploadValue,
     sizeLimit,
     headers,
     handleFail,
+    uploadFileFn,
   };
 };
