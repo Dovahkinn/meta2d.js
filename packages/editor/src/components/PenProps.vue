@@ -386,88 +386,6 @@
         </t-form>
       </div>
     </t-tab-panel>
-    <t-tab-panel v-if="['line'].includes(pen.name)" :value="2" label="动效">
-      <div class="props-panel">
-        <t-form label-align="left">
-          <t-form-item label="动画效果" name="lineAnimateType">
-            <t-select
-              v-model="pen.lineAnimateType"
-              @change="changeValue('lineAnimateType')"
-            >
-              <t-option
-                v-for="item in animateTypeList"
-                :key="item.value"
-                :value="item.value"
-                :label="item.label"
-              ></t-option>
-            </t-select>
-          </t-form-item>
-          <t-form-item label="反向流动" name="reverse">
-            <t-switch
-              v-model="pen.animateReverse"
-              @change="changeValue('animateReverse')"
-            />
-          </t-form-item>
-          <t-form-item label="线宽" name="animateLineWidth">
-            <t-input-number
-              v-model="pen.animateLineWidth"
-              @change="changeValue('animateLineWidth')"
-            />
-          </t-form-item>
-
-          <t-form-item label="速度" name="animateSpan">
-            <t-input-number
-              v-model="pen.animateSpan"
-              :min="1"
-              :max="5"
-              @change="changeValue('animateSpan')"
-            />
-          </t-form-item>
-          <t-form-item label="颜色" name="color">
-            <t-color-picker
-              class="w-full"
-              v-model="pen.animateColor"
-              :show-primary-color-preview="false"
-              format="CSS"
-              :color-modes="['monochrome']"
-              @change="changeValue('animateColor')"
-            />
-          </t-form-item>
-          <!-- 动画发光 -->
-          <t-form-item label="动画发光" name="animateShadow">
-            <t-switch
-              v-model="pen.animateShadow"
-              @change="changeValue('animateShadow')"
-            />
-          </t-form-item>
-          <!-- 发光颜色 -->
-          <t-form-item label="发光颜色" name="animateShadowColor">
-            <t-color-picker
-              class="w-full"
-              v-model="pen.animateShadowColor"
-              :show-primary-color-preview="false"
-              format="CSS"
-              :color-modes="['monochrome']"
-              @change="changeValue('animateShadowColor')"
-            />
-          </t-form-item>
-
-          <t-form-item label="自动播放" name="autoPlay">
-            <t-switch
-              v-model="pen.autoPlay"
-              @change="changeValue('autoPlay')"
-            />
-          </t-form-item>
-
-          <t-divider />
-          <t-space>
-            <t-button @click="animate(true)">播放</t-button>
-            <t-button @click="animate()">停止</t-button>
-          </t-space>
-        </t-form>
-      </div>
-    </t-tab-panel>
-
     <t-tab-panel v-if="['image'].includes(pen.name)" :value="2" label="图片">
       <div class="props-panel">
         <t-form label-align="left">
@@ -475,7 +393,10 @@
             <t-upload
               ref="uploadRef"
               v-model="uploadValue"
-              :action="$attrs.uploadUrl || 'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'"
+              :action="
+                $attrs.uploadUrl ||
+                'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+              "
               :headers="headers"
               name="object"
               :sizeLimit="sizeLimit"
@@ -504,29 +425,129 @@
         </t-form>
       </div>
     </t-tab-panel>
+    <t-tab-panel :value="3" label="动效">
+      <div class="props-panel">
+        <t-form label-align="left">
+          <t-form-item label="动画效果" name="lineAnimateType">
+            <t-select
+              v-if="isLine"
+              v-model="pen.lineAnimateType"
+              @change="changeValue('lineAnimateType')"
+            >
+              <t-option
+                v-for="item in animateTypeList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"
+              ></t-option>
+            </t-select>
+
+            <t-select
+              v-else
+              v-model="pen.animateType"
+              @change="changeValue('animateType')"
+            >
+              <t-option
+                v-for="item in PenFrameOptions"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"
+              ></t-option>
+            </t-select>
+          </t-form-item>
+
+          <template v-if="isLine">
+            <t-form-item label="反向流动" name="reverse">
+              <t-switch
+                v-model="pen.animateReverse"
+                @change="changeValue('animateReverse')"
+              />
+            </t-form-item>
+            <t-form-item label="线宽" name="animateLineWidth">
+              <t-input-number
+                v-model="pen.animateLineWidth"
+                @change="changeValue('animateLineWidth')"
+              />
+            </t-form-item>
+
+            <t-form-item label="速度" name="animateSpan">
+              <t-input-number
+                v-model="pen.animateSpan"
+                :min="1"
+                :max="5"
+                @change="changeValue('animateSpan')"
+              />
+            </t-form-item>
+            <t-form-item label="颜色" name="color">
+              <t-color-picker
+                class="w-full"
+                v-model="pen.animateColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                @change="changeValue('animateColor')"
+              />
+            </t-form-item>
+            <t-form-item label="动画发光" name="animateShadow">
+              <t-switch
+                v-model="pen.animateShadow"
+                @change="changeValue('animateShadow')"
+              />
+            </t-form-item>
+            <t-form-item label="发光颜色" name="animateShadowColor">
+              <t-color-picker
+                class="w-full"
+                v-model="pen.animateShadowColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                @change="changeValue('animateShadowColor')"
+              />
+            </t-form-item>
+          </template>
+
+          <t-form-item label="自动播放" name="autoPlay">
+            <t-switch
+              v-model="pen.autoPlay"
+              @change="changeValue('autoPlay')"
+            />
+          </t-form-item>
+
+          <t-divider />
+          <t-space>
+            <t-button @click="animate(true)">播放</t-button>
+            <t-button @click="animate()">停止</t-button>
+          </t-space>
+        </t-form>
+      </div>
+    </t-tab-panel>
 
     <!-- 结构 -->
-    <t-tab-panel :value="3" label="结构">
+    <t-tab-panel :value="4" label="结构">
       <slot name="struct" :pen="pen"></slot>
     </t-tab-panel>
-    
   </t-tabs>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, computed, useAttrs, } from "vue";
+import { onMounted, onUnmounted, ref, watch, computed, useAttrs } from "vue";
 import { useSelection } from "../services/selections";
 import { useUpload } from "../services/useUpload";
+import { PenFrameOptions, PenFrames, } from "../utils/penFrames.ts";
 
 const { selections } = useSelection();
 
 const pen = ref<any>();
 // 位置数据。当前版本位置需要动态计算获取
 const rect = ref<any>();
-const activePanel = ref(1)
+const activePanel = ref(1);
+
+const isLine = computed(() => {
+  return pen.value?.name == "line";
+});
 
 onMounted(() => {
-  activePanel.value = 1
+  activePanel.value = 1;
   getPen();
 });
 
@@ -539,12 +560,11 @@ const getPen = () => {
   rect.value = meta2d.getPenRect(pen.value);
 
   if (activePanel.value == 2) {
-    // 非 图片 或 线
-    if (!['image', 'line'].includes(pen.value.name)) {
-      activePanel.value = 1
+    // 非 图片
+    if (!["image"].includes(pen.value.name)) {
+      activePanel.value = 1;
     }
   }
-
 };
 
 // 状态组合列表
@@ -584,7 +604,6 @@ const animateTypeList = computed(() => {
   ];
 });
 
-
 const animate = (play: boolean = false) => {
   console.log("animate: ", play, pen.value);
   if (play) {
@@ -605,6 +624,12 @@ const changeValue = (prop: string) => {
   v[prop] = pen.value[prop];
   if (prop === "dash") {
     v.lineDash = lineDashs[v[prop]];
+  }
+  if (prop == "animateType") {
+    // TODO: 补全动画帧
+    console.log("animate type: ", v);
+    const frames = PenFrames[v.animateType];
+    v.frames = frames;
   }
   meta2d.setValue(v, { render: true });
 };
@@ -636,23 +661,21 @@ onUnmounted(() => {
   watcher();
 });
 
-
 // * 文件上传
 const uploadRef = ref();
-const { uploadValue, sizeLimit, headers,  } = useUpload()
+const { uploadValue, sizeLimit, headers } = useUpload();
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
   if (context.response) {
     pen.value.image = context.response.url || context.response.data?.fileurl;
-    changeValue('image');
+    changeValue("image");
   }
-}
+};
 
 const handleFail = (e: any) => {
   console.log("upload fail: ", e);
-}
-
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {

@@ -1,13 +1,13 @@
 {
   "name": "@meta2d/diagram-editor-vue3",
-  "private": true,
+  "private": false,
   "version": "0.0.1",
   "scripts": {
     "start": "vite",
     "build": "vue-tsc && vite build",
     "build:lib": "vite build",
     "preview": "vite preview",
-    "rel": "pnpm publish --registry=http://10.0.0.170:4873/"
+    "rel": "pnpm publish --registry=http://10.0.0.170:4873/ --no-git-checks"
   },
   "files": [
     "dist"
