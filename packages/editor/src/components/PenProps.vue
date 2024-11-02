@@ -456,6 +456,18 @@
             </t-select>
           </t-form-item>
 
+          <t-form-item
+            v-if="pen.animateType == 'x-custom'"
+            label="自定义动画帧"
+          >
+            <t-button
+              variant="text"
+              theme="primary"
+              @click="showFramesDrawer"
+              >编辑</t-button
+            >
+          </t-form-item>
+
           <template v-if="isLine">
             <t-form-item label="反向流动" name="reverse">
               <t-switch
@@ -522,18 +534,43 @@
       </div>
     </t-tab-panel>
 
-    <!-- 结构 -->
     <t-tab-panel :value="4" label="结构">
       <slot name="struct" :pen="pen"></slot>
     </t-tab-panel>
   </t-tabs>
+
+  <t-drawer
+    v-model:visible="drawerVisible"
+    header="自定义动画帧"
+    size="20%"
+    :onConfirm="addFrames"
+  >
+    <t-button block theme="primary" @click="insertFrame">新增动画帧</t-button>
+    <t-collapse class="meta-collapse">
+      <t-collapse-panel v-for="item in customFrames" header="动画帧">
+        <prop-editor :data="item"></prop-editor>
+        <template #headerRightContent>
+          <t-button
+            size="small"
+            variant="outline"
+            theme="danger"
+            :style="{ marginLeft: '8px' }"
+          >
+            <t-icon name="delete"></t-icon>
+          </t-button>
+        </template>
+      </t-collapse-panel>
+    </t-collapse>
+  </t-drawer>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, computed, useAttrs } from "vue";
+import { onMounted, onUnmounted, ref, watch, computed, useAttrs, nextTick, } from "vue";
 import { useSelection } from "../services/selections";
 import { useUpload } from "../services/useUpload";
-import { PenFrameOptions, PenFrames, } from "../utils/penFrames.ts";
+import { PenFrameOptions, PenFrames } from "../utils/penFrames.ts";
+import PropEditor from "./PropEditor.vue";
+import { deepClone } from '@meta2d/core';
 
 const { selections } = useSelection();
 
@@ -611,6 +648,31 @@ const animate = (play: boolean = false) => {
   } else {
     meta2d.stopAnimate(pen.value.id);
   }
+};
+
+// * 自定义动画帧
+const drawerVisible = ref(false);
+const customFrames = ref([]);
+
+const showFramesDrawer = () => {
+  customFrames.value = deepClone(pen.value.frames || [])
+  drawerVisible.value = true;
+}
+const addFrames = () => {
+  // TODO: 动画帧数组
+  console.log("custom frames: ", customFrames.value);
+  pen.value.frames = deepClone(customFrames.value)
+  drawerVisible.value = false;
+  nextTick(() => {
+  customFrames.value = []
+  })
+};
+
+const insertFrame = () => {
+  customFrames.value.push({
+    duration: 100,
+    globalAlpha: 1,
+  })
 };
 
 // 监听选中不同图元

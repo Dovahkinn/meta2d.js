@@ -228,12 +228,15 @@ a.hover:hover {
 
 .flex {
   display: flex;
+
   &.column {
     flex-direction: column;
   }
+
   &.middle {
     align-items: center;
   }
+
   &.center {
     justify-content: center;
   }
@@ -431,4 +434,12 @@ a.hover:hover {
 
 ::-webkit-scrollbar-track {
   background-color: transparent !important;
+}
+
+
+.t-collapse.meta-collapse {
+  .t-collapse-panel__wrapper .t-collapse-panel__content {
+    padding-left: 16px;
+  }
+
 }

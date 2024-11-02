@@ -120,10 +120,15 @@ export const PenFrameOptions = [
   {
     label: '进度',
     value: 'processFrames',
-  }
+  },
 
-  // 错误
+  {
+    label: '自定义',
+    value: 'x-custom',
+  },
+
 ];
+
 
 export const PenFrames = {
   moveXFrames,

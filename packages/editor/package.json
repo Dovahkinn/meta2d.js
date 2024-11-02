@@ -28,6 +28,8 @@
     "@meta2d/svg": "workspace:*",
     "@meta2d/utils": "workspace:*",
     "file-saver": "^2.0.5",
+    "sass": "^1.80.6",
+    "sass-loader": "^16.0.3",
     "tdesign-vue-next": "^1.3.10",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"

@@ -36,6 +36,8 @@ const shouldRender = computed(() => {
     selections.mode
   );
 });
+
+
 </script>
 <style lang="postcss" scoped>
 .app-props {
