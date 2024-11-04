@@ -106,7 +106,7 @@ export const useData = (useSingle?: boolean) => {
         fileName.value || 'image.png',
         tempCode == 'paper',
       );
-      const saveFn = (cover: string) =>
+      const saveFn = (cover?: string) =>
         apiManager
           .saveComponent({
             nodeId: folderName.value,

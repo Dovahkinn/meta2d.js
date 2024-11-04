@@ -148,6 +148,16 @@
                   </t-button>
                 </t-popconfirm>
               </t-tooltip>
+              <t-tooltip content="公开目录下的所有组件">
+                  <t-button
+                    size="small"
+                    variant="outline"
+                    theme="primary"
+                    :style="{ marginLeft: '8px' }"
+                  >
+                    <t-icon name="folder-shared"></t-icon>
+                  </t-button>
+              </t-tooltip>
             </template>
 
             <t-row v-if="item.data.length" :gutter="[10, 10]">
@@ -166,6 +176,7 @@
                     :style="{ width: '100px', height: '100px' }"
                   >
                     <template #overlayContent>
+                      
                       <t-popconfirm
                         theme="danger"
                         content="操作后无法恢复, 确定要删除吗?"
@@ -181,6 +192,20 @@
                           <t-icon name="delete"></t-icon>
                         </t-button>
                       </t-popconfirm>
+                      <t-tooltip
+                        content="公开组件给所有人"
+                        @confirm="deleteMyPen(v, 'component')"
+                      >
+                        <t-button
+                          size="small"
+                          variant="outline"
+                          theme="primary"
+                          :style="{ float: 'right', marginRight: '4px' }"
+                          @click.stop="shareMyPen(v)"
+                        >
+                          <t-icon name="share"></t-icon>
+                        </t-button>
+                      </t-tooltip>
                     </template>
                   </t-image>
                 </t-tooltip>
@@ -395,6 +420,12 @@ const openDiagram = (item: any) => {
     },
   });
 };
+
+
+const shareMyPen = (item: any) => {
+  console.log("shareMyPen: ", item);
+  
+}
 </script>
 <style lang="postcss" scoped>
 .panel__wrapper {

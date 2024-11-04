@@ -797,7 +797,7 @@ const copyId = () => {
     // 提示
     MessagePlugin.success({content: "复制成功"})
   })
-};
+}
 
 
 </script>

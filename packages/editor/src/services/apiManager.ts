@@ -45,7 +45,15 @@ const apiManager: IApiManager = {
 
     getTree(data: any) {
         return new Promise((resolve, reject) => {
-            
+            resolve({
+                code: 200,
+                data: [{
+                    dictName: '文件夹1',
+                    data: [{
+                        cover: '',
+                    }]
+                }],
+            })
         })
     }
 
