@@ -1,17 +1,17 @@
 <template>
   <div v-if="shouldRender" class="app-props">
-    <FileProps v-show="selections.mode === SelectionMode.File" key="file" v-bind="$attrs">
+    <FileProps v-show="selections.mode === SelectionMode.File" key="file" class="props__file" v-bind="$attrs">
       <template #struct>
         <Structure v-bind="$attrs" />
       </template>
     </FileProps>
-    <PenProps v-show="selections.mode === SelectionMode.Pen" key="pen" v-bind="$attrs">
+    <PenProps v-show="selections.mode === SelectionMode.Pen" key="pen" class="props__pen" v-bind="$attrs">
       <template #struct>
         <Structure v-bind="$attrs" />
       </template>
     </PenProps>
 
-    <PensProps v-show="selections.mode === SelectionMode.Pens" key="pens" v-bind="$attrs">
+    <PensProps v-show="selections.mode === SelectionMode.Pens" key="pens" class="props__pens" v-bind="$attrs">
       <template #struct>
         <Structure v-bind="$attrs" />
       </template>

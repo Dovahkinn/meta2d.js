@@ -28,7 +28,7 @@ const asymmetries = [
   "Knob_SelfLock",
 ];
 
-function patchPosition(pen: Pen, config, item) {
+function patchPosition(pen: Pen, config: any, item: any) {
   if (asymmetries.includes(config?.['元件类型'])) {
     pen.y -= pen.height / 2;
     pen.x -= pen.width / 2;
@@ -251,3 +251,32 @@ export const readSVGFile = (callback: Function | null = null) => {
   };
   input.click();
 };
+
+
+// 复制文本
+export function copyToClipboard(text: string) {
+  if (navigator.clipboard && window.isSecureContext) {
+    // 使用现代API
+    return navigator.clipboard.writeText(text).then(() => {
+      return true;
+    }).catch(err => {
+      console.error('复制失败：', err);
+    });
+  } else {
+    // 兼容旧版方法
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+
+    const successful = document.execCommand('copy');
+    document.body.removeChild(el);
+    return new Promise((resolve, reject) => {
+      if (successful) {
+        resolve(true);
+      } else {
+        reject(false);
+      }
+    })
+  }
+}
