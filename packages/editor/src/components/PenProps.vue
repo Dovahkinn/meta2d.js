@@ -460,10 +460,7 @@
             v-if="pen.animateType == 'x-custom'"
             label="自定义动画帧"
           >
-            <t-button
-              variant="text"
-              theme="primary"
-              @click="showFramesDrawer"
+            <t-button variant="text" theme="primary" @click="showFramesDrawer"
               >编辑</t-button
             >
           </t-form-item>
@@ -546,7 +543,7 @@
     :onConfirm="addFrames"
   >
     <t-button block theme="primary" @click="insertFrame">新增动画帧</t-button>
-    <t-collapse class="meta-collapse">
+    <t-collapse class="meta-collapse" expand-mutex>
       <t-collapse-panel v-for="item in customFrames" header="动画帧">
         <prop-editor :data="item"></prop-editor>
         <template #headerRightContent>
@@ -555,6 +552,7 @@
             variant="outline"
             theme="danger"
             :style="{ marginLeft: '8px' }"
+            @click="deleteFrame(item)"
           >
             <t-icon name="delete"></t-icon>
           </t-button>
@@ -565,12 +563,20 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, computed, useAttrs, nextTick, } from "vue";
+import {
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  computed,
+  useAttrs,
+  nextTick,
+} from "vue";
 import { useSelection } from "../services/selections";
 import { useUpload } from "../services/useUpload";
 import { PenFrameOptions, PenFrames } from "../utils/penFrames.ts";
 import PropEditor from "./PropEditor.vue";
-import { deepClone } from '@meta2d/core';
+import { deepClone } from "@meta2d/core";
 
 const { selections } = useSelection();
 
@@ -655,25 +661,32 @@ const drawerVisible = ref(false);
 const customFrames = ref([]);
 
 const showFramesDrawer = () => {
-  customFrames.value = deepClone(pen.value.frames || [])
+  customFrames.value = deepClone(pen.value.frames || []);
   drawerVisible.value = true;
-}
+};
 const addFrames = () => {
   // TODO: 动画帧数组
   console.log("custom frames: ", customFrames.value);
-  pen.value.frames = deepClone(customFrames.value)
+  pen.value.frames = deepClone(customFrames.value);
   drawerVisible.value = false;
   nextTick(() => {
-  customFrames.value = []
-  })
+    customFrames.value = [];
+  });
 };
 
 const insertFrame = () => {
   customFrames.value.push({
     duration: 100,
     globalAlpha: 1,
-  })
+  });
 };
+
+const deleteFrame = (frame: PenFrameOptions) => {
+  const index = customFrames.value.indexOf(frame);
+  if (index > -1) {
+    customFrames.value.splice(index, 1);
+  }
+}
 
 // 监听选中不同图元
 // @ts-ignore
