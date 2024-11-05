@@ -117,6 +117,20 @@
     <template #struct-props>
       <slot name="struct"></slot>
     </template>
+
+    <template #comm-props>
+      <div class="props-panel">
+        <t-form :data="data" label-align="left" size="small">
+          <t-form-item label="地址" name="wsUrl">
+            <t-input v-model="data.wsUrl" clearable placeholder="ws:// 开头，不符合则不保存" @blur="changeConnectProp('wsUrl')" />
+          </t-form-item>
+          <t-form-item label="消息名称" name="busName">
+            <t-input v-model="data.busName" clearable @change="changeConnectProp('busName')" />
+          </t-form-item>
+         
+        </t-form>
+      </div>
+    </template>
   </PropsTab>
 </template>
 
@@ -154,10 +168,11 @@ const tabs = [
     value: 2,
     slot: "struct-props",
   },
-  // {
-  //   label: "通信",
-  //   value: 3,
-  // }
+  {
+    label: "通信",
+    value: 3,
+    slot: "comm-props",
+  }
 ];
 
 onMounted(() => {
@@ -191,10 +206,6 @@ const onChangeData = (prop?: string) => {
   Object.assign(meta2d.store.data, data);
   meta2d.store.patchFlagsBackground = true;
 
-  // console.log("change data: ", data);
-  // options.grid = data.grid;
-  // options.gridSize = data.gridSize;
-
   meta2d.setGrid({
     grid: data.grid,
     gridSize: data.gridSize,
@@ -213,17 +224,6 @@ const onChangeData = (prop?: string) => {
   meta2d.render();
 };
 
-/**
- * @description 修改网格等属性需要执行，否则不会即时渲染
- * @deprecated
- */
-const onChangeOptions = () => {
-  console.log("onChangeOptions ", options);
-  meta2d.setOptions(options);
-  meta2d.store.patchFlagsTop = true;
-  meta2d.store.patchFlagsBackground = true;
-  meta2d.render();
-};
 
 const uploadRef = ref();
 const { uploadValue, sizeLimit, headers,  } = useUpload()
@@ -240,6 +240,16 @@ const handleSuccess = (context: any) => {
 const handleFail = (e: any) => {
   console.log("upload fail: ", e);
 };
+
+const changeConnectProp = (prop: string) => {
+  const value = data[prop];
+  if (prop == "wsUrl") {
+    if (!value?.startsWith("ws://")) {
+      data[prop] = "";
+      return;
+    }
+  }
+}
 </script>
 <style lang="postcss" scoped>
 .props-panel {

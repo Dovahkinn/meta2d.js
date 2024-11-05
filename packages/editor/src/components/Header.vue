@@ -695,7 +695,7 @@ const onView = () => {
 
   if (globalThis.$_meta2d_singleton) {
     // 新窗口打开预览页面
-    window.open(`/preview?r=${Date.now()}&id=${data._id}`, "_blank");
+    window.open(`/preview?r=${Date.now()}&id=${data._id || ''}`, "_blank");
   }
 };
 

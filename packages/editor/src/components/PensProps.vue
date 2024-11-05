@@ -97,6 +97,7 @@
     <template #struct-props>
       <slot name="struct" :pen="pen"></slot>
     </template>
+
   </props-tab>
 </template>
 
@@ -116,6 +117,7 @@ const tabs = [
     value: 2,
     slot: "struct-props",
   },
+
 ];
 
 const { selections } = useSelection();

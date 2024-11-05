@@ -551,6 +551,7 @@
             <t-form-item label="描述" name="description">
               <t-input
                 v-model="pen.description"
+                maxlength="50"
                 clearable
                 @change="changeValue('description')"
               />
@@ -560,7 +561,7 @@
                 v-model="pen.tags"
                 clearable
                 placeholder="按回车添加标签，最多10个"
-                :maxlength="10"
+                :max="10"
                 @change="changeValue('tags')"
               />
             </t-form-item>
