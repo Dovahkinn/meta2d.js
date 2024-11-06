@@ -26,7 +26,7 @@ export class WebSocketClient {
   // 重连间隔
   private reconnectInterval = 3000;
   private wsOptions = null;
-
+  private enableLog = true;
   private _subscribeTasks: any[] = [];
 
   private constructor(url: string, options: any = {}) {
@@ -36,6 +36,7 @@ export class WebSocketClient {
     this.maxReconnectTimes = options.maxReconnectTimes || 30;
     this.reconnectInterval = options.reconnectInterval || 3000;
     this.wsOptions = options;
+    this.enableLog = options.enableLog;
   }
 
   // 获取 WebSocketClient 单例实例
@@ -51,9 +52,14 @@ export class WebSocketClient {
     return WebSocketClient.instance;
   }
 
+  
+
   // 1. 初始化 WebSocket 连接并处理事件
   connect() {
-    if (this.isConnected) return; // 避免重复连接
+    if (this.isConnected) {
+      this.wsOptions.onReady && this.wsOptions.onReady();
+      return;
+    }; // 避免重复连接
 
     this.ws = new WebSocket(this.url);
     this.ws.onopen = () => {
@@ -67,6 +73,7 @@ export class WebSocketClient {
         task();
       });
       this._subscribeTasks = [];
+      this.wsOptions.onReady && this.wsOptions.onReady();
     };
 
     this.ws.onmessage = (event) => {
@@ -118,7 +125,9 @@ export class WebSocketClient {
   // 2. 处理 WebSocket 消息
   private handleMessage(message: string) {
     const parsedMessage = JSON.parse(message);
-    console.log('Received message:', parsedMessage);
+    if (this.enableLog) {
+      console.log('Received message:', parsedMessage);
+    }
     const { interMsgType, data } = parsedMessage;
 
     // 处理心跳反馈消息

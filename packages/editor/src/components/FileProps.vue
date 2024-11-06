@@ -136,6 +136,16 @@
               @change="changeConnectProp('busName')"
             />
           </t-form-item>
+
+          <t-form-item label="消息类型" name="msgTypes">
+            <t-tag-input
+              v-model="data.msgTypes"
+              clearable
+              placeholder="消息类型, 数字"
+              @change="changeConnectProp('msgTypes')"
+            />
+          </t-form-item>
+
           <t-divider />
           <t-space>
             <t-button @click="testConnect">测试连接</t-button>
@@ -152,6 +162,7 @@ import { lineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
 import { useUpload } from "../services/useUpload";
 import { WebSocketClient } from "@qs/websocket-client";
+import { NotifyPlugin } from "tdesign-vue-next";
 
 // 图纸数据
 const data = reactive<any>({
@@ -161,6 +172,14 @@ const data = reactive<any>({
   lineCross: false,
   wsUrl: "",
   busName: "",
+  msgTypes: [],
+  backgroundImage: "",
+  grid: false,
+  gridSize: 10,
+  gridRotate: undefined,
+  gridColor: undefined,
+  rule: true,
+  ruleColor: undefined,
 });
 
 // 画布选项
@@ -206,6 +225,7 @@ onMounted(() => {
   data.bkImage = d.bkImage;
   data.wsUrl = d.wsUrl;
   data.busName = d.busName;
+  data.msgTypes = d.msgTypes || [];
   Object.assign(options, meta2d.getOptions());
 });
 
@@ -267,24 +287,29 @@ const changeConnectProp = (prop: string) => {
 };
 
 const testConnect = () => {
-  console.log("testConnect:", data.wsUrl, data.busName);
-  // TODO: websocket
+  const msgTypes = data.msgTypes
+    .map((item: string) => {
+      return Number(item);
+    })
+    .filter((item: number) => {
+      return !isNaN(item);
+    });
+
   const wsClient = WebSocketClient.getInstance(data.wsUrl, {
-    busName: "bus-test",
-    msgTypes: [1, 3],
+    busName: data.busName,
+    msgTypes,
+    enableLog: false,
+    onReady: () => {
+      // 绿色文字提示
+      console.log("%c连接成功！", "color: green; font-weight: bold;");
+      NotifyPlugin.success({
+        title: "连接成功！",
+      });
+    },
   });
   wsClient.connect();
-  console.log("ws client: ", wsClient);
-  wsClient.subscribe("bus-test", 1001, (data) => {
-    console.log("1111111", data);
-  });
-
-  setTimeout(() => {
-    wsClient.sendMessage("", 1001, {
-      hello: "121323",
-      test: "xxxx",
-    });
-  }, 10e3);
+  // console.log("ws client: ", wsClient);
+  // wsClient.subscribe(data.busName, msgTypes, (data) => {});
 };
 </script>
 <style lang="postcss" scoped>

@@ -25,6 +25,7 @@ import { chartsPens } from "@meta2d/le5le-charts";
 import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
+import { WebSocketClient } from "@qs/websocket-client";
 
 const props = defineProps({
   preview: {
@@ -92,6 +93,23 @@ onMounted(() => {
     // 判断是否为运行查看，是-设置为预览模式
     if (location.pathname === "/preview" || props.preview) {
       data.locked = 1;
+      const msgTypes = (data.msgTypes || [])
+        .map((item: string) => {
+          return Number(item);
+        })
+        .filter((item: number) => {
+          return !isNaN(item);
+        });
+
+      const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+        busName: data.busName,
+        msgTypes,
+        enableLog: false,
+        onReady: () => {
+          console.log("%c连接成功！", "color: green; font-weight: bold;");
+        },
+      });
+      wsClient.connect();
     } else {
       data.locked = 0;
     }
