@@ -27,6 +27,7 @@
     "@meta2d/sequence-diagram": "workspace:*",
     "@meta2d/svg": "workspace:*",
     "@meta2d/utils": "workspace:*",
+    "@qs/websocket-client": "workspace:*",
     "file-saver": "^2.0.5",
     "sass": "^1.80.6",
     "sass-loader": "^16.0.3",

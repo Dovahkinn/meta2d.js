@@ -122,12 +122,24 @@
       <div class="props-panel">
         <t-form :data="data" label-align="left" size="small">
           <t-form-item label="地址" name="wsUrl">
-            <t-input v-model="data.wsUrl" clearable placeholder="ws:// 开头，不符合则不保存" @blur="changeConnectProp('wsUrl')" />
+            <t-input
+              v-model="data.wsUrl"
+              clearable
+              placeholder="ws:// 开头，不符合则不保存"
+              @blur="changeConnectProp('wsUrl')"
+            />
           </t-form-item>
           <t-form-item label="消息名称" name="busName">
-            <t-input v-model="data.busName" clearable @change="changeConnectProp('busName')" />
+            <t-input
+              v-model="data.busName"
+              clearable
+              @change="changeConnectProp('busName')"
+            />
           </t-form-item>
-         
+          <t-divider />
+          <t-space>
+            <t-button @click="testConnect">测试连接</t-button>
+          </t-space>
         </t-form>
       </div>
     </template>
@@ -135,10 +147,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, useAttrs, } from "vue";
+import { onMounted, reactive, ref, useAttrs } from "vue";
 import { lineCross, clearLineCross } from "@meta2d/utils";
 import PropsTab from "./PropsTab.vue";
 import { useUpload } from "../services/useUpload";
+import { WebSocketClient } from "@qs/websocket-client";
 
 // 图纸数据
 const data = reactive<any>({
@@ -146,6 +159,8 @@ const data = reactive<any>({
   background: undefined,
   color: undefined,
   lineCross: false,
+  wsUrl: "",
+  busName: "",
 });
 
 // 画布选项
@@ -172,7 +187,7 @@ const tabs = [
     label: "通信",
     value: 3,
     slot: "comm-props",
-  }
+  },
 ];
 
 onMounted(() => {
@@ -189,7 +204,8 @@ onMounted(() => {
   data.rule = d.rule;
   data.ruleColor = d.ruleColor;
   data.bkImage = d.bkImage;
-
+  data.wsUrl = d.wsUrl;
+  data.busName = d.busName;
   Object.assign(options, meta2d.getOptions());
 });
 
@@ -224,10 +240,8 @@ const onChangeData = (prop?: string) => {
   meta2d.render();
 };
 
-
 const uploadRef = ref();
-const { uploadValue, sizeLimit, headers,  } = useUpload()
-
+const { uploadValue, sizeLimit, headers } = useUpload();
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
@@ -249,7 +263,29 @@ const changeConnectProp = (prop: string) => {
       return;
     }
   }
-}
+  Object.assign(meta2d.store.data, data);
+};
+
+const testConnect = () => {
+  console.log("testConnect:", data.wsUrl, data.busName);
+  // TODO: websocket
+  const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+    busName: "bus-test",
+    msgTypes: [1, 3],
+  });
+  wsClient.connect();
+  console.log("ws client: ", wsClient);
+  wsClient.subscribe("bus-test", 1001, (data) => {
+    console.log("1111111", data);
+  });
+
+  setTimeout(() => {
+    wsClient.sendMessage("", 1001, {
+      hello: "121323",
+      test: "xxxx",
+    });
+  }, 10e3);
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {

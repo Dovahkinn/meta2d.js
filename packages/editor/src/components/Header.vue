@@ -90,32 +90,8 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-    <t-dropdown
-      :minColumnWidth="180"
-      :maxHeight="500"
-      :delay2="[10, 150]"
-      overlayClassName="header-dropdown"
-    >
-      <a> 帮助 </a>
-      <t-dropdown-menu>
-        <t-dropdown-item v-for="item in assets.helps" :divider="item.divider">
-          <a v-if="item.url" :href="item.url" target="_blank">{{
-            item.name
-          }}</a>
-        </t-dropdown-item>
-      </t-dropdown-menu>
-    </t-dropdown>
-    <t-popconfirm
-      :visible="visible"
-      theme="default"
-      content="是否导入 ElectricEditor 生成的 JSON 文件?"
-      @visible-change="onVisibleChange"
-    >
-      <a class="logo">
-        <span>导入</span>
-      </a>
-    </t-popconfirm>
-
+   
+    
     <a class="logo">
       <span @click="customToolbarClick()">添加/删除锚点</span>
     </a>
@@ -144,9 +120,37 @@
         <span @click="customToolbarClick('svg')">导入 SVG</span>
       </t-tooltip>
     </a>
+    <t-popconfirm
+      :visible="visible"
+      theme="default"
+      content="是否导入 ElectricEditor 生成的 JSON 文件?"
+      @visible-change="onVisibleChange"
+    >
+      <a class="logo">
+        <span>导入</span>
+      </a>
+    </t-popconfirm>
+
+
     <a class="logo">
       <span @click="customToolbarClick('save')">保存图纸</span>
     </a>
+
+    <t-dropdown
+      :minColumnWidth="180"
+      :maxHeight="500"
+      :delay2="[10, 150]"
+      overlayClassName="header-dropdown"
+    >
+      <a> 帮助 </a>
+      <t-dropdown-menu>
+        <t-dropdown-item v-for="item in assets.helps" :divider="item.divider">
+          <a v-if="item.url" :href="item.url" target="_blank">{{
+            item.name
+          }}</a>
+        </t-dropdown-item>
+      </t-dropdown-menu>
+    </t-dropdown>
   </div>
 
   <div class="app-header header__bottom">

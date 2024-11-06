@@ -148,7 +148,7 @@
                   </t-button>
                 </t-popconfirm>
               </t-tooltip>
-              <t-tooltip content="公开目录下的所有组件">
+              <!-- <t-tooltip content="公开目录下的所有组件">
                   <t-button
                     size="small"
                     variant="outline"
@@ -157,7 +157,7 @@
                   >
                     <t-icon name="folder-shared"></t-icon>
                   </t-button>
-              </t-tooltip>
+              </t-tooltip> -->
             </template>
 
             <t-row v-if="item.data.length" :gutter="[10, 10]">
@@ -192,7 +192,7 @@
                           <t-icon name="delete"></t-icon>
                         </t-button>
                       </t-popconfirm>
-                      <t-tooltip
+                      <!-- <t-tooltip
                         content="公开组件给所有人"
                         @confirm="deleteMyPen(v, 'component')"
                       >
@@ -205,7 +205,7 @@
                         >
                           <t-icon name="share"></t-icon>
                         </t-button>
-                      </t-tooltip>
+                      </t-tooltip> -->
                     </template>
                   </t-image>
                 </t-tooltip>
