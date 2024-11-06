@@ -120,37 +120,41 @@
 
     <template #comm-props>
       <div class="props-panel">
-        <t-form :data="data" label-align="left" size="small">
-          <t-form-item label="地址" name="wsUrl">
-            <t-input
-              v-model="data.wsUrl"
-              clearable
-              placeholder="ws:// 开头，不符合则不保存"
-              @blur="changeConnectProp('wsUrl')"
-            />
-          </t-form-item>
-          <t-form-item label="消息名称" name="busName">
-            <t-input
-              v-model="data.busName"
-              clearable
-              @change="changeConnectProp('busName')"
-            />
-          </t-form-item>
+        <t-collapse defaultExpandAll class="meta-collapse" >
+          <t-collapse-panel value="0" header="WebSocket">
+            <t-form :data="data" label-align="left" size="small" labelWidth="80px">
+              <t-form-item label="地址" name="wsUrl">
+                <t-input
+                  v-model="data.wsUrl"
+                  clearable
+                  placeholder="ws:// 开头，不符合则不保存"
+                  @blur="changeConnectProp('wsUrl')"
+                />
+              </t-form-item>
+              <t-form-item label="消息名称" name="busName">
+                <t-input
+                  v-model="data.busName"
+                  clearable
+                  @change="changeConnectProp('busName')"
+                />
+              </t-form-item>
 
-          <t-form-item label="消息类型" name="msgTypes">
-            <t-tag-input
-              v-model="data.msgTypes"
-              clearable
-              placeholder="消息类型, 数字"
-              @change="changeConnectProp('msgTypes')"
-            />
-          </t-form-item>
+              <t-form-item label="消息类型" name="msgTypes">
+                <t-tag-input
+                  v-model="data.msgTypes"
+                  clearable
+                  placeholder="消息类型, 数字"
+                  @change="changeConnectProp('msgTypes')"
+                />
+              </t-form-item>
 
-          <t-divider />
-          <t-space>
-            <t-button @click="testConnect">测试连接</t-button>
-          </t-space>
-        </t-form>
+              <t-divider />
+              <t-space>
+                <t-button @click="testConnect">测试连接</t-button>
+              </t-space>
+            </t-form>
+          </t-collapse-panel>
+        </t-collapse>
       </div>
     </template>
   </PropsTab>
