@@ -26,6 +26,7 @@ import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
 import { WebSocketClient } from "@qs/websocket-client";
+import { EventAction } from '../types/Event'
 
 const props = defineProps({
   preview: {
@@ -51,6 +52,7 @@ const contextMenuParams = reactive({
   visible: false,
 });
 const showContextMenu = (event: any) => {
+  if (props.preview) return
   if (selections.mode === 0) return;
   contextMenuParams.x = event.e.clientX;
   contextMenuParams.y = event.e.clientY;
@@ -107,9 +109,35 @@ onMounted(() => {
         enableLog: false,
         onReady: () => {
           console.log("%c连接成功！", "color: green; font-weight: bold;");
+          wsClient.subscribe("", [1], (data: any) => {
+            console.log("%c收到消息", "color: green; font-weight: bold;", data);
+            if (data.msg?.action === EventAction.SetProps) {
+              const { params, value } = data.msg;
+              if (value) {
+                // 更新图元
+                meta2d.setValue({
+                  id: params,
+                  ...value,
+                });
+              }
+            }
+          });
         },
       });
       wsClient.connect();
+
+      // test: 模拟修改状态
+      // setTimeout(() => {
+      //   wsClient.sendMessage("", 1, {
+      //     action: 1,
+      //     name: "setProps",
+      //     params: "301cf29",
+      //     value: {
+      //       color: "red",
+      //       text: "ws",
+      //     },
+      //   });
+      // }, 10e3);
     } else {
       data.locked = 0;
     }
