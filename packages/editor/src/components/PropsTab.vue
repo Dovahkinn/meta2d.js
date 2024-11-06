@@ -15,10 +15,6 @@ type Tab = {
 }
 
 const props = defineProps({
-    pen: {
-        type: Object,
-        default: () => ({}),
-    },
     tabs: {
         type: Array as () => Tab[],
         default: () => ([]),

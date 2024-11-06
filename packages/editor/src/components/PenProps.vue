@@ -1,7 +1,7 @@
 <template>
   <div class="">
-    <t-tabs v-if="pen" v-model:value="activePanel">
-      <t-tab-panel :value="1" label="图元">
+    <PropsTab v-if="pen" :tabs="tabs" :defaultValue="activePanel">
+      <template #pen>
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="颜色" name="color">
@@ -80,8 +80,8 @@
                 @change="changeValue('globalAlpha')"
               />
               <span class="ml-16" style="width: 50px; line-height: 30px">
-              {{ pen.globalAlpha }}
-            </span>
+                {{ pen.globalAlpha }}
+              </span>
             </t-form-item>
             <t-form-item label="阴影颜色" name="shadowColor">
               <t-color-picker
@@ -114,7 +114,7 @@
               />
             </t-form-item>
 
-            <t-divider/>
+            <t-divider />
             <t-form-item label="文字阴影" name="textHasShadow">
               <t-switch
                 v-model="pen.textHasShadow"
@@ -137,7 +137,10 @@
             </t-form-item>
 
             <t-form-item label="文字颜色类型" name="textType">
-              <t-select v-model="pen.textType" @change="changeValue('textType')">
+              <t-select
+                v-model="pen.textType"
+                @change="changeValue('textType')"
+              >
                 <t-option key="hex" :value="0" label="纯色"></t-option>
                 <t-option key="rgb" :value="1" label="线性渐变"></t-option>
                 <t-option key="rgba" :value="2" label="径向渐变"></t-option>
@@ -215,7 +218,10 @@
             </t-form-item>
 
             <t-form-item label="超出省略" name="ellipsis">
-              <t-switch v-model="pen.ellipsis" @change="changeValue('ellipsis')">
+              <t-switch
+                v-model="pen.ellipsis"
+                @change="changeValue('ellipsis')"
+              >
               </t-switch>
             </t-form-item>
 
@@ -274,17 +280,21 @@
               >
                 <t-option key="top" value="top" label="顶部对齐"></t-option>
                 <t-option key="middle" value="middle" label="居中"></t-option>
-                <t-option key="bottom" value="bottom" label="底部对齐"></t-option>
+                <t-option
+                  key="bottom"
+                  value="bottom"
+                  label="底部对齐"
+                ></t-option>
               </t-select>
             </t-form-item>
 
-            <t-divider/>
+            <t-divider />
 
             <t-form-item label="X" name="x">
-              <t-input-number v-model="rect.x" @change="changeRect('x')"/>
+              <t-input-number v-model="rect.x" @change="changeRect('x')" />
             </t-form-item>
             <t-form-item label="Y" name="y">
-              <t-input-number v-model="rect.y" @change="changeRect('y')"/>
+              <t-input-number v-model="rect.y" @change="changeRect('y')" />
             </t-form-item>
             <t-form-item label="宽" name="width">
               <t-input-number
@@ -299,7 +309,7 @@
               />
             </t-form-item>
             <t-form-item label="锁定宽高比" name="ratio">
-              <t-switch v-model="pen.ratio" @change="changeValue('ratio')"/>
+              <t-switch v-model="pen.ratio" @change="changeValue('ratio')" />
             </t-form-item>
             <t-form-item label="旋转角度" name="rotate">
               <t-input-number
@@ -308,7 +318,7 @@
               />
             </t-form-item>
 
-            <t-divider/>
+            <t-divider />
             <t-form-item label="进度" name="progress">
               <t-input-number
                 v-model="pen.progress"
@@ -354,16 +364,20 @@
               />
             </t-form-item>
             <t-form-item label="水平翻转" name="flipX">
-              <t-switch v-model="pen.flipX" @change="changeValue('flipX')"/>
+              <t-switch v-model="pen.flipX" @change="changeValue('flipX')" />
             </t-form-item>
 
             <t-form-item label="垂直翻转" name="flipY">
-              <t-switch v-model="pen.flipY" @change="changeValue('flipY')"/>
+              <t-switch v-model="pen.flipY" @change="changeValue('flipY')" />
             </t-form-item>
 
-            <t-divider/>
+            <t-divider />
 
-            <t-form-item v-if="pen.name == 'combine'" label="状态" name="status">
+            <t-form-item
+              v-if="pen.name == 'combine'"
+              label="状态"
+              name="status"
+            >
               <t-select
                 v-model="pen.showChild"
                 @change="changeValue('showChild')"
@@ -376,7 +390,7 @@
                 ></t-option>
               </t-select>
             </t-form-item>
-            <t-divider/>
+            <t-divider />
 
             <t-space>
               <t-button @click="top">置顶</t-button>
@@ -386,8 +400,8 @@
             </t-space>
           </t-form>
         </div>
-      </t-tab-panel>
-      <t-tab-panel v-if="['image'].includes(pen.name)" :value="2" label="图片">
+      </template>
+      <template v-if="['image'].includes(pen.name)" #image>
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="图片上传" name="image">
@@ -395,9 +409,9 @@
                 ref="uploadRef"
                 v-model="uploadValue"
                 :action="
-                $attrs.uploadUrl ||
-                'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
-              "
+                  $attrs.uploadUrl ||
+                  'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+                "
                 :headers="headers"
                 name="object"
                 :sizeLimit="sizeLimit"
@@ -425,8 +439,8 @@
             </t-form-item>
           </t-form>
         </div>
-      </t-tab-panel>
-      <t-tab-panel :value="3" label="动效">
+      </template>
+      <template #animate>
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="动画效果" name="lineAnimateType">
@@ -462,9 +476,8 @@
               label="自定义动画帧"
             >
               <t-button variant="text" theme="primary" @click="showFramesDrawer"
-              >编辑
-              </t-button
-              >
+                >编辑
+              </t-button>
             </t-form-item>
 
             <template v-if="isLine">
@@ -524,26 +537,31 @@
               />
             </t-form-item>
 
-            <t-divider/>
+            <t-divider />
             <t-space>
               <t-button @click="animate(true)">播放</t-button>
               <t-button @click="animate()">停止</t-button>
             </t-space>
           </t-form>
         </div>
-      </t-tab-panel>
+      </template>
 
-      <t-tab-panel :value="4" label="结构">
+      <template #struct>
         <slot name="struct" :pen="pen"></slot>
-      </t-tab-panel>
+      </template>
 
-      <t-tab-panel :value="5" label="数据">
+      <template #data>
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="ID" name="data">
-              <t-tag style="flex: 1;">{{ pen.id }}</t-tag>
+              <t-tag style="flex: 1">{{ pen.id }}</t-tag>
 
-              <t-button theme="primary" variant="text" style="margin-left: 10px;" @click="copyId">
+              <t-button
+                theme="primary"
+                variant="text"
+                style="margin-left: 10px"
+                @click="copyId"
+              >
                 <t-icon name="copy"></t-icon>
               </t-button>
             </t-form-item>
@@ -567,8 +585,12 @@
             </t-form-item>
           </t-form>
         </div>
-      </t-tab-panel>
-    </t-tabs>
+      </template>
+
+      <template #event>
+        <EventEditor :defaultEventsValue="pen.events" @change="eventsChange" />
+      </template>
+    </PropsTab>
 
     <t-drawer
       v-model:visible="drawerVisible"
@@ -598,23 +620,58 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  computed,
-  nextTick,
-} from "vue";
-import {useSelection} from "../services/selections";
-import {useUpload} from "../services/useUpload";
-import {PenFrameOptions, PenFrames} from "../utils/penFrames.ts";
+import { onMounted, onUnmounted, ref, watch, computed, nextTick } from "vue";
+import { useSelection } from "../services/selections";
+import { useUpload } from "../services/useUpload";
+import { PenFrameOptions, PenFrames } from "../utils/penFrames.ts";
 import PropEditor from "./PropEditor.vue";
-import {deepClone} from "@meta2d/core";
-import {copyToClipboard} from "../utils/index.ts";
-import { MessagePlugin } from 'tdesign-vue-next';
+import { deepClone } from "@meta2d/core";
+import { copyToClipboard } from "../utils/index.ts";
+import { MessagePlugin } from "tdesign-vue-next";
+import PropsTab from "./PropsTab.vue";
+import EventEditor from "./EventEditor.vue";
 
-const {selections} = useSelection();
+const tabs = computed(() => {
+  return [
+    {
+      label: "图元",
+      value: 1,
+      slot: "pen",
+    },
+    {
+      label: "图片",
+      value: 2,
+      slot: "image",
+    },
+    {
+      label: "动效",
+      value: 3,
+      slot: "animate",
+    },
+    {
+      label: "结构",
+      value: 4,
+      slot: "struct",
+    },
+    {
+      label: "数据",
+      value: 5,
+      slot: "data",
+    },
+    {
+      label: "事件",
+      value: 6,
+      slot: "event",
+    },
+  ].filter((item) => {
+    if (item.slot == "image") {
+      return pen.value.name == item.slot;
+    }
+    return true;
+  });
+});
+
+const { selections } = useSelection();
 
 const pen = ref<any>();
 // 位置数据。当前版本位置需要动态计算获取
@@ -687,7 +744,6 @@ const animateTypeList = computed(() => {
 });
 
 const animate = (play: boolean = false) => {
-  console.log("animate: ", play, pen.value);
   if (play) {
     meta2d.startAnimate(pen.value.id);
   } else {
@@ -725,7 +781,7 @@ const deleteFrame = (frame: any) => {
   if (index > -1) {
     customFrames.value.splice(index, 1);
   }
-}
+};
 
 // 监听选中不同图元
 // @ts-ignore
@@ -734,7 +790,7 @@ const watcher = watch(() => selections.pen?.id, getPen);
 const lineDashs = [undefined, [5, 5]];
 
 const changeValue = (prop: string) => {
-  const v: any = {id: pen.value.id};
+  const v: any = { id: pen.value.id };
   v[prop] = pen.value[prop];
   if (prop === "dash") {
     v.lineDash = lineDashs[v[prop]];
@@ -746,13 +802,13 @@ const changeValue = (prop: string) => {
     const frames = PenFrames[animateType];
     v.frames = frames;
   }
-  meta2d.setValue(v, {render: true});
+  meta2d.setValue(v, { render: true });
 };
 
 const changeRect = (prop: string) => {
-  const v: any = {id: pen.value.id};
+  const v: any = { id: pen.value.id };
   v[prop] = rect.value[prop];
-  meta2d.setValue(v, {render: true});
+  meta2d.setValue(v, { render: true });
 };
 
 const top = () => {
@@ -778,7 +834,7 @@ onUnmounted(() => {
 
 // * 文件上传
 const uploadRef = ref();
-const {uploadValue, sizeLimit, headers} = useUpload();
+const { uploadValue, sizeLimit, headers } = useUpload();
 
 const handleSuccess = (context: any) => {
   console.log("upload success: ", context);
@@ -793,14 +849,17 @@ const handleFail = (e: any) => {
 };
 
 const copyId = () => {
-  copyToClipboard(pen.value.id).then(res => {
+  copyToClipboard(pen.value.id).then((res) => {
     console.log("copy id: ", res);
     // 提示
-    MessagePlugin.success({content: "复制成功"})
-  })
-}
+    MessagePlugin.success({ content: "复制成功" });
+  });
+};
 
-
+// * 事件处理
+const eventsChange = (events: any) => {
+  pen.value.events = events;
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {
