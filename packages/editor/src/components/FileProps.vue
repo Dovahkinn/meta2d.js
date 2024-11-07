@@ -1,4 +1,5 @@
 <template>
+ <div>
   <PropsTab :tabs="tabs">
     <template #pen-props>
       <div class="props-panel">
@@ -154,10 +155,15 @@
               </t-space>
             </t-form>
           </t-collapse-panel>
+          <t-collapse-panel header="消息处理">
+            <t-button block @click="showCodeEditor">编辑代码</t-button>
+          </t-collapse-panel>
         </t-collapse>
       </div>
     </template>
   </PropsTab>
+  <CodeEditor ref="codeEditor" @confirm="saveJsStr"/>
+ </div>
 </template>
 
 <script lang="ts" setup>
@@ -167,6 +173,7 @@ import PropsTab from "./PropsTab.vue";
 import { useUpload } from "../services/useUpload";
 import { WebSocketClient } from "@qs/websocket-client";
 import { NotifyPlugin } from "tdesign-vue-next";
+import CodeEditor from "./CodeEditor.vue";
 
 // 图纸数据
 const data = reactive<any>({
@@ -230,6 +237,7 @@ onMounted(() => {
   data.wsUrl = d.wsUrl;
   data.busName = d.busName;
   data.msgTypes = d.msgTypes || [];
+  data.onMessageJsCode = d.onMessageJsCode;
   Object.assign(options, meta2d.getOptions());
 });
 
@@ -313,8 +321,31 @@ const testConnect = () => {
   });
   wsClient.connect();
   // console.log("ws client: ", wsClient);
-  // wsClient.subscribe(data.busName, msgTypes, (data) => {});
+  const jsStr = data.onMessageJsCode;
+  wsClient.subscribe(data.busName, msgTypes, (data) => {
+    try {
+      if (jsStr) {
+        const fn = new Function("data", jsStr);
+        fn(data);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  });
 };
+
+const codeEditor = ref();
+const showCodeEditor = () => {
+  if (codeEditor.value) {
+    codeEditor.value.open(data.onMessageJsCode);
+  }
+}
+
+const saveJsStr = (jsStr: string) => {
+  data.onMessageJsCode = jsStr;
+  changeConnectProp('onMessageJsCode');
+}
+
 </script>
 <style lang="postcss" scoped>
 .props-panel {

@@ -13,3 +13,10 @@ app.use(router).use(TDesign);
 // end
 
 app.mount('#app');
+
+import { loader } from '@guolao/vue-monaco-editor'
+loader.config({
+  paths: {
+    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0/min/vs',
+  },
+})
