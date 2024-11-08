@@ -33,7 +33,7 @@ export const useSelection = () => {
     }
 
     selections.mode = SelectionMode.Pens;
-    selections.pens = pens;
+    selections.pens = [...pens];
   };
   return {
     selections,

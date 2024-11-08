@@ -6,6 +6,12 @@
     :data="pensTree"
     :keys="{ label: 'name', value: 'id', children: 'list' }"
     :icon="icon"
+    :scroll="{
+        rowHeight: 34,
+        bufferSize: 100,
+        threshold: 50,
+        type: 'virtual',
+    }"
     style="padding: 10px;"
     
   >

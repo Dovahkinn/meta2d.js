@@ -97,14 +97,17 @@
     <template #struct-props>
       <slot name="struct" :pen="pen"></slot>
     </template>
-
+    <template #animation-props>
+      
+    </template>
   </props-tab>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch, computed, } from "vue";
 import { useSelection } from "../services/selections";
 import PropsTab from "./PropsTab.vue";
+import { Pen } from '@meta2d/core';
 
 const tabs = [
   {
@@ -117,6 +120,12 @@ const tabs = [
     value: 2,
     slot: "struct-props",
   },
+
+  {
+    label: '动效',
+    value: 3,
+    slot: 'animation-props'
+  }
 
 ];
 
@@ -133,8 +142,17 @@ onMounted(() => {
 });
 
 const getPen = () => {
+  console.log("get pen: ", allIsLine.value, allIsRect.value)
   rect.value = meta2d.getPenRect(pen.value);
 };
+
+const allIsLine = computed(() => {
+  return selections.pens?.every((pen: any) => pen.type === 1);
+})
+
+const allIsRect = computed(() => {
+  return selections.pens?.every((pen: any) => !pen.type);
+})
 
 // 监听选中不同图元
 // @ts-ignore
@@ -177,7 +195,7 @@ const alginOptions = [
 const align = (item: any) => {
   const nodes = selections.pens;
   if (nodes?.length) {
-    meta2d.alignNodes(item.value, nodes);
+    meta2d.alignNodes(item.value, nodes as Pen[]);
   }
 };
 
