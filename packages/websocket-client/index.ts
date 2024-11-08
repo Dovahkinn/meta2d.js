@@ -235,7 +235,14 @@ export class WebSocketClient {
         msg,
       },
     };
-    this.ws?.send(JSON.stringify(message));
+    if (this.ws?.readyState !== WebSocket.OPEN) {
+      console.warn('WebSocket 连接尚未建立，sendMessage 任务加入队列');
+      this._subscribeTasks.push(() => {
+        this.ws.send(JSON.stringify(message));
+      });
+    } else {
+      this.ws?.send(JSON.stringify(message));
+    }
   }
 
   /**

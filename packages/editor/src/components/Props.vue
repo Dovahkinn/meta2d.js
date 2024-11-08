@@ -29,8 +29,6 @@ import Structure from "./Structure.vue";
 
 const { selections } = useSelection();
 
-console.log("selections: ", selections);
-
 const shouldRender = computed(() => {
   return [SelectionMode.File, SelectionMode.Pen, SelectionMode.Pens].includes(
     selections.mode

@@ -16,12 +16,14 @@
 //   ○ “![]” - 不属于，上述集合以外的
 // ● value - 属性比较值，配合key使用。
 
+type ComparisonType = ">" | ">=" | "<" | "<=" | "=" | "!=" | "[)" | "![)" | "[]" | "![]"
+
 export type WhereType = {
   type?: string;
   fn?: (pen: Pen) => boolean;
   fnJs?: string;
   key?: string;
-  comparison?: string;
+  comparison?: ComparisonType;
   value?: any;
 };
 
@@ -53,4 +55,20 @@ export enum EventAction {
   StopVideo, // 停止视频
   SendPropData, // 发送图元数据
   SendVarData, // 发送绑定变量
+}
+
+
+export type HandlerType = {
+  id: string
+  action: EventAction
+  params: {
+    tags: string[],
+    ids: string[],
+  },
+  value: any
+  where: {
+    key: string,
+    value: string | number,
+    comparison: ComparisonType,
+  }
 }

@@ -26,7 +26,7 @@ import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
 import { WebSocketClient } from "@qs/websocket-client";
-import { EventAction } from "../types/Event";
+import { useWsHandlers } from '../services/useHandlers'
 
 const props = defineProps({
   preview: {
@@ -91,6 +91,7 @@ onMounted(() => {
   let data: any = localStorage.getItem("meta2d");
   if (props.data || data) {
     data = props.data || JSON.parse(data);
+    const { resolver } = useWsHandlers(data)
 
     // 判断是否为运行查看，是-设置为预览模式
     if (location.pathname === "/preview" || props.preview) {
@@ -110,27 +111,20 @@ onMounted(() => {
         enableLog: false,
         onReady: () => {
           console.log("%c连接成功！", "color: green; font-weight: bold;");
-          wsClient.subscribe("", [1], (data: any) => {
+          wsClient.subscribe("", [1], (response: any) => {
             console.log(
               "%c收到消息: ",
               "color: green; font-weight: bold;",
               data
             );
-            // if (data.msg?.action === EventAction.SetProps) {
-            //   const { params, value } = data.msg;
-            //   if (value) {
-            //     // 更新图元
-            //     meta2d.setValue({
-            //       id: params,
-            //       ...value,
-            //     });
-            //   }
-            // }
-            // TODO：需要根据 msg 中的实际字段信息，转换为具体的 meta2d 执行逻辑
+            
             try {
               if (jsStr) {
                 const fn = new Function("data", jsStr);
-                fn(data);
+                fn(response);
+              } else {
+                // TODO：需要根据 msg 中的实际字段信息，转换为具体的 meta2d 执行逻辑
+                resolver(response)
               }
             } catch (error) {
               console.log("error: ", error);

@@ -117,6 +117,7 @@ export const loadElectricJson = (data: any) => {
             width: Number(config?.['宽度（X向）'] || 100),
             height: Number(config?.['高度（Y向）'] || 100),
             rotate: rotateAngelMap[item.rotateAngel] || 0,
+            tags: [item.type]
             // fontSize: 10,
           };
 
@@ -150,6 +151,7 @@ export const loadElectricJson = (data: any) => {
             width: length,
             height: length,
             anchors,
+            tags: [item.name],
             // fontSize: 10,
           };
           penList.push(pen);
