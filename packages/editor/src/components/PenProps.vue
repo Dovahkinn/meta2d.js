@@ -373,26 +373,24 @@
 
             <t-divider />
 
-            <t-form-item
-              v-if="pen.name == 'combine'"
-              label="状态"
-              name="status"
-            >
-              <t-select
-                v-model="pen.showChild"
-                @change="changeValue('showChild')"
-              >
-                <t-option
-                  v-for="(item, index) in statusList"
-                  :key="item.value"
-                  :value="index"
-                  :label="item.label"
-                ></t-option>
-              </t-select>
-            </t-form-item>
-            <t-divider />
+            <template v-if="pen.name == 'combine'">
+              <t-form-item label="状态" name="status">
+                <t-select
+                  v-model="pen.showChild"
+                  @change="changeValue('showChild')"
+                >
+                  <t-option
+                    v-for="(item, index) in statusList"
+                    :key="item.value"
+                    :value="index"
+                    :label="item.label"
+                  ></t-option>
+                </t-select>
+              </t-form-item>
+              <t-divider />
+            </template>
 
-            <t-space>
+            <t-space size="4px">
               <t-button @click="top">置顶</t-button>
               <t-button @click="bottom">置底</t-button>
               <t-button @click="up">上一层</t-button>
