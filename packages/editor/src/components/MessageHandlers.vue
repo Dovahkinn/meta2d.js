@@ -101,33 +101,38 @@
     :on-confirm="onClickConfirm"
     :close-btn="true"
   >
-    <t-row v-if="currentHandler" :gutter="10">
-      <t-col :span="10">
-        <t-select
-          v-model="currentHandler.tags"
-          :options="tagOptions"
-          placeholder="按标签选择"
-          multiple
-          clearable
-        ></t-select>
+    <t-row v-if="currentHandler" :gutter="10" style="height: 100%;">
+      <t-col :span="3" style="height: 100%;">
+        <t-space direction="vertical">
+          <t-select
+            v-model="currentHandler.tags"
+            :options="tagOptions"
+            placeholder="按标签选择"
+            multiple
+            clearable
+          ></t-select>
+          <t-button block @click="findPens">查询</t-button>
+        </t-space>
       </t-col>
-      <t-col :span="2">
-        <t-button @click="findPens">查询</t-button>
+      <t-col :span="8" style="height: 100%;">
+        <t-table
+          v-if="currentHandler"
+          class="meta-table"
+          row-key="id"
+          :columns="columns"
+          :data="penList.value"
+          :selected-row-keys="currentHandler.ids"
+          :scroll="{ type: 'virtual', rowHeight: 48, bufferSize: 30 }"
+          style="height: 100%;"
+          @select-change="rehandleSelectChange"
+        >
+        </t-table>
       </t-col>
     </t-row>
-    <t-table
-      v-if="currentHandler"
-      row-key="id"
-      :columns="columns"
-      :data="penList"
-      :selected-row-keys="currentHandler.ids"
-      @select-change="rehandleSelectChange"
-    >
-    </t-table>
   </t-drawer>
 </template>
 <script setup lang="ts">
-import { defineProps, ref } from "vue";
+import { defineProps, ref, shallowReactive } from "vue";
 import { EventAction, EventConfig } from "../types/Event";
 import { MessagePlugin } from "tdesign-vue-next";
 import ConfigList from "../utils/electric-config.json";
@@ -289,24 +294,25 @@ const showSelect = (index: number) => {
   drawerVisible.value = true;
 };
 
-const currentHandler = ref<any>({
+const currentHandler = shallowReactive<any>({
   tags: [],
   ids: [],
+  id: "",
 });
 
 /**
  * @description 点击折叠面板
- * @param value 
+ * @param value
  */
 const changeHandler = (value: number[]) => {
-  updatePropList(value);
-  const item = handlers.value[value[0]];
+  // updatePropList(value);
+  // const item = handlers.value[value[0]];
+  // 拷贝
+  const item = JSON.parse(JSON.stringify(handlers.value[value[0]]));
   if (item) {
-    currentHandler.value = {
-      tags: item.params.tags,
-      ids: filterIds(item.params.ids),
-      id: item.id,
-    };
+    currentHandler.tags = item.params.tags;
+    currentHandler.ids = filterIds(item.params.ids);
+    currentHandler.id = item.id;
     findPens();
   }
 };
@@ -321,24 +327,26 @@ const tagOptions = ConfigList.map((item) => {
 // 清空不存在的图元ID
 function filterIds(ids: string[]) {
   return ids.filter((id: string) => {
-    return !!meta2d.findOne(id)
-  })
+    return !!meta2d.findOne(id);
+  });
 }
 
 const onClickConfirm = () => {
   drawerVisible.value = false;
   // 更新 handlers
   const item = handlers.value.find(
-    (item: any) => item.id === currentHandler.value.id
+    (item: any) => item.id === currentHandler.id
   );
   if (item) {
-    item.params.tags = currentHandler.value.tags;
-    item.params.ids = filterIds(currentHandler.value.ids);
+    item.params.tags = currentHandler.tags;
+    item.params.ids = filterIds(currentHandler.ids);
     eventChange();
   }
 };
 
-const penList = ref<any>([]);
+const penList = shallowReactive<any>({
+  value: [],
+});
 const columns = [
   {
     title: "ID",
@@ -364,26 +372,29 @@ const columns = [
 ];
 const findPens = () => {
   const data = meta2d.data();
-  if (currentHandler.value) {
-    if (currentHandler.value.tags.length) {
+  if (currentHandler) {
+    if (currentHandler.tags.length) {
       const pens: any[] = [];
-      currentHandler.value.tags.forEach((tag: string) => {
+      currentHandler.tags.forEach((tag: string) => {
         const list = meta2d.find(tag);
         pens.push(...list);
       });
       // pens 去重
       const sets = [...new Set(pens)];
       // console.log("sets", sets, pens);
-      penList.value = sets;
+      setTimeout(() => {
+        penList.value = sets;
+      }, 1000);
       return;
     }
   }
-  penList.value = data.pens;
+  setTimeout(() => {
+    penList.value = data.pens;
+  }, 1000);
 };
 
 const rehandleSelectChange = (value: string[], ctx: any) => {
-  currentHandler.value.ids = value;
-  //   emit("change", handlers.value);
+  currentHandler.ids = value;
 };
 </script>
 <style lang="scss" scoped></style>

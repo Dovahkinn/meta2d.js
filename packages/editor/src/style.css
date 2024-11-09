@@ -443,3 +443,7 @@ a.hover:hover {
   }
 
 }
+
+.meta-table .t-table__content {
+  height: calc(100% - 50px);
+}
