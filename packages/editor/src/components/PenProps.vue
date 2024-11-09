@@ -441,44 +441,20 @@
       <template #animate>
         <div class="props-panel">
           <t-form label-align="left">
-            <t-form-item label="动画效果" name="lineAnimateType">
-              <t-select
-                v-if="isLine"
-                v-model="pen.lineAnimateType"
-                @change="changeValue('lineAnimateType')"
-              >
-                <t-option
-                  v-for="item in animateTypeList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label"
-                ></t-option>
-              </t-select>
-
-              <t-select
-                v-else
-                v-model="pen.animateType"
-                @change="changeValue('animateType')"
-              >
-                <t-option
-                  v-for="item in PenFrameOptions"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label"
-                ></t-option>
-              </t-select>
-            </t-form-item>
-
-            <t-form-item
-              v-if="pen.animateType == 'x-custom'"
-              label="自定义动画帧"
-            >
-              <t-button variant="text" theme="primary" @click="showFramesDrawer"
-                >编辑
-              </t-button>
-            </t-form-item>
-
             <template v-if="isLine">
+              <t-form-item label="动画效果" name="lineAnimateType">
+                <t-select
+                  v-model="pen.lineAnimateType"
+                  @change="changeValue('lineAnimateType')"
+                >
+                  <t-option
+                    v-for="item in LineAnimateOption"
+                    :key="item.value"
+                    :value="item.value"
+                    :label="item.label"
+                  ></t-option>
+                </t-select>
+              </t-form-item>
               <t-form-item label="反向流动" name="reverse">
                 <t-switch
                   v-model="pen.animateReverse"
@@ -525,6 +501,33 @@
                   :color-modes="['monochrome']"
                   @change="changeValue('animateShadowColor')"
                 />
+              </t-form-item>
+            </template>
+            <template v-else>
+              <t-form-item label="动画效果" name="animateType">
+                <t-select
+                  v-model="pen.animateType"
+                  @change="changeValue('animateType')"
+                >
+                  <t-option
+                    v-for="item in PenFrameOptions"
+                    :key="item.value"
+                    :value="item.value"
+                    :label="item.label"
+                  ></t-option>
+                </t-select>
+              </t-form-item>
+
+              <t-form-item
+                v-if="pen.animateType == 'x-custom'"
+                label="自定义动画帧"
+              >
+                <t-button
+                  variant="text"
+                  theme="primary"
+                  @click="showFramesDrawer"
+                  >编辑
+                </t-button>
               </t-form-item>
             </template>
 
@@ -621,7 +624,11 @@
 import { onMounted, onUnmounted, ref, watch, computed, nextTick } from "vue";
 import { useSelection } from "../services/selections";
 import { useUpload } from "../services/useUpload";
-import { PenFrameOptions, PenFrames } from "../utils/penFrames.ts";
+import {
+  PenFrameOptions,
+  PenFrames,
+  LineAnimateOption,
+} from "../utils/penFrames.ts";
 import PropEditor from "./PropEditor.vue";
 import { deepClone } from "@meta2d/core";
 import { copyToClipboard } from "../utils/index.ts";
@@ -715,32 +722,7 @@ const statusList = computed(() => {
   });
 });
 
-// 动画效果
-const animateTypeList = computed(() => {
-  return [
-    {
-      label: "水流",
-      value: 0,
-    },
-    {
-      label: "水珠滚动",
-      value: 1,
-    },
-    {
-      label: "圆点",
-      value: 2,
-    },
-    {
-      label: "箭头",
-      value: 3,
-    },
-    {
-      label: "水滴",
-      value: 4,
-    },
-  ];
-});
-
+// 动画
 const animate = (play: boolean = false) => {
   if (play) {
     meta2d.startAnimate(pen.value.id);

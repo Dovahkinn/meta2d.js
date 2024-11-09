@@ -98,16 +98,173 @@
       <slot name="struct" :pen="pen"></slot>
     </template>
     <template #animation-props>
-      
+      <div class="props-panel">
+        <t-form
+          v-if="allIsLine || allIsRect"
+          label-width="80px"
+          label-align="left"
+        >
+          <t-space style="width: 100%">
+            <t-alert
+              theme="warning"
+              title="批量修改所有图元的动画"
+              message="执行了操作后才会修改"
+            >
+            </t-alert>
+          </t-space>
+          <t-divider />
+
+          <template v-if="allIsRect">
+            <t-form-item label="动画效果" name="animateType">
+              <t-select
+                v-model="pen.animateType"
+                @change="changeValue('animateType')"
+              >
+                <t-option
+                  v-for="item in PenFrameOptions"
+                  :key="item.value"
+                  :value="item.value"
+                  :label="item.label"
+                ></t-option>
+              </t-select>
+            </t-form-item>
+            <t-form-item
+              v-if="pen.animateType == 'x-custom'"
+              label="自定义动画帧"
+            >
+              <t-button variant="text" theme="primary" @click="showFramesDrawer"
+                >编辑
+              </t-button>
+            </t-form-item>
+          </template>
+
+          <template v-else-if="allIsLine">
+            <t-form-item label="动画效果" name="lineAnimateType">
+              <t-select
+                v-model="pen.lineAnimateType"
+                @change="changeValue('lineAnimateType')"
+              >
+                <t-option
+                  v-for="item in LineAnimateOption"
+                  :key="item.value"
+                  :value="item.value"
+                  :label="item.label"
+                ></t-option>
+              </t-select>
+            </t-form-item>
+            <t-form-item label="反向流动" name="reverse">
+              <t-switch
+                v-model="pen.animateReverse"
+                @change="changeValue('animateReverse')"
+              />
+            </t-form-item>
+            <t-form-item label="线宽" name="animateLineWidth">
+              <t-input-number
+                v-model="pen.animateLineWidth"
+                @change="changeValue('animateLineWidth')"
+              />
+            </t-form-item>
+
+            <t-form-item label="速度" name="animateSpan">
+              <t-input-number
+                v-model="pen.animateSpan"
+                :min="1"
+                :max="5"
+                @change="changeValue('animateSpan')"
+              />
+            </t-form-item>
+            <t-form-item label="颜色" name="color">
+              <t-color-picker
+                class="w-full"
+                v-model="pen.animateColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                @change="changeValue('animateColor')"
+              />
+            </t-form-item>
+            <t-form-item label="动画发光" name="animateShadow">
+              <t-switch
+                v-model="pen.animateShadow"
+                @change="changeValue('animateShadow')"
+              />
+            </t-form-item>
+            <t-form-item label="发光颜色" name="animateShadowColor">
+              <t-color-picker
+                class="w-full"
+                v-model="pen.animateShadowColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                @change="changeValue('animateShadowColor')"
+              />
+            </t-form-item>
+          </template>
+
+          <t-form-item label="自动播放" name="autoPlay">
+            <t-switch
+              v-model="pen.autoPlay"
+              @change="changeValue('autoPlay')"
+            />
+          </t-form-item>
+
+          <t-divider />
+          <t-space>
+            <t-tooltip content="">
+              <t-button @click="animate(true)">播放</t-button>
+            </t-tooltip>
+            <t-tooltip content="">
+              <t-button @click="animate()">停止</t-button>
+            </t-tooltip>
+          </t-space>
+        </t-form>
+        <t-alert v-else theme="error">
+          只能对同一类型的图元批量设置动画
+        </t-alert>
+
+        <t-drawer
+          v-model:visible="drawerVisible"
+          header="自定义动画帧"
+          size="20%"
+          :onConfirm="addFrames"
+        >
+          <t-button block theme="primary" @click="insertFrame"
+            >新增动画帧</t-button
+          >
+          <t-collapse class="meta-collapse" expand-mutex>
+            <t-collapse-panel v-for="item in customFrames" header="动画帧">
+              <prop-editor :data="item"></prop-editor>
+              <template #headerRightContent>
+                <t-button
+                  size="small"
+                  variant="outline"
+                  theme="danger"
+                  :style="{ marginLeft: '8px' }"
+                  @click="deleteFrame(item)"
+                >
+                  <t-icon name="delete"></t-icon>
+                </t-button>
+              </template>
+            </t-collapse-panel>
+          </t-collapse>
+        </t-drawer>
+      </div>
     </template>
   </props-tab>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, computed, } from "vue";
+import { onMounted, onUnmounted, ref, watch, computed, nextTick } from "vue";
 import { useSelection } from "../services/selections";
 import PropsTab from "./PropsTab.vue";
-import { Pen } from '@meta2d/core';
+import { Pen } from "@meta2d/core";
+import {
+  PenFrameOptions,
+  LineAnimateOption,
+  PenFrames,
+} from "../utils/penFrames";
+import { deepClone } from "@meta2d/core";
+import PropEditor from "./PropEditor.vue";
 
 const tabs = [
   {
@@ -122,11 +279,10 @@ const tabs = [
   },
 
   {
-    label: '动效',
+    label: "动效",
     value: 3,
-    slot: 'animation-props'
-  }
-
+    slot: "animation-props",
+  },
 ];
 
 const { selections } = useSelection();
@@ -142,17 +298,17 @@ onMounted(() => {
 });
 
 const getPen = () => {
-  console.log("get pen: ", allIsLine.value, allIsRect.value)
+  // console.log("get pen: ", allIsLine.value, allIsRect.value);
   rect.value = meta2d.getPenRect(pen.value);
 };
 
 const allIsLine = computed(() => {
   return selections.pens?.every((pen: any) => pen.type === 1);
-})
+});
 
 const allIsRect = computed(() => {
   return selections.pens?.every((pen: any) => !pen.type);
-})
+});
 
 // 监听选中不同图元
 // @ts-ignore
@@ -169,10 +325,35 @@ const changeValue = (prop: string) => {
       v[prop] = newValue;
       if (prop === "dash") {
         v.lineDash = lineDashs[v[prop]];
+      } else if (prop == "animateType") {
+        const animateType = v.animateType as keyof typeof PenFrames;
+        const frames = PenFrames[animateType];
+        v.frames = frames;
       }
-      meta2d.setValue(v, { render: true });
+      meta2d.setValue(v, { render: false });
     });
+    meta2d.render();
   }
+};
+
+const animate = (play = false) => {
+  // 不传执行所有自动播放的画笔的动画
+  // console.log("animate: ", play, selections.pens)
+
+  // ! 使用 Pen[] 有bug，有的不生效
+  // if (play) {
+  //   meta2d.startAnimate(selections.pens)
+  // } else {
+  //   meta2d.stopAnimate(selections.pens)
+  // }
+
+  selections.pens?.forEach((pen: any) => {
+    if (play) {
+      meta2d.startAnimate(pen.id);
+    } else {
+      meta2d.stopAnimate(pen.id);
+    }
+  });
 };
 
 const alginOptions = [
@@ -202,6 +383,37 @@ const align = (item: any) => {
 onUnmounted(() => {
   watcher();
 });
+
+const drawerVisible = ref(false);
+const customFrames = ref<any>([]);
+
+const showFramesDrawer = () => {
+  customFrames.value = deepClone(pen.value.frames || []);
+  drawerVisible.value = true;
+};
+const addFrames = () => {
+  // 动画帧数组
+  pen.value.frames = deepClone(customFrames.value);
+  changeValue("frames")
+  drawerVisible.value = false;
+  nextTick(() => {
+    customFrames.value = [];
+  });
+};
+
+const insertFrame = () => {
+  customFrames.value.push({
+    duration: 100,
+    globalAlpha: 1,
+  });
+};
+
+const deleteFrame = (frame: any) => {
+  const index = customFrames.value.indexOf(frame);
+  if (index > -1) {
+    customFrames.value.splice(index, 1);
+  }
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {

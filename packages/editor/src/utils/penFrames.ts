@@ -131,6 +131,28 @@ export const PenFrameOptions = [
 
 ];
 
+export const LineAnimateOption = [
+  {
+    label: "水流",
+    value: 0,
+  },
+  {
+    label: "水珠滚动",
+    value: 1,
+  },
+  {
+    label: "圆点",
+    value: 2,
+  },
+  {
+    label: "箭头",
+    value: 3,
+  },
+  {
+    label: "水滴",
+    value: 4,
+  },
+];
 
 export const PenFrames = {
   moveXFrames,

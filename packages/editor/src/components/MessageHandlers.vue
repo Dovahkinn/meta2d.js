@@ -97,7 +97,7 @@
   <t-drawer
     v-model:visible="drawerVisible"
     header="选择图元"
-    size="30%"
+    size="35%"
     :on-confirm="onClickConfirm"
     :close-btn="true"
   >
@@ -305,8 +305,7 @@ const currentHandler = shallowReactive<any>({
  * @param value
  */
 const changeHandler = (value: number[]) => {
-  // updatePropList(value);
-  // const item = handlers.value[value[0]];
+  if (!value.length) return
   // 拷贝
   const item = JSON.parse(JSON.stringify(handlers.value[value[0]]));
   if (item) {

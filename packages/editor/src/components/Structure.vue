@@ -8,12 +8,11 @@
     :icon="icon"
     :scroll="{
         rowHeight: 34,
-        bufferSize: 100,
+        bufferSize: 30,
         threshold: 50,
         type: 'virtual',
     }"
-    style="padding: 10px;"
-    
+    style="padding: 10px; height: 100%;"
   >
     <template #label="{ node }">
       <span @click="click(node)"> {{ node.label }} - {{ node.data.text || node.value }}</span>

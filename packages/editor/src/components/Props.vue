@@ -56,6 +56,9 @@ const shouldRender = computed(() => {
       overflow: auto;
       height: calc(100% - 50px);
 
+      .t-tab-panel {
+        height: 100%;
+      }
     }
   }
 }
