@@ -555,7 +555,7 @@
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="ID" name="data">
-              <t-tag style="flex: 1">{{ pen.id }}</t-tag>
+              <t-tag maxWidth="100%" style="flex: 1;width: 0;">{{ pen.id }}</t-tag>
 
               <t-button
                 theme="primary"

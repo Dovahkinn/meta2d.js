@@ -91,6 +91,12 @@
               </t-button>
             </t-collapse-panel>
           </t-collapse>
+          <t-divider />
+          <t-space>
+            <t-tooltip content="清空高亮图元">
+              <t-button @click="inactive">取消选中</t-button>
+            </t-tooltip>
+          </t-space>
         </t-form>
       </div>
     </template>
@@ -209,8 +215,16 @@
           </t-form-item>
 
           <t-divider />
+            <div>
+          <t-statistic
+            title="图元总数"
+            :value="pensTotal"
+            trend="increase"
+            color="orange"
+          />
+            </div>
           <t-space>
-            <t-tooltip content="">
+            <t-tooltip content="对大量图元执行动画时存在性能问题，请谨慎操作">
               <t-button @click="animate(true)">播放</t-button>
             </t-tooltip>
             <t-tooltip content="">
@@ -309,6 +323,9 @@ const allIsLine = computed(() => {
 const allIsRect = computed(() => {
   return selections.pens?.every((pen: any) => !pen.type);
 });
+const pensTotal = computed(() => {
+  return selections.pens?.length || 0;
+});
 
 // 监听选中不同图元
 // @ts-ignore
@@ -394,7 +411,7 @@ const showFramesDrawer = () => {
 const addFrames = () => {
   // 动画帧数组
   pen.value.frames = deepClone(customFrames.value);
-  changeValue("frames")
+  changeValue("frames");
   drawerVisible.value = false;
   nextTick(() => {
     customFrames.value = [];
@@ -413,6 +430,10 @@ const deleteFrame = (frame: any) => {
   if (index > -1) {
     customFrames.value.splice(index, 1);
   }
+};
+
+const inactive = () => {
+  meta2d.inactive();
 };
 </script>
 <style lang="postcss" scoped>

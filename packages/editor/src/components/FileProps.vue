@@ -149,7 +149,7 @@
                   <t-tag-input
                     v-model="data.msgTypes"
                     clearable
-                    placeholder="消息类型, 数字"
+                    placeholder="消息类型, 数字, 回车添加"
                     @change="changeConnectProp('msgTypes')"
                   />
                 </t-form-item>
@@ -175,7 +175,7 @@
                   </t-button>
                 </t-tooltip>
               </template>
-              <br>             
+              <br>
               <t-row v-for="(item, index) in data.wsMsgFields" :key="index" justify="start" style="margin-bottom: 4px;">
                 <t-col :span="10">
                   <t-input v-model="item.value" @change="wsMsgFieldsChange"></t-input>
@@ -286,7 +286,7 @@ onMounted(() => {
   data.onMessageJsCode = d.onMessageJsCode;
   data.wsMsgFields = d.wsMsgFields || [];
   data.wsMsgHandlers = d.wsMsgHandlers || [];
-  
+
   Object.assign(options, meta2d.getOptions());
 });
 

@@ -101,8 +101,8 @@
     :on-confirm="onClickConfirm"
     :close-btn="true"
   >
-    <t-row v-if="currentHandler" :gutter="10" style="height: 100%;">
-      <t-col :span="3" style="height: 100%;">
+    <t-row v-if="currentHandler" :gutter="10" style="height: 100%">
+      <t-col :span="3" style="height: 100%">
         <t-space direction="vertical">
           <t-select
             v-model="currentHandler.tags"
@@ -112,9 +112,14 @@
             clearable
           ></t-select>
           <t-button block @click="findPens">查询</t-button>
+          <t-tooltip content="符合条件的图元数量大时，会出现卡顿">
+          <t-button block theme="warning" @click="activePens"
+            >选中图元</t-button
+          >
+          </t-tooltip>
         </t-space>
       </t-col>
-      <t-col :span="8" style="height: 100%;">
+      <t-col :span="8" style="height: 100%">
         <t-table
           v-if="currentHandler"
           class="meta-table"
@@ -123,7 +128,7 @@
           :data="penList.value"
           :selected-row-keys="currentHandler.ids"
           :scroll="{ type: 'virtual', rowHeight: 48, bufferSize: 30 }"
-          style="height: 100%;"
+          style="height: 100%"
           @select-change="rehandleSelectChange"
         >
         </t-table>
@@ -305,7 +310,7 @@ const currentHandler = shallowReactive<any>({
  * @param value
  */
 const changeHandler = (value: number[]) => {
-  if (!value.length) return
+  if (!value.length) return;
   // 拷贝
   const item = JSON.parse(JSON.stringify(handlers.value[value[0]]));
   if (item) {
@@ -334,7 +339,7 @@ const onClickConfirm = () => {
   drawerVisible.value = false;
   // 更新 handlers
   const item = handlers.value.find(
-    (item: any) => item.id === currentHandler.id
+    (item: any) => item.id === currentHandler.id,
   );
   if (item) {
     item.params.tags = currentHandler.tags;
@@ -394,6 +399,21 @@ const findPens = () => {
 
 const rehandleSelectChange = (value: string[], ctx: any) => {
   currentHandler.ids = value;
+};
+
+const activePens = () => {
+  if (currentHandler.ids.length) {
+    // 根据ID设置选中
+    const pens = currentHandler.ids
+      .map((id) => {
+        return meta2d.findOne(id);
+      })
+      .filter((pen) => !!pen);
+    meta2d.active(pens);
+  } else {
+    // 按标签查询图元
+    meta2d.active(penList.value);
+  }
 };
 </script>
 <style lang="scss" scoped></style>
