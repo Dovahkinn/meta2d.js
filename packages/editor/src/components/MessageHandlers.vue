@@ -97,29 +97,43 @@
   <t-drawer
     v-model:visible="drawerVisible"
     header="选择图元"
-    size="35%"
+    size="40%"
     :on-confirm="onClickConfirm"
     :close-btn="true"
   >
     <t-row v-if="currentHandler" :gutter="10" style="height: 100%">
-      <t-col :span="3" style="height: 100%">
-        <t-space direction="vertical">
-          <t-select
-            v-model="currentHandler.tags"
-            :options="tagOptions"
-            placeholder="按标签选择"
-            multiple
-            clearable
-          ></t-select>
-          <t-button block @click="findPens">查询</t-button>
-          <t-tooltip content="符合条件的图元数量大时，会出现卡顿">
-          <t-button block theme="warning" @click="activePens"
-            >选中图元</t-button
-          >
-          </t-tooltip>
-        </t-space>
+      <t-col :span="4" style="height: 100%">
+        <t-form label-align="top">
+          <t-form-item label="电路元件" name="name">
+            <t-select
+              v-model="currentHandler.tags"
+              :options="tagOptions"
+              placeholder="按标签选择"
+              multiple
+              :minCollapsedNum="10"
+              clearable
+            ></t-select>
+          </t-form-item>
+          <t-form-item label="图元标签" name="tag">
+            <t-input
+              v-model="currentHandler._tag"
+              placeholder="输入自定义的标签进行查询，不做保存"
+              clearable
+            ></t-input>
+          </t-form-item>
+          <t-form-item>
+            <t-button block @click="findPens">查询</t-button>
+          </t-form-item>
+          <t-form-item>
+            <t-tooltip content="符合条件的图元数量大时，会出现卡顿">
+              <t-button block theme="warning" @click="activePens"
+                >选中图元</t-button
+              >
+            </t-tooltip>
+          </t-form-item>
+        </t-form>
       </t-col>
-      <t-col :span="8" style="height: 100%">
+      <t-col :span="7" style="height: 100%">
         <t-table
           v-if="currentHandler"
           class="meta-table"
@@ -377,7 +391,10 @@ const columns = [
 const findPens = () => {
   const data = meta2d.data();
   if (currentHandler) {
-    if (currentHandler.tags.length) {
+    if (currentHandler._tag) {
+      penList.value = meta2d.find(currentHandler._tag);
+      return;
+    } else if (currentHandler.tags.length) {
       const pens: any[] = [];
       currentHandler.tags.forEach((tag: string) => {
         const list = meta2d.find(tag);
