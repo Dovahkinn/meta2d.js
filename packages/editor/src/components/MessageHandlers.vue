@@ -54,13 +54,12 @@
               ></t-input>
             </t-col>
             <t-col :span="2">
-              <t-button variant="text" @click="deleteProp(propItem)">
+              <t-button variant="text" @click="deleteProp(propItem, item)">
                 <t-icon name="delete"></t-icon>
               </t-button>
             </t-col>
           </t-row>
         </template>
-        <!-- 字段名 -->
         <t-form-item label="字段名">
           <t-select
             v-model="item.where.key"
@@ -238,7 +237,7 @@ const propOptions = [
   },
   {
     label: "状态",
-    value: "status",
+    value: "showChild",
   },
 ];
 const propList = ref<any>([]);
@@ -253,9 +252,10 @@ const addProp = () => {
   });
 };
 
-const deleteProp = (item: any) => {
+const deleteProp = (item: any, event: EventConfig) => {
   const index = propList.value.indexOf(item);
   propList.value.splice(index, 1);
+  propChange(event)
 };
 
 const propChange = (event: EventConfig) => {
@@ -265,6 +265,7 @@ const propChange = (event: EventConfig) => {
   });
   event.value = value;
   emit("change", handlers.value);
+console.log('prop change: ', event, handlers.value)
 };
 
 const updatePropList = (index: number[]) => {
@@ -331,6 +332,7 @@ const changeHandler = (value: number[]) => {
     currentHandler.tags = item.params.tags;
     currentHandler.ids = filterIds(item.params.ids);
     currentHandler.id = item.id;
+    updatePropList(value);
     findPens();
   }
 };

@@ -9,10 +9,10 @@ const testData = {
   interMsgType: 3,
   data: {
     busName: 'ttt',
-    msgType: 11, 
+    msgType: 11,
     msg: {
       value: 1,
-      CurrentInfo
+      //CurrentInfo
     },
   },
 };
