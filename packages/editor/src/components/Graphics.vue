@@ -13,17 +13,19 @@
             @dragstart="dragStart($event, elem)"
             @click.prevent="dragStart($event, elem)"
           >
-            <img
-              v-if="elem.icon.endsWith('svg')"
-              class="icon__image"
-              :src="elem.icon"
-              alt=""
-              srcset=""
-            />
-            <svg v-else class="l-icon" aria-hidden="true">
-              <use :xlink:href="'#' + elem.icon"></use>
-            </svg>
-            <p :title="elem.name">{{ elem.name }}</p>
+            <t-tooltip :content="elem.name">
+              <img
+                v-if="elem.icon.endsWith('svg')"
+                class="icon__image"
+                :src="elem.icon"
+                alt=""
+                srcset=""
+              />
+              <svg v-else class="l-icon" aria-hidden="true">
+                <use :xlink:href="'#' + elem.icon"></use>
+              </svg>
+              <p>{{ elem.name }}</p>
+            </t-tooltip>
           </div>
         </template>
       </t-collapse-panel>
@@ -32,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { parseSvgStr, loadSvg, } from "../utils/svgParser";
+import { parseSvgStr, loadSvg } from "../utils/svgParser";
 import { electricSvgList } from "../utils/svgConfigList.ts";
 
 const graphicGroups = [
