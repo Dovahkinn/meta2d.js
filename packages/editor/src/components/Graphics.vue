@@ -32,7 +32,8 @@
 </template>
 
 <script lang="ts" setup>
-import { parseSvgStr } from "../utils/svgParser";
+import { parseSvgStr, loadSvg, } from "../utils/svgParser";
+import { electricSvgList } from "../utils/svgConfigList.ts";
 
 const graphicGroups = [
   {
@@ -737,59 +738,11 @@ const graphicGroups = [
     ],
   },
   {
-    name: "自定义",
+    name: "电路元件",
     show: true,
-    list: [
-      {
-        name: "常开",
-        icon: "svg/常开.svg",
-        data: {
-          text: "",
-          // width: 160,
-          // height: 40,
-          name: "image",
-          image: "svg/常开.svg",
-        },
-      },
-      {
-        name: "常闭",
-        icon: "svg/常闭.svg",
-        data: {
-          text: "",
-          // width: 160,
-          // height: 40,
-          name: "image",
-          image: "svg/常闭.svg",
-        },
-      },
-      {
-        name: "图框",
-        icon: "svg/图框.svg",
-        data: {
-          text: "",
-          // width: 160,
-          // height: 40,
-          name: "image",
-          image: "svg/图框.svg",
-        },
-      },
-     
-    ],
+    list: electricSvgList,
   },
 ];
-
-const loadSvg = (svgUrl: string) => {
-  
-fetch(svgUrl).then((res) => {
-  const text = res.text();
-  // 解析 svg 文本
-  text.then((svgString) => {
-    // console.log("parseSvgStr: ", svgString);
-    parseSvgStr(svgString);
-  });
-});
-
-}
 
 const dragStart = (e: any, elem: any) => {
   if (!elem) {
@@ -798,8 +751,8 @@ const dragStart = (e: any, elem: any) => {
   e.stopPropagation();
   if (elem.icon.endsWith("svg")) {
     // 创建 svg 图元对象
-    loadSvg(elem.icon);
-    return
+    loadSvg(elem.icon, elem);
+    return;
   }
   console.log("elem: ", elem);
   // 拖拽事件
@@ -812,8 +765,6 @@ const dragStart = (e: any, elem: any) => {
     meta2d.canvas.addCaches = [elem.data];
   }
 };
-
-
 </script>
 <style lang="postcss" scoped>
 .graphics {

@@ -88,8 +88,8 @@ export const useWsHandlers = (data: any) => {
         // ! 性能测试结束
 
         const { tags, ids } = params;
-        console.log('resolver: ', handlers);
-        console.log('process action: ', action, ids, tags);
+        //console.log('resolver: ', handlers);
+        //console.log('process action: ', action, ids, tags);
         switch (action) {
           case EventAction.SetProps:
             // ! id 保存时进行了过滤，理论上都存在

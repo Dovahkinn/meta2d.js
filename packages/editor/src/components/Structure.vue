@@ -15,7 +15,7 @@
     style="padding: 10px; height: 100%;"
   >
     <template #label="{ node }">
-      <span @click="click(node)"> {{ node.label }} - {{ node.data.text || node.value }}</span>
+      <span @click="click(node)"> {{ node.label }} - {{ node.data.text || node.data.description || node.value }}</span>
     </template>
     <template #operations="{ node }">
       <div class="tdesign-demo-block-row">

@@ -1,5 +1,7 @@
 import ConfigList from './electric-config.json';
 import { Pen } from '@meta2d/core';
+import { electricSvgList } from './svgConfigList.ts';
+import { loadSvg } from './svgParser.ts';
 
 const rotateAngelMap: {
   [key: string]: number;
@@ -21,14 +23,32 @@ const asymmetries = [
   'Lamp',
   'duanluqi_wx',
   'Contactk',
-  "Diode",
-  "TerminalsXT",
-  "CoilOnDelay",
-  "R",
-  "Knob_SelfLock",
+  'Diode',
+  'TerminalsXT',
+  'CoilOnDelay',
+  'R',
+  'Knob_SelfLock',
+  'VProbe',
+  'IProbe',
 ];
 
 function patchPosition(pen: Pen, config: any, item: any) {
+  let rotate = rotateAngelMap[item.rotateAngel] || 0;
+  if (['Switch', 'MultipleContact'].includes(item.type)) {
+    console.log('switch patch rotate: ', rotate);
+    rotate -= 90;
+  }
+
+  // 补丁
+  if (rotate) {
+    setTimeout(() => {
+      meta2d.setValue({
+        id: pen.id,
+        rotate: -rotate, // 电路编辑器默认是逆时针旋转
+      });
+    }, 100);
+  }
+  // 对称元件
   if (asymmetries.includes(config?.['元件类型'])) {
     pen.y -= pen.height / 2;
     pen.x -= pen.width / 2;
@@ -39,7 +59,7 @@ function patchPosition(pen: Pen, config: any, item: any) {
     case 'Input':
       // 输入连接点在右侧
 
-      if (pen.rotate == 0) {
+      if (!pen.rotate) {
         pen.x -= pen.width;
         pen.y -= pen.height / 2;
       } else if (pen.rotate === 90) {
@@ -53,7 +73,7 @@ function patchPosition(pen: Pen, config: any, item: any) {
       }
       break;
     case 'Output':
-      if (pen.rotate == 0) {
+      if (!pen.rotate) {
         pen.y -= pen.height / 2;
         pen.x -= pen.width;
       } else if (pen.rotate === 90) {
@@ -69,13 +89,13 @@ function patchPosition(pen: Pen, config: any, item: any) {
       break;
     case 'GND':
       // 位置在一边
-      if (pen.rotate == 0) {
+      if (!rotate) {
         pen.x -= pen.width / 2;
-      } else if (pen.rotate === 90) {
+      } else if (rotate === 90) {
         pen.y -= pen.height / 2;
-      } else if (pen.rotate === 180) {
+      } else if (rotate === 180) {
         pen.x -= pen.width / 2;
-      } else if (pen.rotate === 270) {
+      } else if (rotate === 270) {
         pen.y -= pen.height / 2;
         pen.x -= pen.width;
       }
@@ -106,25 +126,50 @@ export const loadElectricJson = (data: any) => {
             // TODO: 可能更新
             return;
           }
+          const svgItem = electricSvgList.find((v) => {
+            return v.data.electricTypeCode == item.type;
+          });
+          if (svgItem) {
+            loadSvg(svgItem.data.image, svgItem, false).then((list) => {
+              console.log('load svg: ', svgItem, list);
+              const parent = list.find(
+                (v) => v.name == 'combine' && !v.parentId,
+              );
+              //const rotate = item.type == 'Switch' ? 90 : 0;
+              Object.assign(parent, {
+                //id: item.uuid,
+                text: item.name,
+                x: Number(item.posX),
+                y: Number(item.posY),
+                //rotate,
+                //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
+                tags: [item.type, item.name],
+              });
+              patchPosition(parent, config, item);
+              // 更新位置
+              meta2d.addPens(list);
+            });
+          } else {
+            const pen = {
+              id: item.uuid,
+              name: 'rectangle',
+              text: item.name,
+              //   title: item.name,
+              x: Number(item.posX),
+              y: Number(item.posY),
+              width: Number(config?.['宽度（X向）'] || 100),
+              height: Number(config?.['高度（Y向）'] || 100),
+              rotate: rotateAngelMap[item.rotateAngel] || 0,
+              tags: [item.type, item.name],
+              // fontSize: 10,
+            };
 
-          const pen = {
-            id: item.uuid,
-            name: 'rectangle',
-            text: item.name,
-            //   title: item.name,
-            x: Number(item.posX),
-            y: Number(item.posY),
-            width: Number(config?.['宽度（X向）'] || 100),
-            height: Number(config?.['高度（Y向）'] || 100),
-            rotate: rotateAngelMap[item.rotateAngel] || 0,
-            tags: [item.type]
-            // fontSize: 10,
-          };
+            patchPosition(pen, config, item);
 
-          patchPosition(pen, config, item);
+            penList.push(pen);
+          }
 
-          console.log('add to meta2d: ', item, config, pen);
-          penList.push(pen);
+          // console.log('add to meta2d: ', item, config, pen);
         });
       }
 
@@ -159,6 +204,7 @@ export const loadElectricJson = (data: any) => {
       }
 
       if (Paintings) {
+        // 文本
         Paintings.forEach((item) => {
           const has = meta2d.findOne(item.uuid);
           if (has) {
@@ -190,7 +236,7 @@ export const loadElectricJson = (data: any) => {
 function calcLinePos(item: any) {
   const { startX, startY, endX, endY } = item;
   const length = Math.sqrt(
-    Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)
+    Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2),
   );
   const anchors = [
     { x: 0, y: 0 },
@@ -229,7 +275,6 @@ export const readJSONFile = (callback: Function | null = null) => {
   input.click();
 };
 
-
 export const readSVGFile = (callback: Function | null = null) => {
   const input = document.createElement('input');
   input.type = 'file';
@@ -237,7 +282,7 @@ export const readSVGFile = (callback: Function | null = null) => {
   input.onchange = async () => {
     if (!input.files || !input.files.length) return;
     const file = input.files[0];
-    const { name, } = file;
+    const { name } = file;
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -254,16 +299,18 @@ export const readSVGFile = (callback: Function | null = null) => {
   input.click();
 };
 
-
 // 复制文本
 export function copyToClipboard(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
     // 使用现代API
-    return navigator.clipboard.writeText(text).then(() => {
-      return true;
-    }).catch(err => {
-      console.error('复制失败：', err);
-    });
+    return navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        return true;
+      })
+      .catch((err) => {
+        console.error('复制失败：', err);
+      });
   } else {
     // 兼容旧版方法
     const el = document.createElement('textarea');
@@ -279,6 +326,6 @@ export function copyToClipboard(text: string) {
       } else {
         reject(false);
       }
-    })
+    });
   }
 }

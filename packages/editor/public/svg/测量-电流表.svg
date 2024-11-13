@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" baseProfile="tiny" version="1.2" viewBox="0 0 566.929 566.929">
+  <!-- Generator: Adobe Illustrator 29.0.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 186)  -->
+  <g id="CIRCLE">
+    <path d="M0,283.465C0,126.911,126.911,0,283.465,0s283.465,126.911,283.465,283.465-126.911,283.465-283.465,283.465S0,440.018,0,283.465h0Z" fill="none" stroke="#231815" stroke-linecap="round" stroke-linejoin="round" stroke-width=".2"/>
+  </g>
+  <polygon points="283.53 151.595 230.3 304.651 336.761 304.651 283.53 151.595" fill="none" stroke="#231815" stroke-miterlimit="10" stroke-width=".25"/>
+  <line x1="230.3" y1="381.187" x2="230.3" y2="304.651" fill="none" stroke="#231815" stroke-miterlimit="10" stroke-width=".25"/>
+  <line x1="336.761" y1="381.187" x2="336.761" y2="304.651" fill="none" stroke="#231815" stroke-miterlimit="10" stroke-width=".25"/>
+</svg>
