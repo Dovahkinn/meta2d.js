@@ -19,6 +19,9 @@
             class="is--subpanel"
             :header="panel.name"
           >
+            <template #headerRightContent>
+              <t-tag theme="success">{{ panel.children.length }}</t-tag>
+            </template>
             <div
               v-for="elem in panel.children"
               :key="elem.name"
@@ -31,7 +34,7 @@
                 <img
                   v-if="elem.icon?.endsWith('svg')"
                   :src="elem.icon"
-                  style="width: 100%; height: 48px;"
+                  style="width: 100%; height: 48px"
                 />
                 <svg v-else class="l-icon" aria-hidden="true">
                   <use :xlink:href="'#' + elem.icon"></use>
