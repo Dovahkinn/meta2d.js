@@ -35,7 +35,6 @@ const asymmetries = [
 function patchPosition(pen: Pen, config: any, item: any) {
   let rotate = rotateAngelMap[item.rotateAngel] || 0;
   if (['Switch', 'MultipleContact'].includes(item.type)) {
-    console.log('switch patch rotate: ', rotate);
     rotate -= 90;
   }
 
@@ -135,13 +134,11 @@ export const loadElectricJson = (data: any) => {
               const parent = list.find(
                 (v) => v.name == 'combine' && !v.parentId,
               );
-              //const rotate = item.type == 'Switch' ? 90 : 0;
               Object.assign(parent, {
                 //id: item.uuid,
                 text: item.name,
                 x: Number(item.posX),
                 y: Number(item.posY),
-                //rotate,
                 //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
                 tags: [item.type, item.name],
               });
