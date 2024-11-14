@@ -9,11 +9,7 @@
           'has--group': item.style == 'group',
         }"
       >
-        <t-collapse
-          v-if="item.style === 'group'"
-          :header="item.name"
-          default-expand-all
-        >
+        <t-collapse v-if="item.style === 'group'" :header="item.name">
           <t-collapse-panel
             v-for="panel in item.list"
             class="is--subpanel"
@@ -28,7 +24,6 @@
               class="graphic"
               :draggable="true"
               @dragstart="dragStart($event, elem)"
-              @click.prevent="dragStart($event, elem)"
             >
               <t-tooltip :content="elem.name">
                 <img
@@ -50,7 +45,6 @@
             class="graphic"
             :draggable="true"
             @dragstart="dragStart($event, elem)"
-            @click.prevent="dragStart($event, elem)"
           >
             <t-tooltip :content="elem.name">
               <img
@@ -74,9 +68,15 @@
 
 <script lang="ts" setup>
 import { parseSvgStr, loadSvg } from "../utils/svgParser";
-import { electricSvgList } from "../utils/svgConfigList.ts";
+import {
+  electricSvgList,
+  electricCombineList,
+} from "../utils/svgConfigList.ts";
 import { computed } from "vue";
 import { defaultGraphics } from "../utils/graphicConfig.ts";
+import SwitchCombinesData from "../utils/switch-combines.json";
+import { deepClone } from "@meta2d/core";
+
 // 根据名称增加分组
 const electricList = computed(() => {
   const list = [];
@@ -109,16 +109,57 @@ const graphicGroups = [
     style: "group",
     list: electricList.value,
   },
+  {
+    name: "电路元件组合(包含状态)",
+    show: true,
+    style: "group",
+    list: electricCombineList,
+  },
 ];
+
+function findChildren(parent, list) {
+  if (!parent) return;
+  if (!list) return;
+  const result = [];
+  const queue = [parent];
+
+  while (queue.length) {
+    const current = queue.shift();
+    result.push(current);
+    for (const data of list) {
+      if (data.parentId == current.id) {
+        queue.push(data);
+      }
+    }
+  }
+  return result;
+}
+
 const dragStart = (e: any, elem: any) => {
   if (!elem) {
     return;
   }
   e.stopPropagation();
   if (elem.icon.endsWith("svg")) {
-    // 创建 svg 图元对象
-    loadSvg(elem.icon, elem);
-    return;
+    if (elem.type == "combine-json") {
+      // 加载预设
+      console.log("load json: ", elem, SwitchCombinesData);
+      const parent = SwitchCombinesData.pens.find((v) => {
+        if (v.description == elem.name && !v.parentId) {
+          // parent
+          return true;
+        }
+      });
+      const pens = findChildren(parent, SwitchCombinesData.pens);
+      console.log("combine pens: ", parent, pens);
+      if (pens) {
+        elem.data = deepClone(pens);
+      }
+    } else {
+      // 创建 svg 图元对象
+      loadSvg(elem.icon, elem);
+      return;
+    }
   }
   console.log("elem: ", elem);
   // 拖拽事件
@@ -128,6 +169,7 @@ const dragStart = (e: any, elem: any) => {
   } else {
     // 支持单击添加图元。平板模式
     // 需要单击画布
+    // ! 有问题，ID 不会修改
     meta2d.canvas.addCaches = [elem.data];
   }
 };

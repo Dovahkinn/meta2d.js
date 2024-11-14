@@ -373,7 +373,7 @@
 
             <t-divider />
 
-            <template v-if="pen.name == 'combine'">
+            <template v-if="pen.name == 'combine' && pen.showChild != undefined">
               <t-form-item label="状态" name="status">
                 <t-select
                   v-model="pen.showChild"
