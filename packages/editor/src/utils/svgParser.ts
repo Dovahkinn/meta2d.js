@@ -15,6 +15,19 @@ export function parseSvgStr(svgString: string, penConfig: any, manual = true) {
     }
     if (pen.name == 'combine' && !pen.parentId) {
       pen.description = penConfig?.name;
+      if (penConfig?.data?.anchors && manual) {
+        penConfig.data.anchors.forEach((anchor) => {
+          //! 报错
+          // meta2d.addAnchor(pen, anchor);
+          if (pen.anchors) {
+            const newId = pen.anchors.length;
+            anchor.id = newId;
+            pen.anchors.push(anchor);
+          } else {
+            pen.anchors = [anchor]
+          }
+        });
+      }
     }
   });
 

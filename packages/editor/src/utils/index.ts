@@ -15,25 +15,31 @@ const rotateAngelMap: {
 const asymmetries = [
   'Vdc',
   'MultipleContact',
-  'Switch',
   'Coil',
   'Contact',
-  'Btn_SelfReset',
-  'Btn_SelfLock',
   'Lamp',
-  'duanluqi_wx',
   'Contactk',
   'Diode',
   'TerminalsXT',
   'CoilOnDelay',
   'R',
-  'Knob_SelfLock',
   'VProbe',
   'IProbe',
+  'CoilOffDelay',
+  'CoilOnDelay',
+  'DoubleCoil',
+  'TransformerNew',
 ];
-
+// 初始位置在右边
+const sideRightShapes = [
+  'Btn_SelfReset',
+  'Btn_SelfLock',
+  'Knob_SelfReset',
+  'Knob_SelfLock',
+];
 function patchPosition(pen: Pen, config: any, item: any) {
   let rotate = rotateAngelMap[item.rotateAngel] || 0;
+  // 特殊处理，和电路编辑器默认角度保持一致
   if (['Switch', 'MultipleContact'].includes(item.type)) {
     rotate -= 90;
   }
@@ -47,14 +53,32 @@ function patchPosition(pen: Pen, config: any, item: any) {
       });
     }, 100);
   }
+
+  const penType = config?.['元件类型'] || item.type;
   // 对称元件
-  if (asymmetries.includes(config?.['元件类型'])) {
+  if (asymmetries.includes(penType)) {
     pen.y -= pen.height / 2;
     pen.x -= pen.width / 2;
     return;
+  } else if (sideRightShapes.includes(penType)) {
+    if (!rotate) {
+      pen.x += pen.width / 4;
+      pen.y -= pen.height / 2;
+    } else if (item.rotateAngel == '1') {
+      pen.y -= pen.height - pen.width / 2;
+      pen.x -= pen.width / 2;
+    } else if (item.rotateAngel == '2') {
+      pen.y -= pen.height / 2;
+      pen.x -= pen.width;
+    } else if (item.rotateAngel == '3') {
+      pen.x -= pen.width / 2;
+      pen.y -= pen.height/4;
+    }
+
+    return;
   }
 
-  switch (config?.['元件类型']) {
+  switch (penType) {
     case 'Input':
       // 输入连接点在右侧
 
@@ -99,6 +123,47 @@ function patchPosition(pen: Pen, config: any, item: any) {
         pen.x -= pen.width;
       }
       break;
+
+    case 'ElectromagneticValve':
+      if (!rotate) {
+        pen.y -= pen.height / 2;
+        pen.x -= pen.width / 1.5;
+      } else if (item.rotateAngel == '1') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 2.5;
+      } else if (item.rotateAngel == '2') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 2;
+      } else if (item.rotateAngel == '3') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 2;
+      }
+      break;
+    case 'duanluqi_wx':
+      if (!rotate) {
+        pen.x += pen.width;
+        pen.y -= pen.height / 2;
+      } else if (item.rotateAngel == '1') {
+        pen.y -= pen.height - pen.width / 2;
+      } else if (item.rotateAngel == '2') {
+        pen.x -= pen.width * 2;
+        pen.y -= pen.height / 2;
+      }
+      break;
+    case 'Switch':
+      if (item.rotateAngel == '0') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 1.5;
+      } else if (item.rotateAngel == '1') {
+        pen.x -= pen.width;
+        pen.y -= pen.height / 2;
+      } else if (item.rotateAngel == '2') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 3;
+      } else if (item.rotateAngel == '3') {
+        pen.y -= pen.height / 2;
+      }
+      break;
   }
 }
 
@@ -126,11 +191,14 @@ export const loadElectricJson = (data: any) => {
             return;
           }
           const svgItem = electricSvgList.find((v) => {
-            return v.data.electricTypeCode == item.type;
+            return (
+              v.data.electricTypeCode == item.type ||
+              v.data.tags?.includes(item.type)
+            );
           });
           if (svgItem) {
             loadSvg(svgItem.data.image, svgItem, false).then((list) => {
-              console.log('load svg: ', svgItem, list);
+              console.log('load svg: ', svgItem.name, svgItem);
               const parent = list.find(
                 (v) => v.name == 'combine' && !v.parentId,
               );
@@ -143,6 +211,9 @@ export const loadElectricJson = (data: any) => {
                 tags: [item.type, item.name],
               });
               patchPosition(parent, config, item);
+              if (svgItem.data.anchors) {
+                parent.anchors = svgItem.data.anchors;
+              }
               // 更新位置
               meta2d.addPens(list);
             });

@@ -202,6 +202,9 @@ const dragStart = (e: any, elem: any) => {
         .t-collapse-panel__content {
           display: grid;
         }
+        .graphic {
+          padding: 10px;
+        }
       }
     }
     .graphic {
