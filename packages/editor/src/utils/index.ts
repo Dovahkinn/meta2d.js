@@ -1,8 +1,8 @@
 import ConfigList from './electric-config.json';
-import { Pen } from '@meta2d/core';
+import { Pen, deepClone, s8, } from '@meta2d/core';
 import { electricSvgList } from './svgConfigList.ts';
 import { loadSvg } from './svgParser.ts';
-
+import SwitchCombinesData from './switch-combines.json';
 const rotateAngelMap: {
   [key: string]: number;
 } = {
@@ -72,7 +72,7 @@ function patchPosition(pen: Pen, config: any, item: any) {
       pen.x -= pen.width;
     } else if (item.rotateAngel == '3') {
       pen.x -= pen.width / 2;
-      pen.y -= pen.height/4;
+      pen.y -= pen.height / 4;
     }
 
     return;
@@ -166,11 +166,87 @@ function patchPosition(pen: Pen, config: any, item: any) {
       break;
   }
 }
+const StatusTypes = [
+  'Btn_SelfLock',
+  'Knob_SelfReset',
+  'Switch',
+  'Knob_SelfLock',
+  'duanluqi_wx',
+  'MultipleContact',
+  'Btn_SelfReset',
+];
+
+function getChildIndex(item: any) {
+  if(item.type == "MultipleContact") {
+    if (item.v10 > '3') {
+      // ! 暂无四路以上的开关
+      return 0
+    } else {
+      if (item.v10 == '2') {
+        return item.v16 == '0' ? 1 : 2;
+      } else if (item.v10 == '3') {
+        return Number(item.v18)
+      }
+    }
+
+  } else {
+    // ! 约定，制作组合时 0 是端口 1 是闭合
+    if (item.v10 == 'off') {
+      return 0
+    } else if (item.v10 == 'on') {
+      return 1
+    }
+  }
+}
+function findChildren(parent: any, list: any[]) {
+
+  if (!parent) return;
+  if (!list) return;
+  const result = [];
+  const queue = [parent];
+
+  while (queue.length) {
+    const current = queue.shift();
+    result.push(current);
+    for (const data of list) {
+      if (data.parentId == current.id) {
+        queue.push(data);
+      }
+    }
+  }
+  return result;
+}
+
+function clonePens(list: any[]) {
+  const uuid = '-' + s8();
+  const copy = deepClone(list)
+  copy.forEach(item => {
+    item.id = item.id + uuid;
+    if (item.children) {
+      item.children = item.children.map((id: string) => {
+        return id + uuid;
+      })
+    }
+    if (item.parentId) {
+      item.parentId = item.parentId + uuid;
+    }
+
+    if (item.anchors) {
+      item.anchors.forEach((anchor: any) => {
+
+        anchor.penId = anchor.penId + uuid;
+      })
+    }
+
+  })
+  return copy;
+}
+
 
 // json 解析
 export const loadElectricJson = (data: any) => {
   readJSONFile((res: any) => {
-    console.log('readJSONFile: ', res);
+    console.log('readJSONFile: ', res, SwitchCombinesData);
     if (res?.data) {
       meta2d.clear();
       const { Components, Paintings, Wires } = res.data;
@@ -189,6 +265,44 @@ export const loadElectricJson = (data: any) => {
           if (has) {
             // TODO: 可能更新
             return;
+          }
+          if (StatusTypes.includes(item.type)) {
+            let parent = deepClone(SwitchCombinesData.pens.find((v) => {
+              if (item.type == "MultipleContact" && item.v10 >= '3') {
+                // 目前只有三路开关
+                return v.tags?.includes('MultipleContact-3') && !v.parentId
+              }
+              else if (v.tags?.includes(item.type) && !v.parentId) {
+                // parent
+                return true;
+              }
+            }));
+            const list = clonePens(findChildren(parent, SwitchCombinesData.pens))
+            console.log('状态组合：', item.type, item, list );
+
+            if (list) {
+              parent = list[0]
+              const rect = meta2d.getPenRect(parent)
+              const width = rect.width / SwitchCombinesData.scale;
+              const height = rect.height / SwitchCombinesData.scale;
+
+              Object.assign(parent, {
+                text: item.name,
+                x: Number(item.posX),
+                y: Number(item.posY),
+                width,
+                height,
+              });
+              if (parent.tags && !parent.tags?.includes(item.name)) {
+                parent.tags.push(item.name)
+              }
+              patchPosition(parent, config, item);
+              // 切换状态
+              parent.showChild = getChildIndex(item)
+
+              meta2d.addPens((list))
+              return
+            }
           }
           const svgItem = electricSvgList.find((v) => {
             return (
@@ -237,14 +351,13 @@ export const loadElectricJson = (data: any) => {
             penList.push(pen);
           }
 
-          // console.log('add to meta2d: ', item, config, pen);
         });
       }
 
       // 设置连接线
       if (Wires) {
         // 连线 name 必须为 line。不同类型连线用 lineName 属性描述。例如： lineName:'curve'
-        Wires.forEach((item) => {
+        Wires.forEach((item: any) => {
           const has = meta2d.findOne(item.uuid);
           if (has) {
             // TODO: 可能更新
@@ -273,7 +386,7 @@ export const loadElectricJson = (data: any) => {
 
       if (Paintings) {
         // 文本
-        Paintings.forEach((item) => {
+        Paintings.forEach((item: any) => {
           const has = meta2d.findOne(item.uuid);
           if (has) {
             // TODO: 可能更新

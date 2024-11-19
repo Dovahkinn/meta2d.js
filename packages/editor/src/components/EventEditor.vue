@@ -253,7 +253,7 @@ const propOptions = [
   },
   {
     label: "状态",
-    value: "status",
+    value: "showChild",
   },
 ];
 const propList = ref<any>([]);

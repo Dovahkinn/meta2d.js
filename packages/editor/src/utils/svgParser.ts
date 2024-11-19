@@ -31,7 +31,7 @@ export function parseSvgStr(svgString: string, penConfig: any, manual = true) {
     }
   });
 
-  console.log('svg to pens: ', pens, penConfig);
+  //console.log('svg to pens: ', pens, penConfig);
   // 可使用 dragStart or meta2d.canvas.addCaches
   if (manual) {
     meta2d.canvas.addCaches = deepClone(pens);
