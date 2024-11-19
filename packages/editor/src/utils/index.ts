@@ -510,3 +510,38 @@ export function copyToClipboard(text: string) {
     });
   }
 }
+
+
+
+
+
+
+export const toggleFullScreen = () => {
+  // 检查当前是否已经在全屏模式
+  if (!document.fullscreenElement &&    // 没有处于全屏模式
+      !document.mozFullScreenElement && // Firefox
+      !document.webkitFullscreenElement && // Chrome, Safari, Opera
+      !document.msFullscreenElement) { // IE/Edge
+    // 进入全屏
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+      document.documentElement.msRequestFullscreen();
+    }
+  } else {
+    // 退出全屏
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { // Firefox
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { // IE/Edge
+      document.msExitFullscreen();
+    }
+  }
+};

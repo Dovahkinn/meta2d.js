@@ -180,6 +180,7 @@ onUnmounted(() => {
 
   &.is--preview {
     height: 100%;
+    flex: 1;
   }
 }
 </style>

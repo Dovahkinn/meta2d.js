@@ -56,6 +56,11 @@ export class WebSocketClient {
 
   // 1. 初始化 WebSocket 连接并处理事件
   connect() {
+    if (!this.url) {
+      // throw new Error('ws url is required');
+      console.error('ws url is required');
+      return
+    }
     if (this.isConnected) {
       this.wsOptions.onReady && this.wsOptions.onReady();
       return;
