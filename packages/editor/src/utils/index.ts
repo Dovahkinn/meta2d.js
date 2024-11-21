@@ -1,5 +1,5 @@
 import ConfigList from './electric-config.json';
-import { Pen, deepClone, s8, } from '@meta2d/core';
+import { Pen, deepClone, s8 } from '@meta2d/core';
 import { electricSvgList } from './svgConfigList.ts';
 import { loadSvg } from './svgParser.ts';
 import SwitchCombinesData from './switch-combines.json';
@@ -16,9 +16,7 @@ const asymmetries = [
   'Vdc',
   'MultipleContact',
   'Coil',
-  'Contact',
   'Lamp',
-  'Contactk',
   'Diode',
   'TerminalsXT',
   'CoilOnDelay',
@@ -41,6 +39,12 @@ function patchPosition(pen: Pen, config: any, item: any) {
   let rotate = rotateAngelMap[item.rotateAngel] || 0;
   // 特殊处理，和电路编辑器默认角度保持一致
   if (['Switch', 'MultipleContact'].includes(item.type)) {
+    if (pen.width > pen.height) {
+      // svg 是纵向，需要交互
+      const h = pen.height;
+      pen.height = pen.width;
+      pen.width = h;
+    }
     rotate -= 90;
   }
 
@@ -62,17 +66,17 @@ function patchPosition(pen: Pen, config: any, item: any) {
     return;
   } else if (sideRightShapes.includes(penType)) {
     if (!rotate) {
-      pen.x += pen.width / 4;
+      pen.x -= pen.width / 1.5;
       pen.y -= pen.height / 2;
     } else if (item.rotateAngel == '1') {
-      pen.y -= pen.height - pen.width / 2;
+      pen.y -= pen.height / 2 - 10;
       pen.x -= pen.width / 2;
     } else if (item.rotateAngel == '2') {
       pen.y -= pen.height / 2;
-      pen.x -= pen.width;
+      pen.x -= pen.width / 2 - 10;
     } else if (item.rotateAngel == '3') {
       pen.x -= pen.width / 2;
-      pen.y -= pen.height / 4;
+      pen.y -= pen.height / 2 + 10;
     }
 
     return;
@@ -82,30 +86,33 @@ function patchPosition(pen: Pen, config: any, item: any) {
     case 'Input':
       // 输入连接点在右侧
 
-      if (!pen.rotate) {
+      if (!rotate) {
         pen.x -= pen.width;
         pen.y -= pen.height / 2;
-      } else if (pen.rotate === 90) {
+      } else if (rotate === 90) {
         pen.x -= pen.width / 2;
-      } else if (pen.rotate === 180) {
+        //pen.y += pen.height /2;
+        pen.y += 5;
+      } else if (rotate === 180) {
         pen.y -= pen.height / 2;
-      } else if (pen.rotate === 270) {
+      } else if (rotate === 270) {
         // 连接点朝下
-        pen.y -= pen.height;
+        pen.y -= pen.height + 5;
         pen.x -= pen.width / 2;
       }
       break;
     case 'Output':
-      if (!pen.rotate) {
+      if (!rotate) {
         pen.y -= pen.height / 2;
         pen.x -= pen.width;
-      } else if (pen.rotate === 90) {
+      } else if (rotate === 90) {
         pen.x -= pen.width / 2;
-      } else if (pen.rotate === 180) {
+        pen.y += 5;
+      } else if (rotate === 180) {
         pen.y -= pen.height / 2;
-      } else if (pen.rotate === 270) {
+      } else if (rotate === 270) {
         // 连接点朝下
-        pen.y -= pen.height;
+        pen.y -= pen.height + 5;
         pen.x -= pen.width / 2;
       }
 
@@ -118,6 +125,7 @@ function patchPosition(pen: Pen, config: any, item: any) {
         pen.y -= pen.height / 2;
       } else if (rotate === 180) {
         pen.x -= pen.width / 2;
+        pen.y -= pen.height;
       } else if (rotate === 270) {
         pen.y -= pen.height / 2;
         pen.x -= pen.width;
@@ -127,10 +135,10 @@ function patchPosition(pen: Pen, config: any, item: any) {
     case 'ElectromagneticValve':
       if (!rotate) {
         pen.y -= pen.height / 2;
-        pen.x -= pen.width / 1.5;
+        pen.x -= pen.width / 2;
       } else if (item.rotateAngel == '1') {
         pen.x -= pen.width / 2;
-        pen.y -= pen.height / 2.5;
+        pen.y -= pen.height / 2;
       } else if (item.rotateAngel == '2') {
         pen.x -= pen.width / 2;
         pen.y -= pen.height / 2;
@@ -141,13 +149,17 @@ function patchPosition(pen: Pen, config: any, item: any) {
       break;
     case 'duanluqi_wx':
       if (!rotate) {
-        pen.x += pen.width;
+        pen.x -= pen.width / 4;
         pen.y -= pen.height / 2;
       } else if (item.rotateAngel == '1') {
-        pen.y -= pen.height - pen.width / 2;
+        pen.y -= pen.height / 2 + 10;
+        pen.x -= pen.width / 2;
       } else if (item.rotateAngel == '2') {
-        pen.x -= pen.width * 2;
+        pen.x -= pen.width / 2 + 10;
         pen.y -= pen.height / 2;
+      } else if (item.rotateAngel == '3') {
+        pen.y -= (pen.width -6);
+        pen.x -= pen.width / 2;
       }
       break;
     case 'Switch':
@@ -164,6 +176,37 @@ function patchPosition(pen: Pen, config: any, item: any) {
         pen.y -= pen.height / 2;
       }
       break;
+    case 'Contact':
+      if (item.rotateAngel == '0') {
+        pen.x -= pen.width - 3;
+        pen.y -= pen.height / 2;
+      } else if (item.rotateAngel == '1') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 4 + 2;
+      } else if (item.rotateAngel == '2') {
+        pen.y -= pen.height / 2;
+        pen.x -= 2;
+      } else if (item.rotateAngel == '3') {
+        pen.y -= pen.height / 1.5 + 2;
+        pen.x -= pen.width / 2;
+      }
+      break;
+    case 'Contactk':
+      if (item.rotateAngel == '0') {
+        pen.x -= pen.width - 3;
+        pen.y -= pen.height / 2;
+      } else if (item.rotateAngel == '1') {
+        pen.x -= pen.width / 2;
+        pen.y -= pen.height / 4 + 2;
+      } else if (item.rotateAngel == '2') {
+        pen.y -= pen.height / 2;
+        pen.x -= 2;
+      } else if (item.rotateAngel == '3') {
+        pen.y -= pen.height / 1.5 + 2;
+        pen.x -= pen.width / 2;
+      }
+
+      break;
   }
 }
 const StatusTypes = [
@@ -177,29 +220,27 @@ const StatusTypes = [
 ];
 
 function getChildIndex(item: any) {
-  if(item.type == "MultipleContact") {
+  if (item.type == 'MultipleContact') {
     if (item.v10 > '3') {
       // ! 暂无四路以上的开关
-      return 0
+      return 0;
     } else {
       if (item.v10 == '2') {
         return item.v16 == '0' ? 1 : 2;
       } else if (item.v10 == '3') {
-        return Number(item.v18)
+        return Number(item.v18);
       }
     }
-
   } else {
     // ! 约定，制作组合时 0 是端口 1 是闭合
     if (item.v10 == 'off') {
-      return 0
+      return 0;
     } else if (item.v10 == 'on') {
-      return 1
+      return 1;
     }
   }
 }
 function findChildren(parent: any, list: any[]) {
-
   if (!parent) return;
   if (!list) return;
   const result = [];
@@ -219,13 +260,13 @@ function findChildren(parent: any, list: any[]) {
 
 function clonePens(list: any[]) {
   const uuid = '-' + s8();
-  const copy = deepClone(list)
-  copy.forEach(item => {
+  const copy = deepClone(list);
+  copy.forEach((item) => {
     item.id = item.id + uuid;
     if (item.children) {
       item.children = item.children.map((id: string) => {
         return id + uuid;
-      })
+      });
     }
     if (item.parentId) {
       item.parentId = item.parentId + uuid;
@@ -233,15 +274,12 @@ function clonePens(list: any[]) {
 
     if (item.anchors) {
       item.anchors.forEach((anchor: any) => {
-
         anchor.penId = anchor.penId + uuid;
-      })
+      });
     }
-
-  })
+  });
   return copy;
 }
-
 
 // json 解析
 export const loadElectricJson = (data: any) => {
@@ -249,6 +287,15 @@ export const loadElectricJson = (data: any) => {
     console.log('readJSONFile: ', res, SwitchCombinesData);
     if (res?.data) {
       meta2d.clear();
+      if (SwitchCombinesData.paths) {
+        // [svgPathId]: pathString
+        // 写入到当前 data
+        const paths = meta2d.data().paths || {};
+        Object.assign(paths, SwitchCombinesData.paths);
+        Object.assign(meta2d.store.data, {
+          paths,
+        });
+      }
       const { Components, Paintings, Wires } = res.data;
       const penList: Pen[] = [];
 
@@ -267,25 +314,31 @@ export const loadElectricJson = (data: any) => {
             return;
           }
           if (StatusTypes.includes(item.type)) {
-            let parent = deepClone(SwitchCombinesData.pens.find((v) => {
-              if (item.type == "MultipleContact" && item.v10 >= '3') {
-                // 目前只有三路开关
-                return v.tags?.includes('MultipleContact-3') && !v.parentId
-              }
-              else if (v.tags?.includes(item.type) && !v.parentId) {
-                // parent
-                return true;
-              }
-            }));
-            const list = clonePens(findChildren(parent, SwitchCombinesData.pens))
-            console.log('状态组合：', item.type, item, list );
+            let parent = deepClone(
+              SwitchCombinesData.pens.find((v) => {
+                if (item.type == 'MultipleContact' && item.v10 >= '3') {
+                  // 目前只有三路开关
+                  return v.tags?.includes('MultipleContact-3') && !v.parentId;
+                } else if (v.tags?.includes(item.type) && !v.parentId) {
+                  // parent
+                  return true;
+                }
+              }),
+            );
+            const list = clonePens(
+              findChildren(parent, SwitchCombinesData.pens),
+            );
+            //console.log('状态组合：', item.type, item, config);
 
             if (list) {
-              parent = list[0]
-              const rect = meta2d.getPenRect(parent)
-              const width = rect.width / SwitchCombinesData.scale;
-              const height = rect.height / SwitchCombinesData.scale;
+              //console.log('svg pen list: ', item.type, list);
+              parent = list[0];
+              const rect = meta2d.getPenRect(parent);
+              const rWidth = rect.width / SwitchCombinesData.scale;
+              const rHeight = rect.height / SwitchCombinesData.scale;
 
+              const width = Number(config?.['宽度(X向)'] || rWidth);
+              const height = Number(config?.['高度(Y向)'] || rHeight);
               Object.assign(parent, {
                 text: item.name,
                 x: Number(item.posX),
@@ -294,14 +347,14 @@ export const loadElectricJson = (data: any) => {
                 height,
               });
               if (parent.tags && !parent.tags?.includes(item.name)) {
-                parent.tags.push(item.name)
+                parent.tags.push(item.name);
               }
               patchPosition(parent, config, item);
               // 切换状态
-              parent.showChild = getChildIndex(item)
+              parent.showChild = getChildIndex(item);
 
-              meta2d.addPens((list))
-              return
+              meta2d.addPens(list);
+              return;
             }
           }
           const svgItem = electricSvgList.find((v) => {
@@ -311,19 +364,29 @@ export const loadElectricJson = (data: any) => {
             );
           });
           if (svgItem) {
+            const cWidth = Number(config?.['宽度(X向)']);
+            const cHeight = Number(config?.['高度(Y向)']);
             loadSvg(svgItem.data.image, svgItem, false).then((list) => {
-              console.log('load svg: ', svgItem.name, svgItem);
               const parent = list.find(
                 (v) => v.name == 'combine' && !v.parentId,
               );
               Object.assign(parent, {
-                //id: item.uuid,
                 text: item.name,
                 x: Number(item.posX),
                 y: Number(item.posY),
                 //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
                 tags: [item.type, item.name],
+                width: cWidth || parent.width,
+                height: cHeight || parent.height,
               });
+              console.log(
+                '单一 svg: ',
+                svgItem.name,
+                svgItem,
+                parent,
+                cWidth,
+                cHeight,
+              );
               patchPosition(parent, config, item);
               if (svgItem.data.anchors) {
                 parent.anchors = svgItem.data.anchors;
@@ -339,8 +402,8 @@ export const loadElectricJson = (data: any) => {
               //   title: item.name,
               x: Number(item.posX),
               y: Number(item.posY),
-              width: Number(config?.['宽度（X向）'] || 100),
-              height: Number(config?.['高度（Y向）'] || 100),
+              width: Number(config?.['宽度(X向)'] || 100),
+              height: Number(config?.['高度(Y向)'] || 100),
               rotate: rotateAngelMap[item.rotateAngel] || 0,
               tags: [item.type, item.name],
               // fontSize: 10,
@@ -350,7 +413,6 @@ export const loadElectricJson = (data: any) => {
 
             penList.push(pen);
           }
-
         });
       }
 
@@ -511,36 +573,40 @@ export function copyToClipboard(text: string) {
   }
 }
 
-
-
-
-
-
 export const toggleFullScreen = () => {
   // 检查当前是否已经在全屏模式
-  if (!document.fullscreenElement &&    // 没有处于全屏模式
-      !document.mozFullScreenElement && // Firefox
-      !document.webkitFullscreenElement && // Chrome, Safari, Opera
-      !document.msFullscreenElement) { // IE/Edge
+  if (
+    !document.fullscreenElement && // 没有处于全屏模式
+    !document.mozFullScreenElement && // Firefox
+    !document.webkitFullscreenElement && // Chrome, Safari, Opera
+    !document.msFullscreenElement
+  ) {
+    // IE/Edge
     // 进入全屏
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
-    } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+    } else if (document.documentElement.mozRequestFullScreen) {
+      // Firefox
       document.documentElement.mozRequestFullScreen();
-    } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      // Chrome, Safari, Opera
       document.documentElement.webkitRequestFullscreen();
-    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+    } else if (document.documentElement.msRequestFullscreen) {
+      // IE/Edge
       document.documentElement.msRequestFullscreen();
     }
   } else {
     // 退出全屏
     if (document.exitFullscreen) {
       document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) { // Firefox
+    } else if (document.mozCancelFullScreen) {
+      // Firefox
       document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
+    } else if (document.webkitExitFullscreen) {
+      // Chrome, Safari, Opera
       document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { // IE/Edge
+    } else if (document.msExitFullscreen) {
+      // IE/Edge
       document.msExitFullscreen();
     }
   }

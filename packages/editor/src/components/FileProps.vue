@@ -175,10 +175,18 @@
                   </t-button>
                 </t-tooltip>
               </template>
-              <br>
-              <t-row v-for="(item, index) in data.wsMsgFields" :key="index" justify="start" style="margin-bottom: 4px;">
+              <br />
+              <t-row
+                v-for="(item, index) in data.wsMsgFields"
+                :key="index"
+                justify="start"
+                style="margin-bottom: 4px"
+              >
                 <t-col :span="10">
-                  <t-input v-model="item.value" @change="wsMsgFieldsChange"></t-input>
+                  <t-input
+                    v-model="item.value"
+                    @change="wsMsgFieldsChange"
+                  ></t-input>
                 </t-col>
                 <t-col :span="2">
                   <t-button variant="text" @click="deleteWsMsgField(index)">
@@ -188,7 +196,11 @@
               </t-row>
             </t-collapse-panel>
             <t-collapse-panel header="消息处理队列">
-              <MessageHandlers :wsMsgFields="data.wsMsgFields" :wsMsgHandlers="data.wsMsgHandlers" @change="wsHandlersChange"/>
+              <MessageHandlers
+                :wsMsgFields="data.wsMsgFields"
+                :wsMsgHandlers="data.wsMsgHandlers"
+                @change="wsHandlersChange"
+              />
               <template #headerRightContent>
                 <t-tooltip
                   content="【消息处理代码】存在时，此处的设置无效"
@@ -217,7 +229,7 @@ import { WebSocketClient } from "@qs/websocket-client";
 import { NotifyPlugin } from "tdesign-vue-next";
 import CodeEditor from "./CodeEditor.vue";
 import MessageHandlers from "./MessageHandlers.vue";
-import { useWsHandlers } from '../services/useHandlers'
+import { useWsHandlers } from "../services/useHandlers";
 
 // 图纸数据
 const data = reactive<any>({
@@ -347,7 +359,7 @@ const changeConnectProp = (prop: string) => {
   Object.assign(meta2d.store.data, data);
 };
 
-const { resolver } = useWsHandlers(data)
+const { resolver } = useWsHandlers(data);
 const testConnect = () => {
   const msgTypes = data.msgTypes
     .map((item: string) => {
@@ -379,7 +391,7 @@ const testConnect = () => {
         fn(response);
       } else {
         // 消息处理器的封装
-        resolver(response)
+        resolver(response);
       }
     } catch (error) {
       console.log("error: ", error);
@@ -404,21 +416,20 @@ const addWsMsgField = () => {
   data.wsMsgFields.push({
     label: "",
     value: "",
-  })
-}
+  });
+};
 const deleteWsMsgField = (index: number) => {
-  data.wsMsgFields.splice(index, 1)
-}
+  data.wsMsgFields.splice(index, 1);
+};
 const wsMsgFieldsChange = () => {
   changeConnectProp("wsMsgFields");
-}
+};
 
 const wsHandlersChange = (handlers: any) => {
   console.log("handlers: ", handlers);
-  data.wsMsgHandlers = handlers
-    changeConnectProp("wsMsgHandlers");
-}
-
+  data.wsMsgHandlers = handlers;
+  changeConnectProp("wsMsgHandlers");
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {
