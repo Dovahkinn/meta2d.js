@@ -63,7 +63,7 @@ function executeAnimate(type: string, ids: string[], tags: string[]) {
 export const useWsHandlers = (data: any) => {
   const resolver = (response: any) => {
     // ? 如何判断是更新图元的消息
-    if (response.msg) {
+    if (response?.msg) {
       const handlers = data.wsMsgHandlers || [];
       const msg = response.msg;
       handlers.forEach((handler: HandlerType) => {

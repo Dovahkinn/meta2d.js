@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "rel": "pnpm publish --registry=http://10.0.0.170:4873/ --no-git-checks",
     "build": "tsc"
   },
   "keywords": [],

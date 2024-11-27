@@ -105,7 +105,8 @@ onMounted(() => {
         });
 
       const jsStr = data.onMessageJsCode;
-      const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+      if (data.wsUrl) {
+        const wsClient = WebSocketClient.getInstance(data.wsUrl, {
         busName: data.busName,
         msgTypes,
         enableLog: false,
@@ -133,6 +134,8 @@ onMounted(() => {
         },
       });
       wsClient.connect();
+      }
+
 
       // test: 模拟修改状态
       // setTimeout(() => {

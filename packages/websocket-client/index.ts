@@ -12,13 +12,15 @@ function createWsData(type: MsgType, busName: string, msgTypes: number[]) {
 }
 
 export class WebSocketClient {
-  private static instance: WebSocketClient | null = null; // 单例实例
+  private static InstanceMap: Map<string, WebSocketClient> = new Map();
   private ws: WebSocket | null = null;
   private url: string;
   private messageHandlers: Map<string, Callback[]> = new Map();
   private cache: Map<string, any> = new Map(); // 消息缓存
   private heartbeatInterval: number;
   private heartbeatTimer: NodeJS.Timeout | null = null;
+  // 客户端主动发送心跳
+  private enableHeartbeat = false;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private isConnected = false;
   // 最大重连次数
@@ -37,6 +39,7 @@ export class WebSocketClient {
     this.reconnectInterval = options.reconnectInterval || 3000;
     this.wsOptions = options;
     this.enableLog = options.enableLog;
+    this.enableHeartbeat = options.enableHeartbeat;
   }
 
   // 获取 WebSocketClient 单例实例
@@ -44,15 +47,21 @@ export class WebSocketClient {
     url: string,
     options?: any,
   ): WebSocketClient {
-    if (!WebSocketClient.instance) {
-      WebSocketClient.instance = new WebSocketClient(url, options);
+    if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+      url = 'ws://' + url;
+    }
+    console.log('getInstance: ', url, options)
+    let instance = WebSocketClient.InstanceMap.get(url);
+    if (!instance) {     
+      instance = new WebSocketClient(url, options);
+      WebSocketClient.InstanceMap.set(url, instance);
     } else {
       console.log('Using existing WebSocketClient instance.');
     }
-    return WebSocketClient.instance;
+    instance.connect();
+    return instance;
   }
 
-  
 
   // 1. 初始化 WebSocket 连接并处理事件
   connect() {
@@ -66,38 +75,78 @@ export class WebSocketClient {
       return;
     }; // 避免重复连接
 
-    this.ws = new WebSocket(this.url);
-    this.ws.onopen = () => {
-      this.isConnected = true;
-      this.register();
-      this.startHeartbeat();
-      this.subscribe(this.wsOptions.busName, this.wsOptions.msgTypes);
-      console.log('WebSocket connection established.');
-      // 清空队列
-      this._subscribeTasks.forEach((task) => {
-        task();
-      });
-      this._subscribeTasks = [];
+    // 避免重复创建 ws
+    if (!this.ws) {
+      this.ws = new WebSocket(this.url);
+      this.ws.onopen = () => {
+        this.isConnected = true;
+        this.register();
+        this.startHeartbeat();
+        this.subscribe(this.wsOptions.busName, this.wsOptions.msgTypes);
+        console.log('========= WebSocket connection established. =========');
+        // 清空队列
+        this._subscribeTasks.forEach((task) => {
+          task();
+        });
+        this._subscribeTasks = [];
+        this.wsOptions.onReady && this.wsOptions.onReady();
+      };
+  
+      this.ws.onmessage = (event) => {
+        this.handleMessage(event.data);
+      };
+  
+      this.ws.onclose = () => {
+        this.isConnected = false;
+        this.stopHeartbeat();
+        this.reconnect();
+        console.log('WebSocket connection closed.');
+      };
+  
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.isConnected = false;
+        this.stopHeartbeat();
+        this.reconnect();
+      };
+    } else if (this.ws.readyState === WebSocket.OPEN) {
       this.wsOptions.onReady && this.wsOptions.onReady();
-    };
-
-    this.ws.onmessage = (event) => {
-      this.handleMessage(event.data);
-    };
-
-    this.ws.onclose = () => {
-      this.isConnected = false;
-      this.stopHeartbeat();
-      this.reconnect();
-      console.log('WebSocket connection closed.');
-    };
-
-    this.ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      this.isConnected = false;
-      this.stopHeartbeat();
-      this.reconnect();
-    };
+    } else {
+      console.error('连接已断开：', this.url)
+      this.ws = new WebSocket(this.url);
+      this.ws.onopen = () => {
+        this.isConnected = true;
+        this.register();
+        this.startHeartbeat();
+        this.subscribe(this.wsOptions.busName, this.wsOptions.msgTypes);
+        console.log('========= WebSocket connection established. =========');
+        // 清空队列
+        this._subscribeTasks.forEach((task) => {
+          task();
+        });
+        this._subscribeTasks = [];
+        this.wsOptions.onReady && this.wsOptions.onReady();
+      };
+  
+      this.ws.onmessage = (event) => {
+        this.handleMessage(event.data);
+      };
+  
+      this.ws.onclose = () => {
+        this.isConnected = false;
+        this.stopHeartbeat();
+        this.reconnect();
+        console.log('WebSocket connection closed.');
+      };
+  
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.isConnected = false;
+        this.stopHeartbeat();
+        this.reconnect();
+      };
+    }
+    
   }
 
   /**
@@ -175,7 +224,7 @@ export class WebSocketClient {
       _busName,
       _msgTypes
     );
-    if (this.ws.readyState !== WebSocket.OPEN) {
+    if (this.ws?.readyState !== WebSocket.OPEN) {
       console.log('WebSocket 连接尚未建立，订阅任务加入队列');
       this._subscribeTasks.push(() => {
         this.ws.send(JSON.stringify(registerData));
@@ -257,6 +306,7 @@ export class WebSocketClient {
    * @returns
    */
   private startHeartbeat() {
+    if (!this.enableHeartbeat) return;
     if (this.heartbeatTimer) return;
 
     this.heartbeatTimer = setInterval(() => {
@@ -313,7 +363,8 @@ export class WebSocketClient {
     this.stopHeartbeat();
     this.ws?.close();
     this.ws = null;
-    WebSocketClient.instance = null; // 清除单例
+    // WebSocketClient.instance = null; // 清除单例
+    WebSocketClient.InstanceMap.delete(this.url);
     this.isConnected = false;
     console.log('WebSocketClient instance closed and cleared.');
   }
