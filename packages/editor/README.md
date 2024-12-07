@@ -4,11 +4,11 @@
 
 This is a diagram editor implemented based on vite+vue3+meta2d.js.
 
-# 教程
+## 教程
 
 https://doc.le5le.com/blog/136442377
 
-# 运行 How to run
+## 运行 How to run
 
 ```
 pnpm i
@@ -21,7 +21,7 @@ pnpm start
 
 ```
 
-# 编译 Build
+## 编译 Build
 
 ```
 pnpm i
@@ -30,6 +30,20 @@ pnpm build
 
 ```
 
-# License
+## TODO
+
+- 预览页支持步骤切换、播放、停止等  
+  * 一个电路图包含若干步骤
+  * 一个步骤包含若干状态，有时序，有持续时间
+
+- ws 消息处理调度、优化机制：
+  * 短时间大量更新消息，先统一更新数据，后渲染
+  * 时间段的连续消息，可见视图即时更新，未加载的图纸，维护一个后台任务
+  * 
+
+- 内置控件
+  * 支持视频音频
+
+## License
 
 MIT © le5le.com
