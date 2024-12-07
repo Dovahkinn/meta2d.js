@@ -1,6 +1,10 @@
 <template>
   <div class="app-page is--preview">
-    <transition name="sidebar-transition">
+    <transition
+      name="sidebar-transition"
+      @after-leave="afterLeave"
+      @after-enter="afterEnter"
+    >
       <div v-if="!isCollapsed" class="left__panel">
         <t-row justify="end">
           <t-col :span="2">
@@ -24,7 +28,48 @@
     </transition>
 
     <View v-bind="$attrs" preview :data="data" @ready="emit('ready', $event)" />
+
+    <div class="right__panel">
+      <slot name="right-panel">
+        <t-list v-if="playList.length" :split="true">
+          <t-list-item>
+            <t-list-item-meta
+              title="内容"
+              :description="currentStepData?.description"
+            />
+          </t-list-item>
+        </t-list>
+        <t-empty v-else></t-empty>
+        <t-divider></t-divider>
+        <t-space direction="vertical" align="center">
+          <t-button
+            block
+            theme="primary"
+            variant="base"
+            @click="clickHandler(0)"
+            >上一页</t-button
+          >
+          <t-button block variant="outline" @click="clickHandler(1)"
+            >下一页</t-button
+          >
+          <t-button block variant="dashed" @click="clickHandler(2)"
+            >播放</t-button
+          >
+          <t-button block variant="text" @click="clickHandler(3)"
+            >暂停</t-button
+          >
+          <t-button block variant="text" @click="clickHandler(4)"
+            >停止</t-button
+          >
+          <t-button block variant="dashed" @click="clickHandler(5)"
+            >重播</t-button
+          >
+        </t-space>
+      </slot>
+    </div>
+
     <t-sticky-tool
+      v-if="showStickyTool"
       type="compact"
       placement="left-bottom"
       style="z-index: 999"
@@ -44,10 +89,20 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps, h, ref, reactive, computed } from "vue";
+import {
+  defineEmits,
+  defineProps,
+  h,
+  ref,
+  reactive,
+  computed,
+  watch,
+  nextTick,
+} from "vue";
 import View from "../components/View.vue";
 import { Icon } from "tdesign-vue-next";
 import { toggleFullScreen } from "../utils";
+import { usePlayer } from "../services/usePlayer.ts";
 
 const emit = defineEmits(["ready"]);
 const props = defineProps({
@@ -56,6 +111,10 @@ const props = defineProps({
   },
   projectTreeData: {
     type: Array,
+  },
+  showStickyTool: {
+    type: Boolean,
+    default: true,
   },
 });
 
@@ -165,12 +224,106 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
       });
   }
 };
+const afterEnter = () => {
+  meta2d?.resize();
+};
+const afterLeave = () => {
+  meta2d?.resize();
+};
+
+// * 控制逻辑，页面切换
+const { playList, currentStepData, prev, next, play } = usePlayer();
+playList.value = [
+  {
+    name: "page1",
+    description: "text1",
+    stateList: [
+      {
+        Name: "Switch",
+        Type: 0,
+        State: 0,
+      },
+      {
+        Name: "继电器A",
+        Type: 18,
+        Value: 1, // 有电无电
+      },
+    ],
+    currentStateList: [
+      {
+        name: "LineA",
+        value: 1.1, // 电流值
+      },
+    ],
+  },
+  {
+    name: "page2",
+    description: "text2",
+    stateList: [
+      {
+        Name: "Switch",
+        Type: 0,
+        State: 1,
+      },
+      {
+        Name: "继电器",
+        Type: 17,
+        Value: 0,
+      },
+    ],
+    currentStateList: [
+      {
+        name: "LineB",
+        value: 1.1, // 电流值
+      },
+    ],
+  },
+  {
+    name: "page3",
+    description: "text3",
+    stateList: [
+      {
+        Name: "Switch",
+        Type: 0,
+        State: 2,
+      },
+      {
+        Name: "R",
+        Type: 0,
+        Value: 1,
+      },
+    ],
+    currentStateList: [
+      {
+        name: "LineC",
+        value: 1.1, // 电流值
+      },
+    ],
+  },
+];
+
+// 测试用
+const clickHandler = (code: number) => {
+  switch (code) {
+    case 0:
+      prev();
+      break;
+    case 1:
+      next();
+      break;
+    case 2:
+      play();
+      break;
+  }
+};
 </script>
 
 <style lang="postcss" scoped>
 .sidebar-transition-enter-active,
 .sidebar-transition-leave-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .sidebar-transition-enter, .sidebar-transition-leave-to /* .sidebar-transition-leave-active in <2.1.8 */ {
@@ -198,6 +351,15 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
     border-right: 2px solid #f5f5f5;
     padding: 20px;
     overflow-y: auto;
+  }
+
+  .right__panel {
+    width: 250px;
+    height: 100%;
+    border-left: 2px solid #f5f5f5;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 999;
   }
 }
 </style>

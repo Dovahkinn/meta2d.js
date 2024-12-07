@@ -118,7 +118,7 @@ onMounted(() => {
               "color: green; font-weight: bold;",
               data
             );
-            
+
             try {
               if (jsStr) {
                 const fn = new Function("data", jsStr);
@@ -184,6 +184,9 @@ onUnmounted(() => {
   &.is--preview {
     height: 100%;
     flex: 1;
+    overflow-x: hidden;
+
+
   }
 }
 </style>
