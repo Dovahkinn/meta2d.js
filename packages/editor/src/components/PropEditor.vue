@@ -336,7 +336,7 @@
 
       <t-divider />
 
-      <t-form-item v-if="data.name == 'combine'" label="状态" name="status">
+      <t-form-item v-if="data.penName == 'combine'" label="状态" name="status">
         <t-select v-model="data.showChild" @change="changeValue('showChild')">
           <t-option
             v-for="(item, index) in statusList"
@@ -356,6 +356,10 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  statusList: {
+    type: Array,
+    default: () => [],
+  }
 });
 
 const emit = defineEmits(["propChange"]);

@@ -44,6 +44,13 @@ pnpm build
 - 内置控件
   * 支持视频音频
 
+-------
+1. 编辑器，dist
+2. vue3 项目，yudao 原生
+3. ~~自定义动画帧，增加状态配置项~~
+4. 
+
+
 ## License
 
 MIT © le5le.com

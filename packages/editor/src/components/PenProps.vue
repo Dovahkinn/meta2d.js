@@ -602,7 +602,7 @@
       <t-button block theme="primary" @click="insertFrame">新增动画帧</t-button>
       <t-collapse class="meta-collapse" expand-mutex>
         <t-collapse-panel v-for="item in customFrames" header="动画帧">
-          <prop-editor :data="item"></prop-editor>
+          <prop-editor :data="item" :statusList="statusList"></prop-editor>
           <template #headerRightContent>
             <t-button
               size="small"
@@ -753,6 +753,7 @@ const insertFrame = () => {
   customFrames.value.push({
     duration: 100,
     globalAlpha: 1,
+    penName: pen.value.name,
   });
 };
 
