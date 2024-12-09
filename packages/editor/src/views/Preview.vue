@@ -29,7 +29,7 @@
 
     <View v-bind="$attrs" preview :data="data" @ready="emit('ready', $event)" />
 
-    <div class="right__panel">
+    <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel">
         <t-list v-if="playList.length" :split="true">
           <t-list-item>
@@ -116,6 +116,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showRightPanel: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 // * 侧边工具栏

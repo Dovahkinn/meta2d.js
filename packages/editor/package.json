@@ -4,17 +4,18 @@
   "version": "0.0.4",
   "scripts": {
     "start": "vite",
-    "build": "vue-tsc && vite build",
-    "build:lib": "vite build",
+    "tsc": "vue-tsc",
+    "build": "vite build",
+    "build:lib": "vite build --mode lib",
     "preview": "vite preview",
     "rel": "pnpm publish --registry=http://10.0.0.170:4873/ --no-git-checks"
   },
   "files": [
-    "dist"
+    "lib"
   ],
   "main-": "./src/index.ts",
-  "main": "./dist/diagram-editor-vue3.umd.js",
-  "module": "./dist/diagram-editor-vue3.mjs",
+  "main": "./lib/diagram-editor-vue3.umd.js",
+  "module": "./lib/diagram-editor-vue3.mjs",
   "dependencies": {
     "@meta2d/activity-diagram": "workspace:*",
     "@meta2d/chart-diagram": "workspace:*",
