@@ -223,6 +223,7 @@ const insert = () => {
 };
 const deleteEvent = (event: any) => {
   events.value = events.value.filter((item: any) => item !== event);
+  eventChange()
 };
 
 const emit = defineEmits(["change"]);
