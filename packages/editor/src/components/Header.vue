@@ -29,9 +29,9 @@
         <t-dropdown-item>
           <a @click="downloadPng">下载为PNG</a>
         </t-dropdown-item>
-        <t-dropdown-item>
-          <a @click="downloadSvg">下载为SVG</a>
-        </t-dropdown-item>
+        <!-- <t-dropdown-item> -->
+        <!--   <a @click="downloadSvg">下载为SVG</a> -->
+        <!-- </t-dropdown-item> -->
       </t-dropdown-menu>
     </t-dropdown>
     <t-dropdown
@@ -90,8 +90,8 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-   
-    
+
+
     <a class="logo">
       <span @click="customToolbarClick()">添加/删除锚点</span>
     </a>
@@ -553,6 +553,7 @@ function isShowChild(pen: any, store: any) {
   return true;
 }
 
+// 有 bug, 先不用
 const downloadSvg = () => {
   if (!C2S) {
     MessagePlugin.error("请先加载乐吾乐官网下的canvas2svg.js");
