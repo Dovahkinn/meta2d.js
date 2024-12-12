@@ -13,9 +13,9 @@
   "files": [
     "lib"
   ],
-  "main-": "./src/index.ts",
-  "main": "./lib/diagram-editor-vue3.umd.js",
-  "module": "./lib/diagram-editor-vue3.mjs",
+  "main": "./src/index.ts",
+  "main-": "./lib/diagram-editor-vue3.umd.js",
+  "module-": "./lib/diagram-editor-vue3.mjs",
   "dependencies": {
     "@meta2d/activity-diagram": "workspace:*",
     "@meta2d/chart-diagram": "workspace:*",

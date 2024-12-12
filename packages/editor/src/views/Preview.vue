@@ -118,8 +118,8 @@ const props = defineProps({
   },
   showRightPanel: {
     type: Boolean,
-    default: false,
-  }
+    default: true,
+  },
 });
 
 // * 侧边工具栏
@@ -241,66 +241,96 @@ playList.value = [
   {
     name: "page1",
     description: "text1",
-    stateList: [
+    // stateList: [
+    //   {
+    //     Name: "Switch",
+    //     Type: 28,
+    //     State: 0,
+    //   },
+    //   {
+    //     Name: "继电器A",
+    //     Type: 18,
+    //     Value: 1, // 有电无电
+    //   },
+    // ],
+    // currentStateList: [
+    //   {
+    //     name: "LineA",
+    //     value: 1.1, // 电流值
+    //   },
+    // ],
+    privatePropList: [
       {
-        Name: "Switch",
-        Type: 0,
-        State: 0,
+        tag: "Switch",
+        showChild: 1,
       },
       {
-        Name: "继电器A",
-        Type: 18,
-        Value: 1, // 有电无电
-      },
-    ],
-    currentStateList: [
-      {
-        name: "LineA",
-        value: 1.1, // 电流值
+        tag: "L32",
+        lineWidth: 2,
       },
     ],
   },
   {
     name: "page2",
     description: "text2",
-    stateList: [
+    // stateList: [
+    //   {
+    //     Name: "Switch",
+    //     Type: 28,
+    //     State: 1,
+    //   },
+    //   {
+    //     Name: "继电器",
+    //     Type: 17,
+    //     Value: 0,
+    //   },
+    // ],
+    // currentStateList: [
+    //   {
+    //     name: "LineB",
+    //     value: 1.1, // 电流值
+    //   },
+    // ],
+    privatePropList: [
       {
-        Name: "Switch",
-        Type: 0,
-        State: 1,
+        tag: "Switch",
+        showChild: 1,
       },
       {
-        Name: "继电器",
-        Type: 17,
-        Value: 0,
-      },
-    ],
-    currentStateList: [
-      {
-        name: "LineB",
-        value: 1.1, // 电流值
+        tag: "L32",
+        lineWidth: 3,
       },
     ],
   },
   {
     name: "page3",
     description: "text3",
-    stateList: [
+    // stateList: [
+    //   {
+    //     Name: "Switch",
+    //     Type: 28,
+    //     State: 2,
+    //   },
+    //   {
+    //     Name: "R",
+    //     Type: 0,
+    //     Value: 1,
+    //   },
+    // ],
+    // currentStateList: [
+    //   {
+    //     name: "LineC",
+    //     value: 1.1, // 电流值
+    //   },
+    // ],
+    privatePropList: [
       {
-        Name: "Switch",
-        Type: 0,
-        State: 2,
+        tag: "Switch",
+        showChild: 1,
       },
       {
-        Name: "R",
-        Type: 0,
-        Value: 1,
-      },
-    ],
-    currentStateList: [
-      {
-        name: "LineC",
-        value: 1.1, // 电流值
+        tag: "L32",
+        lineWidth: 1,
       },
     ],
   },
@@ -325,9 +355,7 @@ const clickHandler = (code: number) => {
 <style lang="postcss" scoped>
 .sidebar-transition-enter-active,
 .sidebar-transition-leave-active {
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .sidebar-transition-enter, .sidebar-transition-leave-to /* .sidebar-transition-leave-active in <2.1.8 */ {

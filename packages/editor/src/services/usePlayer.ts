@@ -5,8 +5,8 @@ type StepDataType = {
   order?: number;
   description?: string;
   // 元件状态集合
-  stateList: ElectricState[];
-  currentStateList: ElectricCurrentState[];
+  stateList?: ElectricState[];
+  currentStateList?: ElectricCurrentState[];
   // meta2d 内置属性集合，用于电路协议未支持的状态：颜色、大小等等
   privatePropList: any[];
 };
@@ -36,7 +36,7 @@ function transformToPenProps(state: ElectricCurrentState | ElectricState, type: 
   if (type == 1) {
     const { Name, Value } = state;
     // TODO: value 决定流向
-    // TODO: name 目前感觉是线路，其他类型有什么效果需要特别处理
+    // TODO: name 目前感觉是线条，其他类型有什么效果需要特别处理
   } else {
     const { Name, Type, Value, State, } = state;
 
@@ -89,18 +89,46 @@ export const usePlayer = () => {
   };
 
   const play = () => {
-    console.log('play: ', currentStepData.value, meta2d.data());
+    console.log('play: ', currentStepData.value);
     if (currentStepData.value) {
-      const { stateList, currentStateList } = currentStepData.value;
+      const { stateList, currentStateList, privatePropList } = currentStepData.value;
       if (stateList?.length) {
         stateList.forEach((state) => {
-          transformToPenProps(state, 0);
+          const value = transformToPenProps(state, 0);
+          if (value) {
+            if (!value.tag && !value.id) {
+              console.warn('更新参数必须要有标签名或ID：', value)
+              return;
+            }
+            meta2d.setValue(value);
+          }
         });
       }
       if (currentStateList?.length) {
         currentStateList.forEach((state) => {
-          transformToPenProps(state, 1);
+          const value = transformToPenProps(state, 1);
+          if (value) {
+            if (!value.tag && !value.id) {
+              console.warn('更新参数必须要有标签名或ID：', value)
+              return
+            }
+            meta2d.setValue(value);
+          }
+
         });
+      }
+      if (privatePropList?.length) {
+          privatePropList.forEach(value => {
+            if (value) {
+              if (!value.id && !value.tag) {
+                return;
+              }
+              // - 修改属性
+              meta2d.setValue(value)
+              // - 执行动画
+              //
+            }
+          })
       }
     }
   };
