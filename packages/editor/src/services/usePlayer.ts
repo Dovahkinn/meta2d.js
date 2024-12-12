@@ -1,9 +1,11 @@
 import { ref, computed } from 'vue';
+import { EventAction } from '../types/Event'
 
 type StepDataType = {
   name: string;
   order?: number;
   description?: string;
+  duration?: number;
   // 元件状态集合
   stateList?: ElectricState[];
   currentStateList?: ElectricCurrentState[];
@@ -38,7 +40,7 @@ function transformToPenProps(state: ElectricCurrentState | ElectricState, type: 
     // TODO: value 决定流向
     // TODO: name 目前感觉是线条，其他类型有什么效果需要特别处理
   } else {
-    const { Name, Type, Value, State, } = state;
+    const { Name, Type, Value, State, } = state as ElectricState;
 
     // * 开关取 state
     // 修改开关组合状态 0 1 2
@@ -60,6 +62,7 @@ export const usePlayer = () => {
   const playList = ref<StepDataType[]>([]);
   const currentStep = ref(0);
   const currentStepData = computed(() => playList.value[currentStep.value]);
+  let queue: TaskQueue | null = null;
 
   const changePage = (key: string | number) => {
     // 名称、序号
@@ -76,7 +79,7 @@ export const usePlayer = () => {
         currentStep.value = 0;
         return;
       }
-      const normalKey = parseInt(key);
+      const normalKey = +Number(key).toFixed();
       if (normalKey > max) {
         currentStep.value = max;
         console.warn('指定序号超出上限');
@@ -87,9 +90,9 @@ export const usePlayer = () => {
       }
     }
   };
-
-  const play = () => {
-    console.log('play: ', currentStepData.value);
+  // 执行更新
+  const apply = () => {
+    console.log('apply: ', currentStepData.value);
     if (currentStepData.value) {
       const { stateList, currentStateList, privatePropList } = currentStepData.value;
       if (stateList?.length) {
@@ -118,23 +121,28 @@ export const usePlayer = () => {
         });
       }
       if (privatePropList?.length) {
-          privatePropList.forEach(value => {
-            if (value) {
-              if (!value.id && !value.tag) {
-                return;
-              }
+        privatePropList.forEach(value => {
+          if (value) {
+            if (!value.id && !value.tag) {
+              return;
+            }
+            const { id, tag, action, ...props } = value;
+            const pens = meta2d.find(id || tag)
+            if (action == EventAction.StartAnimate) {
+              meta2d.startAnimate(pens)
+            } else if (action == EventAction.PauseAnimate) {
+              meta2d.pauseAnimate(pens)
+            } else if (action == EventAction.StopAnimate) {
+              meta2d.stopAnimate(pens)
+            } else {
               // - 修改属性
               meta2d.setValue(value)
-              // - 执行动画
-              //
             }
-          })
+          }
+        })
       }
     }
   };
-  const pause = () => {};
-  const stop = () => {};
-  const replay = () => {};
 
   const prev = () => {
     changePage(currentStep.value - 1);
@@ -143,10 +151,41 @@ export const usePlayer = () => {
     changePage(currentStep.value + 1);
   };
 
+  // * 针对所有步骤
+  const play = () => {
+    console.log('play: ', playList.value, queue)
+    if (!queue || queue.currentIndex >= playList.value.length) {
+      queue = new TaskQueue(playList.value)
+      queue.handler((task, index) => {
+        currentStep.value = index;
+        apply()
+      })
+      queue.start()
+    } else {
+      queue.resume()
+    }
+  }
+  const pause = () => {
+    if (queue) {
+      queue.pause();
+    }
+  };
+  const stop = () => {
+    if (queue) {
+      queue.stop()
+    }
+  };
+  const replay = () => {
+    if (queue) {
+      queue.replay()
+    }
+  };
+
   return {
     playList,
     currentStep,
     changePage,
+    apply,
     play,
     pause,
     stop,
@@ -156,3 +195,113 @@ export const usePlayer = () => {
     currentStepData,
   };
 };
+
+class TaskQueue {
+  private tasks: StepDataType[]; // 任务队列
+  currentIndex: number; // 当前任务索引
+  private isPaused: boolean; // 暂停标志
+  private isRunning: boolean; // 运行标志
+  private resumeCallback: (() => void) | null; // 恢复回调
+  private isStopped: boolean; // 停止标志
+  private handlerCallback: ((task: StepDataType, index: number) => void) | null;
+
+  constructor(tasks: StepDataType[]) {
+    this.tasks = tasks;
+    this.currentIndex = 0;
+    this.isPaused = false;
+    this.isRunning = false;
+    this.resumeCallback = null;
+    this.isStopped = false;
+  }
+
+
+  public handler(fn: (task: StepDataType, index: number) => void) {
+    this.handlerCallback = fn;
+  }
+
+  // 执行任务
+  private async runTask(task: StepDataType): Promise<void> {
+    console.log(`Task started: ${JSON.stringify(task)}`);
+    return new Promise((resolve) => {
+      // 开始执行更新任务
+      if (this.handlerCallback) {
+        this.handlerCallback(task, this.currentIndex)
+      }
+
+      const timer = setTimeout(() => {
+        console.log(`Task completed: ${JSON.stringify(task)}`);
+        resolve();
+      }, task.duration);
+
+      // 支持暂停和停止逻辑
+      const checkPauseOrStop = () => {
+        if (this.isPaused || this.isStopped) {
+          clearTimeout(timer); // 清除当前任务的定时器
+          if (this.isPaused) {
+            this.resumeCallback = () => {
+              console.log(`Task resumed: ${JSON.stringify(task)}`);
+              this.runTask(task).then(resolve); // 重新开始任务
+            };
+          }
+        }
+      };
+
+      checkPauseOrStop();
+    });
+  }
+
+  // 启动任务队列
+  public async start(): Promise<void> {
+    if (this.isRunning) return; // 防止重复启动
+    this.isRunning = true;
+    this.isPaused = false;
+    this.isStopped = false;
+
+    while (this.currentIndex < this.tasks.length) {
+      const task = this.tasks[this.currentIndex];
+      await this.runTask(task);
+      if (this.isPaused || this.isStopped) break; // 暂停或停止后退出循环
+      this.currentIndex += 1;
+    }
+
+    this.isRunning = false; // 所有任务执行完毕或停止后重置运行状态
+    if (this.currentIndex >= this.tasks.length && !this.isStopped) {
+      console.log("All tasks completed.");
+    }
+  }
+
+  // 暂停任务
+  public pause(): void {
+    if (!this.isRunning || this.isPaused) return;
+    this.isPaused = true;
+    console.log("Task queue paused.");
+  }
+
+  // 恢复任务
+  public resume(): void {
+    if (!this.isPaused || this.isStopped) return;
+    this.isPaused = false;
+    console.log("Task queue resumed.");
+
+    if (this.resumeCallback) {
+      this.resumeCallback();
+      this.resumeCallback = null;
+    } else {
+      this.start();
+    }
+  }
+
+  // 停止任务
+  public stop(): void {
+    if (!this.isRunning) return;
+    this.isStopped = true;
+    this.isPaused = false;
+    this.resumeCallback = null;
+    console.log("Task queue stopped.");
+  }
+
+  public replay(): void {
+    this.currentIndex = 0;
+    this.start()
+  }
+}

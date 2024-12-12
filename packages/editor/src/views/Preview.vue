@@ -1,25 +1,13 @@
 <template>
   <div class="app-page is--preview">
-    <transition
-      name="sidebar-transition"
-      @after-leave="afterLeave"
-      @after-enter="afterEnter"
-    >
+    <transition name="sidebar-transition" @after-leave="afterLeave" @after-enter="afterEnter">
       <div v-if="!isCollapsed" class="left__panel">
         <t-row justify="end">
           <t-col :span="2">
-            <t-icon
-              name="fullscreen"
-              size="large"
-              @click="handleToolClick('fullscreen')"
-            ></t-icon>
+            <t-icon name="fullscreen" size="large" @click="handleToolClick('fullscreen')"></t-icon>
           </t-col>
           <t-col :span="2">
-            <t-icon
-              name="rectangle"
-              size="large"
-              @click="handleToolClick('fit')"
-            ></t-icon>
+            <t-icon name="rectangle" size="large" @click="handleToolClick('fit')"></t-icon>
           </t-col>
         </t-row>
         <t-divider></t-divider>
@@ -31,57 +19,13 @@
 
     <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel">
-        <t-list v-if="playList.length" :split="true">
-          <t-list-item>
-            <t-list-item-meta
-              title="内容"
-              :description="currentStepData?.description"
-            />
-          </t-list-item>
-        </t-list>
-        <t-empty v-else></t-empty>
-        <t-divider></t-divider>
-        <t-space direction="vertical" align="center">
-          <t-button
-            block
-            theme="primary"
-            variant="base"
-            @click="clickHandler(0)"
-            >上一页</t-button
-          >
-          <t-button block variant="outline" @click="clickHandler(1)"
-            >下一页</t-button
-          >
-          <t-button block variant="dashed" @click="clickHandler(2)"
-            >播放</t-button
-          >
-          <t-button block variant="text" @click="clickHandler(3)"
-            >暂停</t-button
-          >
-          <t-button block variant="text" @click="clickHandler(4)"
-            >停止</t-button
-          >
-          <t-button block variant="dashed" @click="clickHandler(5)"
-            >重播</t-button
-          >
-        </t-space>
-      </slot>
+     </slot>
     </div>
 
-    <t-sticky-tool
-      v-if="showStickyTool"
-      type="compact"
-      placement="left-bottom"
-      style="z-index: 999"
-      @click="handleClick"
-    >
+    <t-sticky-tool v-if="showStickyTool" type="compact" placement="left-bottom" style="z-index: 999"
+      @click="handleClick">
       <template v-for="tool in sidebarTools" :key="tool.label">
-        <t-sticky-item
-          v-if="tool.show()"
-          :label="tool.label"
-          :icon="renderIcon(tool.icon)"
-          :popup="tool.popup"
-        >
+        <t-sticky-item v-if="tool.show()" :label="tool.label" :icon="renderIcon(tool.icon)" :popup="tool.popup">
         </t-sticky-item>
       </template>
     </t-sticky-tool>
@@ -236,11 +180,12 @@ const afterLeave = () => {
 };
 
 // * 控制逻辑，页面切换
-const { playList, currentStepData, prev, next, play } = usePlayer();
+const { playList, currentStepData, prev, next, apply, play, pause, stop, replay, } = usePlayer();
 playList.value = [
   {
     name: "page1",
     description: "text1",
+    duration: 6000,
     // stateList: [
     //   {
     //     Name: "Switch",
@@ -267,12 +212,14 @@ playList.value = [
       {
         tag: "L32",
         lineWidth: 2,
+        color: 'blue',
       },
     ],
   },
   {
     name: "page2",
     description: "text2",
+    duration: 9000,
     // stateList: [
     //   {
     //     Name: "Switch",
@@ -294,17 +241,23 @@ playList.value = [
     privatePropList: [
       {
         tag: "Switch",
-        showChild: 1,
+        showChild: 0,
       },
       {
         tag: "L32",
         lineWidth: 3,
+        color: 'green',
       },
+      {
+        tag: 'L32',
+        action: 2,
+      }
     ],
   },
   {
     name: "page3",
     description: "text3",
+    duration: 7000,
     // stateList: [
     //   {
     //     Name: "Switch",
@@ -331,25 +284,17 @@ playList.value = [
       {
         tag: "L32",
         lineWidth: 1,
+        color: 'red',
       },
+      {
+        tag: 'L32',
+        action: 3,
+      }
+
     ],
   },
 ];
 
-// 测试用
-const clickHandler = (code: number) => {
-  switch (code) {
-    case 0:
-      prev();
-      break;
-    case 1:
-      next();
-      break;
-    case 2:
-      play();
-      break;
-  }
-};
 </script>
 
 <style lang="postcss" scoped>
@@ -358,7 +303,11 @@ const clickHandler = (code: number) => {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.sidebar-transition-enter, .sidebar-transition-leave-to /* .sidebar-transition-leave-active in <2.1.8 */ {
+.sidebar-transition-enter,
+.sidebar-transition-leave-to
+
+/* .sidebar-transition-leave-active in <2.1.8 */
+  {
   transform: translateX(-250px);
   opacity: 0;
 }
