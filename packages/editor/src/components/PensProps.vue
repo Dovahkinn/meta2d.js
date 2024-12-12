@@ -83,7 +83,7 @@
 
           <template v-if="allIsRect">
             <t-form-item label="动画效果" name="animateType">
-              <t-select v-model="pen.animateType" @change="changeValue('animateType')">
+              <t-select v-model="pen.animateType" clearable @change="changeValue('animateType')">
                 <t-option v-for="item in PenFrameOptions" :key="item.value" :value="item.value"
                   :label="item.label"></t-option>
               </t-select>
@@ -96,7 +96,7 @@
 
           <template v-else-if="allIsLine">
             <t-form-item label="动画效果" name="lineAnimateType">
-              <t-select v-model="pen.lineAnimateType" @change="changeValue('lineAnimateType')">
+              <t-select v-model="pen.lineAnimateType" clearable @change="changeValue('lineAnimateType')">
                 <t-option v-for="item in LineAnimateOption" :key="item.value" :value="item.value"
                   :label="item.label"></t-option>
               </t-select>
