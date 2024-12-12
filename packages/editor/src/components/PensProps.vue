@@ -7,24 +7,12 @@
             <t-input v-model="pen.text" @change="changeValue('text')" />
           </t-form-item>
           <t-form-item label="颜色" name="color">
-            <t-color-picker
-              class="w-full"
-              v-model="pen.color"
-              :show-primary-color-preview="false"
-              format="CSS"
-              :color-modes="['monochrome']"
-              @change="changeValue('color')"
-            />
+            <t-color-picker class="w-full" v-model="pen.color" :show-primary-color-preview="false" format="CSS"
+              :color-modes="['monochrome']" @change="changeValue('color')" />
           </t-form-item>
           <t-form-item label="背景" name="background">
-            <t-color-picker
-              class="w-full"
-              v-model="pen.background"
-              :show-primary-color-preview="false"
-              format="CSS"
-              :color-modes="['monochrome']"
-              @change="changeValue('background')"
-            />
+            <t-color-picker class="w-full" v-model="pen.background" :show-primary-color-preview="false" format="CSS"
+              :color-modes="['monochrome']" @change="changeValue('background')" />
           </t-form-item>
           <t-form-item label="线条" name="dash">
             <t-select v-model="pen.dash" @change="changeValue('dash')">
@@ -32,23 +20,16 @@
               <t-option :key="1" :value="1" label="虚线"></t-option>
             </t-select>
           </t-form-item>
+          <t-form-item label="线条宽度" name="lineWidth">
+            <t-input-number v-model="pen.lineWidth" @change="changeValue('lineWidth')" />
+          </t-form-item>
+
           <t-form-item label="圆角" name="borderRadius">
-            <t-input-number
-              :min="0"
-              :max="1"
-              :step="0.01"
-              v-model="pen.borderRadius"
-              @change="changeValue('borderRadius')"
-            />
+            <t-input-number :min="0" :max="1" :step="0.01" v-model="pen.borderRadius"
+              @change="changeValue('borderRadius')" />
           </t-form-item>
           <t-form-item label="不透明度" name="globalAlpha">
-            <t-slider
-              v-model="pen.globalAlpha"
-              :min="0"
-              :max="1"
-              :step="0.01"
-              @change="changeValue('globalAlpha')"
-            />
+            <t-slider v-model="pen.globalAlpha" :min="0" :max="1" :step="0.01" @change="changeValue('globalAlpha')" />
             <span class="ml-16" style="width: 50px; line-height: 30px">
               {{ pen.globalAlpha }}
             </span>
@@ -57,20 +38,14 @@
           <t-divider />
 
           <t-form-item label="文字水平对齐" name="textAlign">
-            <t-select
-              v-model="pen.textAlign"
-              @change="changeValue('textAlign')"
-            >
+            <t-select v-model="pen.textAlign" @change="changeValue('textAlign')">
               <t-option key="left" value="left" label="左对齐"></t-option>
               <t-option key="center" value="center" label="居中"></t-option>
               <t-option key="right" value="right" label="右对齐"></t-option>
             </t-select>
           </t-form-item>
           <t-form-item label="文字垂直对齐" name="textBaseline">
-            <t-select
-              v-model="pen.textBaseline"
-              @change="changeValue('textBaseline')"
-            >
+            <t-select v-model="pen.textBaseline" @change="changeValue('textBaseline')">
               <t-option key="top" value="top" label="顶部对齐"></t-option>
               <t-option key="middle" value="middle" label="居中"></t-option>
               <t-option key="bottom" value="bottom" label="底部对齐"></t-option>
@@ -79,14 +54,8 @@
           <t-divider />
           <t-collapse expand-icon borderless defaultExpandAll>
             <t-collapse-panel value="0" header="对齐">
-              <t-button
-                v-for="(item, index) in alginOptions"
-                :key="index"
-                shape="square"
-                variant="outline"
-                style="margin-right: 4px"
-                @click="align(item)"
-              >
+              <t-button v-for="(item, index) in alginOptions" :key="index" shape="square" variant="outline"
+                style="margin-right: 4px" @click="align(item)">
                 <t-icon :name="item.icon" />
               </t-button>
             </t-collapse-panel>
@@ -105,124 +74,64 @@
     </template>
     <template #animation-props>
       <div class="props-panel">
-        <t-form
-          v-if="allIsLine || allIsRect"
-          label-width="80px"
-          label-align="left"
-        >
+        <t-form v-if="allIsLine || allIsRect" label-width="80px" label-align="left">
           <t-space style="width: 100%">
-            <t-alert
-              theme="warning"
-              title="批量修改所有图元的动画"
-              message="执行了操作后才会修改"
-            >
+            <t-alert theme="warning" title="批量修改所有图元的动画" message="执行了操作后才会修改">
             </t-alert>
           </t-space>
           <t-divider />
 
           <template v-if="allIsRect">
             <t-form-item label="动画效果" name="animateType">
-              <t-select
-                v-model="pen.animateType"
-                @change="changeValue('animateType')"
-              >
-                <t-option
-                  v-for="item in PenFrameOptions"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label"
-                ></t-option>
+              <t-select v-model="pen.animateType" @change="changeValue('animateType')">
+                <t-option v-for="item in PenFrameOptions" :key="item.value" :value="item.value"
+                  :label="item.label"></t-option>
               </t-select>
             </t-form-item>
-            <t-form-item
-              v-if="pen.animateType == 'x-custom'"
-              label="自定义动画帧"
-            >
-              <t-button variant="text" theme="primary" @click="showFramesDrawer"
-                >编辑
+            <t-form-item v-if="pen.animateType == 'x-custom'" label="自定义动画帧">
+              <t-button variant="text" theme="primary" @click="showFramesDrawer">编辑
               </t-button>
             </t-form-item>
           </template>
 
           <template v-else-if="allIsLine">
             <t-form-item label="动画效果" name="lineAnimateType">
-              <t-select
-                v-model="pen.lineAnimateType"
-                @change="changeValue('lineAnimateType')"
-              >
-                <t-option
-                  v-for="item in LineAnimateOption"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label"
-                ></t-option>
+              <t-select v-model="pen.lineAnimateType" @change="changeValue('lineAnimateType')">
+                <t-option v-for="item in LineAnimateOption" :key="item.value" :value="item.value"
+                  :label="item.label"></t-option>
               </t-select>
             </t-form-item>
             <t-form-item label="反向流动" name="reverse">
-              <t-switch
-                v-model="pen.animateReverse"
-                @change="changeValue('animateReverse')"
-              />
+              <t-switch v-model="pen.animateReverse" @change="changeValue('animateReverse')" />
             </t-form-item>
             <t-form-item label="线宽" name="animateLineWidth">
-              <t-input-number
-                v-model="pen.animateLineWidth"
-                @change="changeValue('animateLineWidth')"
-              />
+              <t-input-number v-model="pen.animateLineWidth" @change="changeValue('animateLineWidth')" />
             </t-form-item>
 
             <t-form-item label="速度" name="animateSpan">
-              <t-input-number
-                v-model="pen.animateSpan"
-                :min="1"
-                :max="5"
-                @change="changeValue('animateSpan')"
-              />
+              <t-input-number v-model="pen.animateSpan" :min="1" :max="5" @change="changeValue('animateSpan')" />
             </t-form-item>
             <t-form-item label="颜色" name="color">
-              <t-color-picker
-                class="w-full"
-                v-model="pen.animateColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                @change="changeValue('animateColor')"
-              />
+              <t-color-picker class="w-full" v-model="pen.animateColor" :show-primary-color-preview="false" format="CSS"
+                :color-modes="['monochrome']" @change="changeValue('animateColor')" />
             </t-form-item>
             <t-form-item label="动画发光" name="animateShadow">
-              <t-switch
-                v-model="pen.animateShadow"
-                @change="changeValue('animateShadow')"
-              />
+              <t-switch v-model="pen.animateShadow" @change="changeValue('animateShadow')" />
             </t-form-item>
             <t-form-item label="发光颜色" name="animateShadowColor">
-              <t-color-picker
-                class="w-full"
-                v-model="pen.animateShadowColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                @change="changeValue('animateShadowColor')"
-              />
+              <t-color-picker class="w-full" v-model="pen.animateShadowColor" :show-primary-color-preview="false"
+                format="CSS" :color-modes="['monochrome']" @change="changeValue('animateShadowColor')" />
             </t-form-item>
           </template>
 
           <t-form-item label="自动播放" name="autoPlay">
-            <t-switch
-              v-model="pen.autoPlay"
-              @change="changeValue('autoPlay')"
-            />
+            <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
           </t-form-item>
 
           <t-divider />
-            <div>
-          <t-statistic
-            title="图元总数"
-            :value="pensTotal"
-            trend="increase"
-            color="orange"
-          />
-            </div>
+          <div>
+            <t-statistic title="图元总数" :value="pensTotal" trend="increase" color="orange" />
+          </div>
           <t-space>
             <t-tooltip content="对大量图元执行动画时存在性能问题，请谨慎操作">
               <t-button @click="animate(true)">播放</t-button>
@@ -236,26 +145,14 @@
           只能对同一类型的图元批量设置动画
         </t-alert>
 
-        <t-drawer
-          v-model:visible="drawerVisible"
-          header="自定义动画帧"
-          size="20%"
-          :onConfirm="addFrames"
-        >
-          <t-button block theme="primary" @click="insertFrame"
-            >新增动画帧</t-button
-          >
+        <t-drawer v-model:visible="drawerVisible" header="自定义动画帧" size="20%" :onConfirm="addFrames">
+          <t-button block theme="primary" @click="insertFrame">新增动画帧</t-button>
           <t-collapse class="meta-collapse" expand-mutex>
             <t-collapse-panel v-for="item in customFrames" header="动画帧">
               <prop-editor :data="item"></prop-editor>
               <template #headerRightContent>
-                <t-button
-                  size="small"
-                  variant="outline"
-                  theme="danger"
-                  :style="{ marginLeft: '8px' }"
-                  @click="deleteFrame(item)"
-                >
+                <t-button size="small" variant="outline" theme="danger" :style="{ marginLeft: '8px' }"
+                  @click="deleteFrame(item)">
                   <t-icon name="delete"></t-icon>
                 </t-button>
               </template>
@@ -444,6 +341,7 @@ const inactive = () => {
     .t-form__item {
       margin-bottom: 8px;
     }
+
     .t-form__label {
       padding-right: 8px;
     }
