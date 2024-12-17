@@ -15,11 +15,11 @@
       </div>
     </transition>
 
-    <View v-bind="$attrs" preview :data="data" @ready="emit('ready', $event)" />
+    <View v-bind="$attrs" preview :data="data" :customWsHandler="customWsHandler" @ready="emit('ready', $event)" />
 
     <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel">
-     </slot>
+      </slot>
     </div>
 
     <t-sticky-tool v-if="showStickyTool" type="compact" placement="left-bottom" style="z-index: 999"
@@ -47,6 +47,7 @@ import View from "../components/View.vue";
 import { Icon } from "tdesign-vue-next";
 import { toggleFullScreen } from "../utils";
 import { usePlayer } from "../services/usePlayer.ts";
+import { EventAction } from '../types/Event.ts'
 
 const emit = defineEmits(["ready"]);
 const props = defineProps({
@@ -62,8 +63,15 @@ const props = defineProps({
   },
   showRightPanel: {
     type: Boolean,
+    default: false,
+  },
+
+  // * 后台更新模式，用于一个项目包含多张电路的情形
+  enableBackgroundUpdate: {
+    type: Boolean,
     default: true,
   },
+
 });
 
 // * 侧边工具栏
@@ -165,6 +173,7 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
           meta2d.open(res);
           meta2d.emit("clear");
           meta2d.fitView();
+          applyStateSet()
         }
       })
       .catch((err) => {
@@ -294,6 +303,106 @@ playList.value = [
     ],
   },
 ];
+
+
+// * ws 消息处理
+let customWsHandler;
+type ResponseMsgType = {
+  busName: string
+  msg: any
+  msgType: number
+}
+
+type PenState = {
+  action: number
+  id?: string
+  tag?: string
+  [t: string]: any
+}
+
+const penStateSet: any[] = [];
+const combineState = (msg: PenState) => {
+  const state = penStateSet.find((s) => s.id == msg.id || s.tag == msg.tag);
+  if (state) {
+    const { id, tag, ...rest } = msg;
+    Object.assign(state, rest)
+    return
+  }
+  penStateSet.push(msg)
+}
+
+const applyState = (msg: PenState) => {
+  if (!msg) return;
+  const { id, tag, action, value, ...rest } = msg;
+  const _props = value || rest;
+  const pens = meta2d.find(id || tag)
+  // * 暂时包含四种
+  switch (action) {
+    case EventAction.StartAnimate:
+      meta2d.startAnimate(pens)
+      break;
+    case EventAction.PauseAnimate:
+      meta2d.pauseAnimate(pens)
+      break;
+    case EventAction.StopAnimate:
+      meta2d.stopAnimate(pens)
+      break;
+    // case EventAction.SetProps:
+    //   break;
+
+    default:
+      pens.forEach((pen: any) => {
+        _props.id = pen.id;
+        meta2d.setValue(_props, { render: false });
+      })
+
+      break;
+  }
+
+
+}
+
+const applyStateSet = () => {
+  if (!meta2d) return
+  penStateSet.forEach((state: PenState) => {
+    applyState(state)
+  })
+}
+
+
+if (props.enableBackgroundUpdate) {
+  // 针对所有图纸的状态消息
+  customWsHandler = (data: ResponseMsgType) => {
+    const { busName, msg, msgType } = data || {};
+
+    // TODO: 可以根据 msgType 进行判断
+
+    // 更新处理
+    if (msg) {
+      // * 先认为是符合内置属性集合的标准 Meta2D 对象
+      const { id, tag, action, value, ...rest } = msg;
+      if (!id && !tag) {
+        console.warn('无法识别目标图元：', data)
+        return;
+      }
+
+      combineState(msg)
+
+      // -- 当前打开图元
+      const pens = meta2d.find(id || tag)
+      if (pens.length) {
+        applyState(msg)
+        meta2d.render()
+      }
+      else {
+        // 未加载的图纸
+        // 暂定在打开时从状态集合全量更新一次
+      }
+
+    }
+
+  }
+}
 
 </script>
 

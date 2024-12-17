@@ -5,34 +5,17 @@
     <t-collapse-panel v-for="item in events" header="事件">
       <t-form labelAlign="left">
         <t-form-item label="事件类型">
-          <t-select
-            v-model="item.name"
-            :options="eventTypeOptions"
-            @change="eventChange"
-          ></t-select>
+          <t-select v-model="item.name" :options="eventTypeOptions" @change="eventChange"></t-select>
         </t-form-item>
         <t-form-item label="事件行为">
-          <t-select
-            v-model="item.action"
-            :options="eventActionOptions"
-            @change="eventChange"
-          ></t-select>
+          <t-select v-model="item.action" :options="eventActionOptions" @change="eventChange"></t-select>
         </t-form-item>
         <t-form-item v-if="item.action === EventAction.Link" label="链接地址">
-          <t-input
-            v-model="item.value"
-            clearable
-            @change="eventChange"
-          ></t-input>
+          <t-input v-model="item.value" clearable @change="eventChange"></t-input>
         </t-form-item>
         <template v-if="item.action === EventAction.SetProps">
           <t-form-item label="目标">
-            <t-input
-              v-model="item.params"
-              placeholder="可输入目标图元的ID/Tag"
-              clearable
-              @change="eventChange"
-            ></t-input>
+            <t-input v-model="item.params" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
           </t-form-item>
           <!-- 属性列表修改 -->
           <t-row justify="start">
@@ -48,25 +31,13 @@
               </t-button>
             </t-col>
           </t-row>
-          <t-row
-            v-for="(propItem, index) in propList"
-            :key="index"
-            justify="start"
-            :gutter="4"
-            style="margin-bottom: 4px"
-          >
+          <t-row v-for="(propItem, index) in propList" :key="index" justify="start" :gutter="4"
+            style="margin-bottom: 4px">
             <t-col :span="5">
-              <t-select
-                v-model="propItem.prop"
-                :options="propOptions"
-                @change="propChange(item)"
-              ></t-select>
+              <t-select v-model="propItem.prop" :options="propOptions" @change="propChange(item)"></t-select>
             </t-col>
             <t-col :span="5">
-              <t-input
-                v-model="propItem.value"
-                @change="propChange(item)"
-              ></t-input>
+              <t-input v-model="propItem.value" @change="propChange(item)"></t-input>
             </t-col>
             <t-col :span="2">
               <t-button variant="text" @click="deleteProp(propItem)">
@@ -75,32 +46,19 @@
             </t-col>
           </t-row>
         </template>
-        <t-form-item
-          v-if="
-            [
-              EventAction.PauseAnimate,
-              EventAction.StopAnimate,
-              EventAction.StartAnimate,
-            ].includes(item.action)
-          "
-          label="目标"
-        >
-          <t-input
-            v-model="item.value"
-            placeholder="可输入目标图元的ID/Tag"
-            clearable
-            @change="eventChange"
-          ></t-input>
+        <t-form-item v-if="
+          [
+            EventAction.PauseAnimate,
+            EventAction.StopAnimate,
+            EventAction.StartAnimate,
+          ].includes(item.action)
+        " label="目标">
+          <t-input v-model="item.value" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
         </t-form-item>
       </t-form>
       <template #headerRightContent>
-        <t-button
-          size="small"
-          variant="outline"
-          theme="danger"
-          :style="{ marginLeft: '8px' }"
-          @click="deleteEvent(item)"
-        >
+        <t-button size="small" variant="outline" theme="danger" :style="{ marginLeft: '8px' }"
+          @click="deleteEvent(item)">
           <t-icon name="delete"></t-icon>
         </t-button>
       </template>
@@ -147,14 +105,14 @@ const eventTypeOptions = [
     label: "鼠标离开",
     value: "leave",
   },
-//   {
-//     label: "选中",
-//     value: "active",
-//   },
-//   {
-//     label: "取消选中",
-//     value: "inactive",
-//   },
+  //   {
+  //     label: "选中",
+  //     value: "active",
+  //   },
+  //   {
+  //     label: "取消选中",
+  //     value: "inactive",
+  //   },
 ];
 
 const eventActionOptions = [
@@ -178,10 +136,10 @@ const eventActionOptions = [
     label: "停止动画",
     value: EventAction.StopAnimate,
   },
-  //   {
-  //     label: "执行JS代码",
-  //     value: EventAction.JS,
-  //   },
+  {
+    label: "执行JS代码",
+    value: EventAction.JS,
+  },
   //   {
   //     label: "执行全局函数",
   //     value: EventAction.GlobalFn,
@@ -211,6 +169,21 @@ const eventActionOptions = [
   //     value: EventAction.SendVarData,
   //   },
 ];
+
+const templateCodeStringOptions = [
+  {
+    label: '开关切换',
+    value: '',
+  },
+  {
+    label: '动画播放停止',
+    value: '',
+  },
+  {
+    label: '',
+    value: '',
+  }
+]
 
 const insert = () => {
   events.value.push({

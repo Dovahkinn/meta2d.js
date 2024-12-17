@@ -36,6 +36,9 @@ const props = defineProps({
   data: {
     type: Object,
   },
+  customWsHandler: {
+    type: Function,
+  }
 });
 
 const { select, selections } = useSelection();
@@ -107,49 +110,52 @@ onMounted(() => {
       const jsStr = data.onMessageJsCode;
       if (data.wsUrl) {
         const wsClient = WebSocketClient.getInstance(data.wsUrl, {
-        busName: data.busName,
-        msgTypes,
-        enableLog: false,
-        onReady: () => {
-          console.log("%c连接成功！", "color: green; font-weight: bold;");
-          wsClient.subscribe("", [1], (response: any) => {
-            console.log(
-              "%c收到消息: ",
-              "color: green; font-weight: bold;",
-              data
-            );
+          busName: data.busName,
+          msgTypes,
+          enableLog: false,
+          onReady: () => {
+            console.log("%c连接成功！", "color: green; font-weight: bold;");
+            wsClient.subscribe(data.busName, msgTypes, (response: any) => {
 
-            try {
-              if (jsStr) {
-                const fn = new Function("data", jsStr);
-                fn(response);
-              } else {
-                // TODO：需要根据 msg 中的实际字段信息，转换为具体的 meta2d 执行逻辑
-                resolver(response)
+              try {
+                if (jsStr) {
+                  const fn = new Function("data", jsStr);
+                  fn(response);
+                } else {
+                  if (props.customWsHandler) {
+                    // 自定义处理，如电路消息需要考虑更新不显示的，对消息进行缓存等等
+                    props.customWsHandler(response, meta2d)
+                  } else {
+                    // TODO：需要根据 msg 中的实际字段信息，转换为具体的 meta2d 执行逻辑
+                    resolver(response)
+                  }
+                }
+              } catch (error) {
+                console.log("error: ", error);
               }
-            } catch (error) {
-              console.log("error: ", error);
-            }
-          });
-        },
-      });
-      wsClient.connect();
+            });
+          },
+        });
+        wsClient.connect();
+
+        // test: 模拟修改状态
+        // setTimeout(() => {
+        //   wsClient.sendMessage(data.busName, 1, {
+        //     action: 1,
+        //     // name: "setProps",
+        //     id: "",
+        //     tag: 'Switch',
+        //     value: {
+        //       color: "red",
+        //       text: "ws",
+        //       lineWidth: 2,
+        //     },
+        //   });
+        // }, 10e3);
+
       }
 
 
-      // test: 模拟修改状态
-      // setTimeout(() => {
-      //   wsClient.sendMessage("", 1, {
-      //     action: 1,
-      //     // name: "setProps",
-      //     id: "301cf29",
-      //     tag: '',
-      //     value: {
-      //       color: "red",
-      //       text: "ws",
-      //     },
-      //   });
-      // }, 10e3);
     } else {
       data.locked = 0;
     }

@@ -84,7 +84,7 @@ wss.on('connection', function connection(ws) {
   }, 1000);
 
   setInterval(() => {
-    ws.send(JSON.stringify(testPosData));
+    // ws.send(JSON.stringify(testPosData));
   }, 2000);
 
 });
