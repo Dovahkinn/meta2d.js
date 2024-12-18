@@ -700,7 +700,11 @@ const onView = () => {
 
   if (globalThis.$_meta2d_singleton) {
     // 新窗口打开预览页面
-    window.open(`/preview?r=${Date.now()}&id=${data._id || ''}`, "_blank");
+    if (location.hash) {
+      window.open(`#/preview?r=${Date.now()}&id=${data._id || ''}`, "_blank");
+    } else {
+      window.open(`/preview?r=${Date.now()}&id=${data._id || ''}`, "_blank");
+    }
   }
 };
 

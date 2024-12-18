@@ -25,3 +25,6 @@ dist/
 .vscode/
 vendor
 pnpm-lock.yaml
+
+# Electron
+examples/electron/out/

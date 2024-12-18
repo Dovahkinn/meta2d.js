@@ -24,7 +24,7 @@ export default defineConfig(({ mode, command }) => {
           dir: 'lib'
         },
       },
-    } : undefined,
+    } : {},
 
     plugins: [vue()],
     resolve: {
