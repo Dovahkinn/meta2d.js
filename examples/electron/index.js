@@ -7,14 +7,14 @@ const { createServer } = require('http-server');
 
 const triggerServer = (host, port, directory) => {
     const server = createServer({
-      root: path.join(__dirname, directory) // 指定服务器根目录
+        root: path.join(__dirname, directory) // 指定服务器根目录
     });
-  
+
     server.listen(port, host, () => {
-      console.log(`Server running at http://${host}:${port}/`)
+        console.log(`Server running at http://${host}:${port}/`)
     })
     return [server, `http://${host}:${port}/#/preview`];
-  }
+}
 
 function createWindow(url) {
     const trayIcon = nativeImage.createFromPath('./192x192.png')
@@ -26,7 +26,7 @@ function createWindow(url) {
         width: 1920,
         height: 1080,
         webPreferences: {
-            //   preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
             webSecurity: false
         }
@@ -38,6 +38,13 @@ function createWindow(url) {
 }
 
 app.whenReady().then(() => {
+    // 获取参数中指定的目录配置文件
+    const prefix = '--project-file='
+    const arg = process.argv.find(v => v.startsWith(prefix));
+    if (arg) {
+        console.log('app ready: ', arg)
+    }
+
     const [server, url] = triggerServer("localhost", "8081", "dist");
 
     createWindow(url)

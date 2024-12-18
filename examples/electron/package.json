@@ -4,7 +4,7 @@
   "description": "Meta2D 编辑器",
   "main": "index.js",
   "scripts": {
-    "dev": "electron .",
+    "dev": "electron . --project-file=list.json",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
