@@ -13,7 +13,7 @@ const triggerServer = (host, port, directory) => {
     server.listen(port, host, () => {
       console.log(`Server running at http://${host}:${port}/`)
     })
-    return [server, `http://${host}:${port}/`];
+    return [server, `http://${host}:${port}/#/preview`];
   }
 
 function createWindow(url) {

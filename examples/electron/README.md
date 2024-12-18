@@ -1,37 +1,26 @@
 
 ## 使用说明
-1. 从大屏项目导入配置文件改名为 @.txt
-2. 解压缩 dist-base.zip
-3. 修改 index.js 加载入口
-```js
-    // 改为实际的入口路径
-    win.loadFile('./dist/index.html')
-```
-4. 默认解压目录为 dist, 如果修改了名称，需要修改静态文件 config.js
-```js
-    // 改为实际的目录名
-    globalThis.$_goView_config = {
-        distDir: './dist/',
-    }
-```
-
-5. 将多媒体文件放入 dist 目录
-6. 启动 electron
+### 1. 安装依赖
 ```bash
-    npm run start
+npm install
 ```
-7. 分发 deb
+
+### 2. 运行
 ```bash
-    npm run package
-    npm run make
+npm run start
 ```
 
-## 其他备注
-自定义协议
-```
-local-resource://./dist/
+### 3. 打包
+```bash
+npm run package
+npm run make
 ```
 
-7 HXD3非正常行车处理办法多媒体
+### 4. 打包后输出目录
 
-4 HXD3型机车电器动作实验
+```
+/out/{buildIdentifier}/make/
+```
+
+## TODO:
+- 预览时支持接受参数

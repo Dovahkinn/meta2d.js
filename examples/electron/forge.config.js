@@ -13,6 +13,13 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
+      name: '@electron-forge/maker-zip',
+      platforms: ['win32', 'linux'],
+      config: {
+        // the config can be an object
+      }
+    },
+    {
       name: '@electron-forge/maker-deb',
       config: {
         options: {
@@ -20,13 +27,13 @@ module.exports = {
         }
       },
     },
-    {
-      name: '@electron-forge/maker-wix',
-      config: {
-        language: 1033,
-        manufacturer: 'My Awesome Company'
-      }
-    }
+    // {
+    //   name: '@electron-forge/maker-wix',
+    //   config: {
+    //     language: 1033,
+    //     manufacturer: 'My Awesome Company'
+    //   }
+    // }
 
   ],
   plugins: [
