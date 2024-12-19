@@ -424,7 +424,9 @@ const applyState = (msg: PenState) => {
       pens.forEach((pen: any) => {
         _props.id = pen.id;
          //模拟开关状态 showChild
-         _props.showChild = msg.State;
+         if ('showChild' in pen) {
+          _props.showChild = msg.State;
+         }
         //颜色color 是否有电 1有电显示蓝色 2无电红色
         _props.color = msg.Value == 1 ? '#0000FF' : '#FF0000';        
         console.log('修改的属性值_props======', _props)
