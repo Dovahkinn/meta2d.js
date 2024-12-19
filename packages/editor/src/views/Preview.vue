@@ -148,10 +148,31 @@ onMounted(() => {
   if (isInElectron()) {
     if (globalThis.versions?.projectListSync) {
         globalThis.versions.projectListSync().then((res) => {
-          _electronArgvData.value = res;
+          console.log('projectListSync res: ', res);
+          if (Array.isArray(res)) {
+            _electronArgvData.value = res;
+            if (res.length > 0) {
+              if (res[0].children?.length > 0) {
+                const first = res[0].children[0];
+                if (first.json) {
+                  const res = deepClone(first.json);
+                  res.locked = 1;
+                  meta2d.open(res);
+                  meta2d.emit("clear");
+                  meta2d.fitView();
+                  applyStateSet();
+                }
+              }
+            } else {
+              meta2d.clear();
+            }
+          }
         }).catch(err => {
-          console.log(err);
+          console.log('projectListSync err: ', err);
+          meta2d.clear();
         })
+    } else {
+      meta2d.clear();
     }
   }
 });
