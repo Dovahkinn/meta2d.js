@@ -1,13 +1,25 @@
 <template>
   <div class="app-page is--preview">
-    <transition name="sidebar-transition" @after-leave="afterLeave" @after-enter="afterEnter">
+    <transition
+      name="sidebar-transition"
+      @after-leave="afterLeave"
+      @after-enter="afterEnter"
+    >
       <div v-if="!isCollapsed" class="left__panel">
         <t-row justify="end">
           <t-col :span="2">
-            <t-icon name="fullscreen" size="large" @click="handleToolClick('fullscreen')"></t-icon>
+            <t-icon
+              name="fullscreen"
+              size="large"
+              @click="handleToolClick('fullscreen')"
+            ></t-icon>
           </t-col>
           <t-col :span="2">
-            <t-icon name="rectangle" size="large" @click="handleToolClick('fit')"></t-icon>
+            <t-icon
+              name="rectangle"
+              size="large"
+              @click="handleToolClick('fit')"
+            ></t-icon>
           </t-col>
         </t-row>
         <t-divider></t-divider>
@@ -15,17 +27,32 @@
       </div>
     </transition>
 
-    <View v-bind="$attrs" preview :data="data" :customWsHandler="customWsHandler" @ready="emit('ready', $event)" />
+    <View
+      v-bind="$attrs"
+      preview
+      :data="data"
+      :customWsHandler="customWsHandler"
+      @ready="emit('ready', $event)"
+    />
 
     <div v-if="showRightPanel" class="right__panel">
-      <slot name="right-panel">
-      </slot>
+      <slot name="right-panel"> </slot>
     </div>
 
-    <t-sticky-tool v-if="showStickyTool" type="compact" placement="left-bottom" style="z-index: 999"
-      @click="handleClick">
+    <t-sticky-tool
+      v-if="showStickyTool"
+      type="compact"
+      placement="left-bottom"
+      style="z-index: 999"
+      @click="handleClick"
+    >
       <template v-for="tool in sidebarTools" :key="tool.label">
-        <t-sticky-item v-if="tool.show()" :label="tool.label" :icon="renderIcon(tool.icon)" :popup="tool.popup">
+        <t-sticky-item
+          v-if="tool.show()"
+          :label="tool.label"
+          :icon="renderIcon(tool.icon)"
+          :popup="tool.popup"
+        >
         </t-sticky-item>
       </template>
     </t-sticky-tool>
@@ -42,12 +69,14 @@ import {
   computed,
   watch,
   nextTick,
+  onMounted,
 } from "vue";
 import View from "../components/View.vue";
 import { Icon } from "tdesign-vue-next";
 import { toggleFullScreen } from "../utils";
 import { usePlayer } from "../services/usePlayer.ts";
-import { EventAction } from '../types/Event.ts'
+import { EventAction } from "../types/Event.ts";
+import { deepClone } from "@meta2d/core";
 
 const emit = defineEmits(["ready"]);
 const props = defineProps({
@@ -71,7 +100,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-
 });
 
 // * 侧边工具栏
@@ -111,8 +139,30 @@ const sidebarTools = reactive([
   },
 ]);
 
+const isInElectron = () => {
+  return globalThis.navigator.userAgent.includes("Electron");
+};
+const _electronArgvData = ref([]);
+
+onMounted(() => {
+  if (isInElectron()) {
+    if (globalThis.versions?.projectListSync) {
+        globalThis.versions.projectListSync().then((res) => {
+          _electronArgvData.value = res;
+        }).catch(err => {
+          console.log(err);
+        })
+    }
+  }
+});
+
 const treeData = computed(() => {
+  if (isInElectron()) {
+    return _electronArgvData.value;
+  }
+
   if (props.projectTreeData) return props.projectTreeData;
+
   if (globalThis.__meta2d_env__?.projectTreeData) {
     return globalThis.__meta2d_env__.projectTreeData;
   }
@@ -164,6 +214,18 @@ const handleClick = ({ e, item }: { e: MouseEvent; item: any }) => {
 const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
   console.log("change node: ", node);
 
+  if (isInElectron()) {
+    if (node.data.json) {
+      const res = deepClone(node.data.json);
+      res.locked = 1;
+      meta2d.open(res);
+      meta2d.emit("clear");
+      meta2d.fitView();
+      applyStateSet();
+    }
+    return;
+  }
+
   if (node.value) {
     fetch(node.value)
       .then((res) => res.json())
@@ -173,7 +235,7 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
           meta2d.open(res);
           meta2d.emit("clear");
           meta2d.fitView();
-          applyStateSet()
+          applyStateSet();
         }
       })
       .catch((err) => {
@@ -189,7 +251,17 @@ const afterLeave = () => {
 };
 
 // * 控制逻辑，页面切换
-const { playList, currentStepData, prev, next, apply, play, pause, stop, replay, } = usePlayer();
+const {
+  playList,
+  currentStepData,
+  prev,
+  next,
+  apply,
+  play,
+  pause,
+  stop,
+  replay,
+} = usePlayer();
 playList.value = [
   {
     name: "page1",
@@ -221,7 +293,7 @@ playList.value = [
       {
         tag: "L32",
         lineWidth: 2,
-        color: 'blue',
+        color: "blue",
       },
     ],
   },
@@ -255,12 +327,12 @@ playList.value = [
       {
         tag: "L32",
         lineWidth: 3,
-        color: 'green',
+        color: "green",
       },
       {
-        tag: 'L32',
+        tag: "L32",
         action: 2,
-      }
+      },
     ],
   },
   {
@@ -293,59 +365,57 @@ playList.value = [
       {
         tag: "L32",
         lineWidth: 1,
-        color: 'red',
+        color: "red",
       },
       {
-        tag: 'L32',
+        tag: "L32",
         action: 3,
-      }
-
+      },
     ],
   },
 ];
 
-
 // * ws 消息处理
 let customWsHandler;
 type ResponseMsgType = {
-  busName: string
-  msg: any
-  msgType: number
-}
+  busName: string;
+  msg: any;
+  msgType: number;
+};
 
 type PenState = {
-  action: number
-  id?: string
-  tag?: string
-  [t: string]: any
-}
+  action: number;
+  id?: string;
+  tag?: string;
+  [t: string]: any;
+};
 
 const penStateSet: any[] = [];
 const combineState = (msg: PenState) => {
   const state = penStateSet.find((s) => s.id == msg.id || s.tag == msg.tag);
   if (state) {
     const { id, tag, ...rest } = msg;
-    Object.assign(state, rest)
-    return
+    Object.assign(state, rest);
+    return;
   }
-  penStateSet.push(msg)
-}
+  penStateSet.push(msg);
+};
 
 const applyState = (msg: PenState) => {
   if (!msg) return;
   const { id, tag, action, value, ...rest } = msg;
   const _props = value || rest;
-  const pens = meta2d.find(id || tag)
+  const pens = meta2d.find(id || tag);
   // * 暂时包含四种
   switch (action) {
     case EventAction.StartAnimate:
-      meta2d.startAnimate(pens)
+      meta2d.startAnimate(pens);
       break;
     case EventAction.PauseAnimate:
-      meta2d.pauseAnimate(pens)
+      meta2d.pauseAnimate(pens);
       break;
     case EventAction.StopAnimate:
-      meta2d.stopAnimate(pens)
+      meta2d.stopAnimate(pens);
       break;
     // case EventAction.SetProps:
     //   break;
@@ -354,21 +424,18 @@ const applyState = (msg: PenState) => {
       pens.forEach((pen: any) => {
         _props.id = pen.id;
         meta2d.setValue(_props, { render: false });
-      })
+      });
 
       break;
   }
-
-
-}
+};
 
 const applyStateSet = () => {
-  if (!meta2d) return
+  if (!meta2d) return;
   penStateSet.forEach((state: PenState) => {
-    applyState(state)
-  })
-}
-
+    applyState(state);
+  });
+};
 
 if (props.enableBackgroundUpdate) {
   // 针对所有图纸的状态消息
@@ -382,28 +449,24 @@ if (props.enableBackgroundUpdate) {
       // * 先认为是符合内置属性集合的标准 Meta2D 对象
       const { id, tag, action, value, ...rest } = msg;
       if (!id && !tag) {
-        console.warn('无法识别目标图元：', data)
+        console.warn("无法识别目标图元：", data);
         return;
       }
 
-      combineState(msg)
+      combineState(msg);
 
       // -- 当前打开图元
-      const pens = meta2d.find(id || tag)
+      const pens = meta2d.find(id || tag);
       if (pens.length) {
-        applyState(msg)
-        meta2d.render()
-      }
-      else {
+        applyState(msg);
+        meta2d.render();
+      } else {
         // 未加载的图纸
         // 暂定在打开时从状态集合全量更新一次
       }
-
     }
-
-  }
+  };
 }
-
 </script>
 
 <style lang="postcss" scoped>
@@ -415,8 +478,7 @@ if (props.enableBackgroundUpdate) {
 .sidebar-transition-enter,
 .sidebar-transition-leave-to
 
-/* .sidebar-transition-leave-active in <2.1.8 */
-  {
+/* .sidebar-transition-leave-active in <2.1.8 */ {
   transform: translateX(-250px);
   opacity: 0;
 }

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol, net, nativeImage, Tray } = require('electron/main')
+const { app, BrowserWindow, protocol, net, nativeImage, Tray, ipcMain, } = require('electron/main')
 const path = require('node:path')
 const fs = require("node:fs").promises;
 const url = require('node:url')
@@ -37,13 +37,36 @@ function createWindow(url) {
     win.loadURL(url)
 }
 
+const projectListSync = async (argv) => {
+    const dir = path.dirname(app.getPath('exe'))
+    if (!argv) return []
+    const projectList = require(path.resolve(dir, './project/' + argv))
+    if (Array.isArray(projectList)) {
+        projectList.forEach(item => {
+            if (Array.isArray(item.children)) {
+                item.children.forEach(child => {
+                    const value = child.value;
+                    // 读取 json 文件
+                    child.json = require(path.resolve('./project', value))
+                })
+            }
+        })
+        return projectList
+    }
+    return []
+}
+
+
 app.whenReady().then(() => {
     // 获取参数中指定的目录配置文件
     const prefix = '--project-file='
     const arg = process.argv.find(v => v.startsWith(prefix));
+    let projectFile = ''
     if (arg) {
         console.log('app ready: ', arg)
+        projectFile = arg.replace(prefix, '')
     }
+    ipcMain.handle('argv:project-file', () => projectListSync(projectFile))
 
     const [server, url] = triggerServer("localhost", "8081", "dist");
 
