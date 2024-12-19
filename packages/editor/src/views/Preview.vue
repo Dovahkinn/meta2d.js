@@ -405,7 +405,7 @@ const applyState = (msg: PenState) => {
   if (!msg) return;
   const { id, tag, action, value, ...rest } = msg;
   const _props = value || rest;
-  const pens = meta2d.find(id || tag);
+  const pens = meta2d.find(id || tag || rest.Name);
   // * 暂时包含四种
   switch (action) {
     case EventAction.StartAnimate:
@@ -423,6 +423,11 @@ const applyState = (msg: PenState) => {
     default:
       pens.forEach((pen: any) => {
         _props.id = pen.id;
+         //模拟开关状态 showChild
+         _props.showChild = msg.State;
+        //颜色color 是否有电 1有电显示蓝色 2无电红色
+        _props.color = msg.Value == 1 ? '#0000FF' : '#FF0000';        
+        console.log('修改的属性值_props======', _props)
         meta2d.setValue(_props, { render: false });
       });
 
@@ -448,7 +453,7 @@ if (props.enableBackgroundUpdate) {
     if (msg) {
       // * 先认为是符合内置属性集合的标准 Meta2D 对象
       const { id, tag, action, value, ...rest } = msg;
-      if (!id && !tag) {
+      if (!rest) {
         console.warn("无法识别目标图元：", data);
         return;
       }
@@ -456,7 +461,7 @@ if (props.enableBackgroundUpdate) {
       combineState(msg);
 
       // -- 当前打开图元
-      const pens = meta2d.find(id || tag);
+      const pens = meta2d.find(id || tag || rest.Name);
       if (pens.length) {
         applyState(msg);
         meta2d.render();
