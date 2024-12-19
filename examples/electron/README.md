@@ -22,5 +22,40 @@ npm run make
 /out/{buildIdentifier}/make/
 ```
 
-## TODO:
-- 预览时支持接受参数
+## 启动参数
+
+**约定：**
+
+> 项目图纸文件固定放在 '.exe' 同级 `/project` 目录下，文件名为 'XXX.json'
+
+内容示例：
+```json
+[
+  {
+    "label": "Electron Test",
+    "value": "",
+    "children": [
+      {
+        "label": "test1",
+        "value": "./dir1/test-1.json" // 具体的电路 json 文件
+      },
+      {
+        "label": "test2",
+        "value": "./dir1/test-2.json"
+      },
+      {
+        "label": "test3",
+        "value": "./dir1/test-3.json"
+      }
+    ]
+  }
+]
+
+```
+
+
+
+**参数格式：**
+```
+ --project-file=[filename].json
+```
