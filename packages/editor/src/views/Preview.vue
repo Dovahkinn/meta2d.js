@@ -33,6 +33,7 @@
       :data="data"
       :customWsHandler="customWsHandler"
       @ready="emit('ready', $event)"
+      ref="childComponentRef"
     />
 
     <div v-if="showRightPanel" class="right__panel">
@@ -77,7 +78,7 @@ import { toggleFullScreen } from "../utils";
 import { usePlayer } from "../services/usePlayer.ts";
 import { EventAction } from "../types/Event.ts";
 import { deepClone } from "@meta2d/core";
-
+const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
 const props = defineProps({
   data: {
@@ -147,8 +148,10 @@ const _electronArgvData = ref([]);
 onMounted(() => {
   if (isInElectron()) {
     if (globalThis.versions?.projectListSync) {
-        globalThis.versions.projectListSync().then((res) => {
-          console.log('projectListSync res: ', res);
+      globalThis.versions
+        .projectListSync()
+        .then((res) => {
+          console.log("projectListSync res: ", res);
           if (Array.isArray(res)) {
             _electronArgvData.value = res;
             if (res.length > 0) {
@@ -161,16 +164,21 @@ onMounted(() => {
                   meta2d.emit("clear");
                   meta2d.fitView();
                   applyStateSet();
+                  if (childComponentRef.value) {
+                    // 假设子组件有一个名为childMethod的方法
+                    childComponentRef.value.reconnectWebSocket(res);
+                  }
                 }
               }
             } else {
               meta2d.clear();
             }
           }
-        }).catch(err => {
-          console.log('projectListSync err: ', err);
-          meta2d.clear();
         })
+        .catch((err) => {
+          console.log("projectListSync err: ", err);
+          meta2d.clear();
+        });
     } else {
       meta2d.clear();
     }
@@ -233,7 +241,7 @@ const handleClick = ({ e, item }: { e: MouseEvent; item: any }) => {
 };
 
 const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
-  console.log("change node: ", node);
+  console.log("change node=== ", node);
 
   if (isInElectron()) {
     if (node.data.json) {
@@ -243,6 +251,10 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
       meta2d.emit("clear");
       meta2d.fitView();
       applyStateSet();
+      if (childComponentRef.value) {
+        // 假设子组件有一个名为childMethod的方法
+        childComponentRef.value.reconnectWebSocket(node.data.json);
+      }
     }
     return;
   }
@@ -257,6 +269,11 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
           meta2d.emit("clear");
           meta2d.fitView();
           applyStateSet();
+          // 程序内先不做处理
+          // if (childComponentRef.value) {
+          //   // 假设子组件有一个名为childMethod的方法
+          //   childComponentRef.value.reconnectWebSocket(node.data.json);
+          // }
         }
       })
       .catch((err) => {
@@ -444,13 +461,13 @@ const applyState = (msg: PenState) => {
     default:
       pens.forEach((pen: any) => {
         _props.id = pen.id;
-         //模拟开关状态 showChild
-         if ('showChild' in pen) {
+        //模拟开关状态 showChild
+        if ("showChild" in pen) {
           _props.showChild = msg.State;
-         }
+        }
         //颜色color 是否有电 1有电显示蓝色 2无电红色
-        _props.color = msg.Value == 1 ? '#0000FF' : '#FF0000';        
-        console.log('修改的属性值_props======', _props)
+        _props.color = msg.Value == 1 ? "#0000FF" : "#FF0000";
+        console.log("修改的属性值_props======", _props);
         meta2d.setValue(_props, { render: false });
       });
 

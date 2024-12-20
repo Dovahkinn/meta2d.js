@@ -26,7 +26,7 @@ import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
 import ContextMenu from "./ContextMenu.vue";
 import { useSelection } from "../services/selections";
 import { WebSocketClient } from "@qs/websocket-client";
-import { useWsHandlers } from '../services/useHandlers'
+import { useWsHandlers } from "../services/useHandlers";
 
 const props = defineProps({
   preview: {
@@ -38,7 +38,7 @@ const props = defineProps({
   },
   customWsHandler: {
     type: Function,
-  }
+  },
 });
 
 const { select, selections } = useSelection();
@@ -94,7 +94,7 @@ onMounted(() => {
   let data: any = localStorage.getItem("meta2d");
   if (props.data || data) {
     data = props.data || JSON.parse(data);
-    const { resolver } = useWsHandlers(data)
+    const { resolver } = useWsHandlers(data);
 
     // 判断是否为运行查看，是-设置为预览模式
     if (location.pathname === "/preview" || props.preview) {
@@ -116,7 +116,6 @@ onMounted(() => {
           onReady: () => {
             console.log("%c连接成功！", "color: green; font-weight: bold;");
             wsClient.subscribe(data.busName, msgTypes, (response: any) => {
-
               try {
                 if (jsStr) {
                   const fn = new Function("data", jsStr);
@@ -124,10 +123,10 @@ onMounted(() => {
                 } else {
                   if (props.customWsHandler) {
                     // 自定义处理，如电路消息需要考虑更新不显示的，对消息进行缓存等等
-                    props.customWsHandler(response, meta2d)
+                    props.customWsHandler(response, meta2d);
                   } else {
                     // TODO：需要根据 msg 中的实际字段信息，转换为具体的 meta2d 执行逻辑
-                    resolver(response)
+                    resolver(response);
                   }
                 }
               } catch (error) {
@@ -152,10 +151,7 @@ onMounted(() => {
         //     },
         //   });
         // }, 10e3);
-
       }
-
-
     } else {
       data.locked = 0;
     }
@@ -168,6 +164,53 @@ onMounted(() => {
   meta2d.on("contextmenu", showContextMenu);
   // 点击画布
   meta2d.on("click", hideContextMenu);
+});
+// WebSocket重新连接的方法
+const reconnectWebSocket = (data: any) => {
+  console.log("reconnectWebSocket======== ", data);
+  const { resolver } = useWsHandlers(data);
+  if (data.wsUrl) {
+    data.locked = 1;
+    const msgTypes = (data.msgTypes || [])
+      .map((item: string) => {
+        return Number(item);
+      })
+      .filter((item: number) => {
+        return !isNaN(item);
+      });
+
+    const jsStr = data.onMessageJsCode;
+    const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+      busName: data.busName,
+      msgTypes,
+      enableLog: false,
+      onReady: () => {
+        console.log("%c连接成功！", "color: green; font-weight: bold;");
+        wsClient.subscribe(data.busName, msgTypes, (response: any) => {
+          try {
+            if (jsStr) {
+              const fn = new Function("data", jsStr);
+              fn(response);
+            } else {
+              if (props.customWsHandler) {
+                // 自定义处理，如电路消息需要考虑更新不显示的，对消息进行缓存等等
+                props.customWsHandler(response, meta2d);
+              } else {
+                // TODO：需要根据 msg 中的实际字段信息，转换为具体的 meta2d 执行逻辑
+                resolver(response);
+              }
+            }
+          } catch (error) {
+            console.log("error: ", error);
+          }
+        });
+      },
+    });
+    wsClient.connect();
+  }
+};
+defineExpose({
+  reconnectWebSocket
 });
 
 const active = (pens?: Pen[]) => {
@@ -191,8 +234,6 @@ onUnmounted(() => {
     height: 100%;
     flex: 1;
     overflow-x: hidden;
-
-
   }
 }
 </style>

@@ -378,6 +378,8 @@ export const loadElectricJson = (data: any) => {
                 tags: [item.type, item.name],
                 width: cWidth || parent.width,
                 height: cHeight || parent.height,
+                color:' #4E6EF2',
+                lineWidth:4,
               });
               console.log(
                 '单一 svg: ',
@@ -440,8 +442,15 @@ export const loadElectricJson = (data: any) => {
             height: length,
             anchors,
             tags: [item.name],
-            // fontSize: 10,
+            fontSize: 14,
+            color:' #4E6EF2',
+            textColor:"#000",
+            lineWidth:3,
+            lineAnimateType:1,
+            animateLineWidth:3,
+            animateColor:' #FF0000'
           };
+          console.log('连线: ', pen);
           penList.push(pen);
         });
       }
