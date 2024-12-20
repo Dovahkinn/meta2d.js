@@ -7,10 +7,17 @@
     :style="style"
   >
     <t-list>
-      <t-list-item v-for="item in menuOptions" v-show="item.show ? item.show() : true">
-        <t-button theme="default" block variant="outline" @click="item.action()">{{
-          item.label
-        }}</t-button>
+      <t-list-item
+        v-for="item in menuOptions"
+        v-show="item.show ? item.show() : true"
+      >
+        <t-button
+          theme="default"
+          block
+          variant="outline"
+          @click="item.action()"
+          >{{ item.label }}</t-button
+        >
       </t-list-item>
     </t-list>
   </t-card>
@@ -18,8 +25,9 @@
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
 import { useSelection } from "../services/selections";
-import { useData } from '../services/useGraphics'
-
+import { useData } from "../services/useGraphics";
+import { parseSvgStr1  } from "../utils/svgParser";
+import { readSVGFile } from "../utils";
 const props = defineProps({
   x: {
     type: Number,
@@ -54,24 +62,24 @@ const menuOptions = [
     action: () => {
       console.log("lock", selections);
       if (selections.pen) {
-          const v = { id: selections.pen.id, locked: 2 };
-          meta2d.setValue(v, { render: true });
+        const v = { id: selections.pen.id, locked: 2 };
+        meta2d.setValue(v, { render: true });
       } else if (selections.pens) {
-          selections.pens.forEach((pen: any) => {
-              const v = { id: pen.id, locked: 2 };
-              meta2d.setValue(v, { render: true });
-          })
+        selections.pens.forEach((pen: any) => {
+          const v = { id: pen.id, locked: 2 };
+          meta2d.setValue(v, { render: true });
+        });
       }
       emit("hide", false);
     },
     show: () => {
-        if (selections.pen) {
-            return !selections.pen.locked;
-        }
-        if (selections.pens) {
-            return !selections.pens.some((pen: any) => pen.locked > 0);
-        }
-    }
+      if (selections.pen) {
+        return !selections.pen.locked;
+      }
+      if (selections.pens) {
+        return !selections.pens.some((pen: any) => pen.locked > 0);
+      }
+    },
   },
   {
     label: "解锁",
@@ -79,24 +87,24 @@ const menuOptions = [
     action: () => {
       console.log("unlock", selections);
       if (selections.pen) {
-          const v = { id: selections.pen.id, locked: 0 };
-          meta2d.setValue(v, { render: true });
+        const v = { id: selections.pen.id, locked: 0 };
+        meta2d.setValue(v, { render: true });
       } else if (selections.pens) {
-          selections.pens.forEach((pen: any) => {
-              const v = { id: pen.id, locked: 0 };
-              meta2d.setValue(v, { render: true });
-          })
+        selections.pens.forEach((pen: any) => {
+          const v = { id: pen.id, locked: 0 };
+          meta2d.setValue(v, { render: true });
+        });
       }
       emit("hide", false);
     },
     show: () => {
-        if (selections.pen) {
-            return selections.pen.locked;
-        }
-        if (selections.pens) {
-            return selections.pens.some((pen: any) => pen.locked > 0);
-        }
-    }
+      if (selections.pen) {
+        return selections.pen.locked;
+      }
+      if (selections.pens) {
+        return selections.pens.some((pen: any) => pen.locked > 0);
+      }
+    },
   },
 
   {
@@ -106,7 +114,7 @@ const menuOptions = [
       if (selections.pen) {
         meta2d.delete([selections.pen]);
       } else if (selections.pens) {
-          meta2d.delete(selections.pens);
+        meta2d.delete(selections.pens);
       }
       emit("hide", false);
     },
@@ -124,8 +132,8 @@ const menuOptions = [
       emit("hide", false);
     },
     show: () => {
-        return selections.mode == 2
-    }
+      return selections.mode == 2;
+    },
   },
   // 取消组合
   {
@@ -137,22 +145,53 @@ const menuOptions = [
       emit("hide", false);
     },
     show: () => {
-        return selections.mode == 1 && selections.pen?.name == "combine"
-    }
+      return selections.mode == 1 && selections.pen?.name == "combine";
+    },
   },
 
   {
-    label: '保存为组件',
-    icon: 'save',
+    label: "保存为组件",
+    icon: "save",
     action: () => {
       // console.log("save as component ", selections);
       saveComponentShow(selections);
       emit("hide", false);
     },
-  }
+  },
 
-
+  {
+    label: "替换svg",
+    icon: "save",
+    action: () => {
+      customToolbarClick("svg");
+      emit("hide", false);
+    },
+    show: () => {
+      return selections.mode == 1 && selections.pen?.name == "combine";
+    },
+  },
 ];
+
+const customToolbarClick = (code?: string) => {
+  if (code == "svg") {
+    readSVGFile((res: { data: string }) => {
+      parseSvgStr1(res.data, selections.pen);
+      // console.log("看看新的长啥样pens=====", pens);
+      // meta2d.addPens(pens);
+       //先删除原来的图元
+       meta2d.delete([selections.pen]);
+    });
+    return;
+  }
+  // if (code == "save") {
+  //   // 保存图纸
+  //   saveBlueprintShow();
+  //   return;
+  // }
+
+  // meta2d.toggleAnchorMode();
+  // TODO: 其他操作
+};
 </script>
 <style lang="postcss" scoped>
 .context-menu {
