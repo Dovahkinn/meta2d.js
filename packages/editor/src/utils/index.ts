@@ -245,7 +245,6 @@ function findChildren(parent: any, list: any[]) {
   if (!list) return;
   const result = [];
   const queue = [parent];
-
   while (queue.length) {
     const current = queue.shift();
     result.push(current);
@@ -299,9 +298,11 @@ export const loadElectricJson = (data: any) => {
       const { Components, Paintings, Wires } = res.data;
       const penList: Pen[] = [];
 
+      // 导入的电路图json 读取的components\paintings\wires
       // 添加元件
       if (Components) {
         Components.forEach((item: any) => {
+          // configList自己定义的JSON  根据原件类型查找元件名称 中文信息
           const config = ConfigList.find((config) => {
             return (
               config['元件类型']?.toLocaleLowerCase() ==
@@ -313,9 +314,15 @@ export const loadElectricJson = (data: any) => {
             // TODO: 可能更新
             return;
           }
+
+        // ----------- 特殊图元的处理 多路开关处理 ------------
+
+          // 判断是否有三路或者四路开关 StatusTypes数组'Btn_SelfLock','Knob_SelfReset','Switch','Knob_SelfLock','duanluqi_wx','MultipleContact','Btn_SelfReset',
           if (StatusTypes.includes(item.type)) {
+            // 查找是否有组合开关 处理组合开关
             let parent = deepClone(
               SwitchCombinesData.pens.find((v) => {
+                //传入的电路JSON里是否有三路  item.type和v.type相等并且item.v10大于等于3 返回自己定义的组合开关JSON里tags包含'MultipleContact-3'并且没有父级
                 if (item.type == 'MultipleContact' && item.v10 >= '3') {
                   // 目前只有三路开关
                   return v.tags?.includes('MultipleContact-3') && !v.parentId;
@@ -325,20 +332,25 @@ export const loadElectricJson = (data: any) => {
                 }
               }),
             );
+            //查看自己的组合开关JSON 根据父节点查找自己的组合开关的子节点
+            //返回的三路开关的父节点和子节点
             const list = clonePens(
               findChildren(parent, SwitchCombinesData.pens),
             );
             //console.log('状态组合：', item.type, item, config);
-
+            //自己的组合开关JSON 根据找到的子节点进行处理
             if (list) {
               //console.log('svg pen list: ', item.type, list);
+              // 拿到第一个三路开关的父节点
               parent = list[0];
+              // 获取父节点的位置信息
               const rect = meta2d.getPenRect(parent);
               const rWidth = rect.width / SwitchCombinesData.scale;
               const rHeight = rect.height / SwitchCombinesData.scale;
-
+              // 判断中间json中是否包含了三路开关的配置信息
               const width = Number(config?.['宽度(X向)'] || rWidth);
               const height = Number(config?.['高度(Y向)'] || rHeight);
+              // 组装父节点 自己本地的组合开关JSON 配置了组合开关里的宽高或者是计算出来来的宽高
               Object.assign(parent, {
                 text: item.name,
                 x: Number(item.posX),
@@ -346,17 +358,20 @@ export const loadElectricJson = (data: any) => {
                 width,
                 height,
               });
+              // 添加tag
               if (parent.tags && !parent.tags?.includes(item.name)) {
                 parent.tags.push(item.name);
               }
+              // 特殊处理，和电路编辑器默认角度保持一致  ！！！！！！
               patchPosition(parent, config, item);
-              // 切换状态
+              // 组合开关给默认状态值 
               parent.showChild = getChildIndex(item);
 
               meta2d.addPens(list);
               return;
             }
           }
+          // ----------- SVG处理 ------------
           const svgItem = electricSvgList.find((v) => {
             return (
               v.data.electricTypeCode == item.type ||
@@ -366,10 +381,12 @@ export const loadElectricJson = (data: any) => {
           if (svgItem) {
             const cWidth = Number(config?.['宽度(X向)']);
             const cHeight = Number(config?.['高度(Y向)']);
+            // 读取本地的svg文件 返回数组列表
             loadSvg(svgItem.data.image, svgItem, false).then((list) => {
               const parent = list.find(
                 (v) => v.name == 'combine' && !v.parentId,
               );
+              
               Object.assign(parent, {
                 text: item.name,
                 x: Number(item.posX),
@@ -397,6 +414,7 @@ export const loadElectricJson = (data: any) => {
               meta2d.addPens(list);
             });
           } else {
+            // 处理本地不存在svg的处理图元 目前是rectangle矩形
             const pen = {
               id: item.uuid,
               name: 'rectangle',
@@ -410,7 +428,7 @@ export const loadElectricJson = (data: any) => {
               tags: [item.type, item.name],
               // fontSize: 10,
             };
-
+            // 特殊处理，和电路编辑器默认角度保持一致 ！！！！！！！！！！！！！！！
             patchPosition(pen, config, item);
 
             penList.push(pen);
@@ -418,7 +436,7 @@ export const loadElectricJson = (data: any) => {
         });
       }
 
-      // 设置连接线
+      // 设置连接线  暂时先不看了
       if (Wires) {
         // 连线 name 必须为 line。不同类型连线用 lineName 属性描述。例如： lineName:'curve'
         Wires.forEach((item: any) => {

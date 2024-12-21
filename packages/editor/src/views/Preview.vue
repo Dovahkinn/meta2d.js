@@ -466,7 +466,10 @@ const applyState = (msg: PenState) => {
           _props.showChild = msg.State;
         }
         //颜色color 是否有电 1有电显示蓝色 2无电红色
-        _props.color = msg.Value == 1 ? "#0000FF" : "#FF0000";
+        if (pen.name == 'line') {
+          _props.animateColor = msg.Value == 1 ? "#0000FF" : "#FF0000";
+          meta2d.startAnimate([pen]);
+        }
         console.log("修改的属性值_props======", _props);
         meta2d.setValue(_props, { render: false });
       });

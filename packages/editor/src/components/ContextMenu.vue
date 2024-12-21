@@ -26,7 +26,7 @@
 import { defineProps, computed } from "vue";
 import { useSelection } from "../services/selections";
 import { useData } from "../services/useGraphics";
-import { parseSvgStr1  } from "../utils/svgParser";
+import { parseSvgStr,parseSvgStr1 } from "../utils/svgParser";
 import { readSVGFile } from "../utils";
 const props = defineProps({
   x: {
@@ -172,14 +172,38 @@ const menuOptions = [
   },
 ];
 
+// 替换svg方法 需要拿到之前的pen数据放到上传的svg数据里 删除之前的元素
 const customToolbarClick = (code?: string) => {
   if (code == "svg") {
+    // 读取svg文件
     readSVGFile((res: { data: string }) => {
-      parseSvgStr1(res.data, selections.pen);
-      // console.log("看看新的长啥样pens=====", pens);
-      // meta2d.addPens(pens);
-       //先删除原来的图元
+      // 读到一堆XML信息
+      let list = parseSvgStr1(res.data, selections.pen, false);
+      console.log("看看新的长啥样pens=====", list);
        meta2d.delete([selections.pen]);
+      let item = selections.pen;
+      // // 先给固定的宽高
+      // const cWidth = Number(30);
+      // const cHeight = Number(80);
+      // const parent = list.find((v) => v.name == "combine" && !v.parentId);
+      // Object.assign(parent, {
+      //   text: item.name,
+      //   x: Number(item.posX),
+      //   y: Number(item.posY),
+      //   //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
+      //   tags: [item.type, item.name],
+      //   width: parent.width || cWidth,
+      //   height: parent.height || cHeight,
+      // });
+      // console.log("组装的parent=====", parent);
+      // if (svgItem.data.anchors) {
+      //   parent.anchors = svgItem.data.anchors;
+      // }
+      // 更新位置
+      meta2d.addPens(list);
+      // meta2d.addPens(pens);
+      //先删除原来的图元
+      //  meta2d.delete([selections.pen]);
     });
     return;
   }
