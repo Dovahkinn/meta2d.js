@@ -62,10 +62,14 @@ export function parseSvgStr1(svgString: string, penConfig: any, manual = true) {
     //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
     tags: penConfig?.tags,
   });
+  //处理子节点数据
   pens.forEach((pen) => {
-    if (pen.anchors?.length > 0) {
-      parent.anchors = pen.anchors;
+    if(pen.name !=='combine'){
+      pen.parentId = penConfig?.id;
     }
+    // if (pen.anchors?.length > 0) {
+    //   parent.anchors = pen.anchors;
+    // }
   });
 
   //console.log('svg to pens: ', pens, penConfig);
