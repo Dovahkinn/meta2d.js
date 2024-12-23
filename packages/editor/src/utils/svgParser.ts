@@ -49,7 +49,6 @@ export function parseSvgStr1(svgString: string, penConfig: any, manual = true) {
   const pens = parseSvg(svgString);
   console.log('传入的SVG===== ', pens, '以前的图元数据=====',penConfig);
   // 拿到之前的图元父节点进行组装吧
-  debugger;
   const parent = pens.find(
     (v) => v.name == 'combine' && !v.parentId,
   );
@@ -59,6 +58,9 @@ export function parseSvgStr1(svgString: string, penConfig: any, manual = true) {
     y: penConfig?.y,
     description: penConfig?.description,
     text: penConfig?.text,
+    withh: penConfig?.width,
+    height: penConfig?.height,
+    showChild: penConfig?.showChild,
     //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
     tags: penConfig?.tags,
   });

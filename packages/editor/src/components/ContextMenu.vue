@@ -26,8 +26,10 @@
 import { defineProps, computed } from "vue";
 import { useSelection } from "../services/selections";
 import { useData } from "../services/useGraphics";
-import { parseSvgStr,parseSvgStr1 } from "../utils/svgParser";
+import { parseSvgStr, parseSvgStr1 } from "../utils/svgParser";
 import { readSVGFile } from "../utils";
+import { NotifyPlugin } from "tdesign-vue-next";
+import { deepClone,getAllChildren } from "@meta2d/core";
 const props = defineProps({
   x: {
     type: Number,
@@ -170,8 +172,76 @@ const menuOptions = [
       return selections.mode == 1 && selections.pen?.name == "combine";
     },
   },
+  {
+    label: "拷贝信息",
+    icon: "mark",
+    action: () => {
+      markHandle(true);
+      emit("hide", false);
+    },
+    show: () => {
+      // 只能标记一个组合
+      return (
+        selections.mode == 1 &&
+        selections.pen?.name == "combine" &&
+        selections.pen?.showChild != undefined &&
+        !selections.pen?.tags?.includes("mark")
+      );
+    },
+  },
+  // {
+  //   label: "取消标记",
+  //   icon: "mark",
+  //   action: () => {
+  //     markHandle(false);
+  //     emit("hide", false);
+  //   },
+  //   show: () => {
+  //     return (
+  //       selections.mode == 1 &&
+  //       selections.pen?.name == "combine" &&
+  //       selections.pen?.showChild != undefined &&
+  //       selections.pen?.tags?.includes("mark")
+  //     );
+  //   },
+  // },
+  {
+    label: "粘贴并删除复制的图元",
+    icon: "save",
+    action: () => {
+      customToolbarClick("svgs");
+      emit("hide", false);
+    },
+    show: () => {
+      return (
+        selections.mode == 1 &&
+        selections.pen?.name == "combine" &&
+        selections.pen?.showChild != undefined &&
+        !selections.pen?.tags?.includes("mark")
+      );
+    },
+  },
 ];
-
+// 添加标记
+const markHandle = (type: any) => {
+  console.log("meta2d", meta2d.data());
+  if (type) {
+    let mark = false;
+    meta2d.data().pens.forEach((item) => {
+      if (item.tags?.includes("mark")) {
+        NotifyPlugin.error({
+          title: "只能标记一个组合，请先取消标记",
+        });
+        mark = true;
+      }
+    });
+    if (mark) return;
+    selections.pen?.tags?.push("mark");
+  } else {
+    let arr = selections.pen?.tags || [];
+    selections.pen.tags = arr.filter((item) => item !== "mark");
+  }
+};
 // 替换svg方法 需要拿到之前的pen数据放到上传的svg数据里 删除之前的元素
 const customToolbarClick = (code?: string) => {
   if (code == "svg") {
@@ -180,41 +250,60 @@ const customToolbarClick = (code?: string) => {
       // 读到一堆XML信息
       let list = parseSvgStr1(res.data, selections.pen, false);
       console.log("看看新的长啥样pens=====", list);
-       meta2d.delete([selections.pen]);
-      let item = selections.pen;
-      // // 先给固定的宽高
-      // const cWidth = Number(30);
-      // const cHeight = Number(80);
-      // const parent = list.find((v) => v.name == "combine" && !v.parentId);
-      // Object.assign(parent, {
-      //   text: item.name,
-      //   x: Number(item.posX),
-      //   y: Number(item.posY),
-      //   //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
-      //   tags: [item.type, item.name],
-      //   width: parent.width || cWidth,
-      //   height: parent.height || cHeight,
-      // });
-      // console.log("组装的parent=====", parent);
-      // if (svgItem.data.anchors) {
-      //   parent.anchors = svgItem.data.anchors;
-      // }
+      //先删除原来的图元
+      meta2d.delete([selections.pen]);
       // 更新位置
       meta2d.addPens(list);
-      // meta2d.addPens(pens);
-      //先删除原来的图元
-      //  meta2d.delete([selections.pen]);
     });
     return;
   }
-  // if (code == "save") {
-  //   // 保存图纸
-  //   saveBlueprintShow();
-  //   return;
-  // }
-
-  // meta2d.toggleAnchorMode();
-  // TODO: 其他操作
+  if (code == "svgs") {
+    let mark = false;
+    meta2d.data().pens.forEach((item) => {
+      if (item.tags?.includes("mark")) {
+        mark = true;
+      }
+    });
+    if (!mark) {
+      NotifyPlugin.error({
+        title: "请先拷贝信息",
+      });
+      return;
+    }
+    // 1.获取当前选中的图元 要把这个数据做更改
+    let seletPen:any = selections.pen;
+    const getChildren = getAllChildren(seletPen,meta2d.store); // 获取所有子节点
+    meta2d.delete([seletPen]); // 删除当前图元
+    // 2.获取被复制的图元 只有一个
+    let copyPen: any;
+    meta2d.data().pens.forEach((item) => {
+      if (item.tags?.includes("mark")) {
+        copyPen = {...item};
+      }
+    });
+    meta2d.delete([copyPen]); // 删除被复制的图元
+    console.log("getChildren=======", getChildren); // 获取所有子节点
+    // 查找要替换的子节点                                      
+    // 这里的子节点parentId没有变
+    seletPen.children.forEach((item) => {
+      getChildren.forEach((item2) => {
+        if (item2.id == item) {
+          item2.parentId = copyPen.id;
+          console.log("item2====", item2);
+        }
+      })
+    })
+    // 组合的主节点进行替换 好操作
+    seletPen.id = copyPen?.id;
+    seletPen.description = copyPen?.description;
+    seletPen.tags = copyPen.tags.filter(tag => tag !== 'mark');;
+    if (copyPen?.anchors) {
+      seletPen.anchors.forEach((anchor:any) => (copyPen.anchors = [anchor]));
+    }
+    console.log("getChildren====", getChildren);
+    console.log("seletPen====", seletPen);
+    meta2d.addPens([seletPen, ...getChildren]);
+  }
 };
 </script>
 <style lang="postcss" scoped>
