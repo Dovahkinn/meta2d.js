@@ -29,7 +29,7 @@ import { useData } from "../services/useGraphics";
 import { parseSvgStr, parseSvgStr1 } from "../utils/svgParser";
 import { readSVGFile } from "../utils";
 import { NotifyPlugin } from "tdesign-vue-next";
-import { deepClone,getAllChildren } from "@meta2d/core";
+import { deepClone, getAllChildren } from "@meta2d/core";
 const props = defineProps({
   x: {
     type: Number,
@@ -173,7 +173,7 @@ const menuOptions = [
     },
   },
   {
-    label: "拷贝信息",
+    label: "标记",
     icon: "mark",
     action: () => {
       markHandle(true);
@@ -189,24 +189,24 @@ const menuOptions = [
       );
     },
   },
-  // {
-  //   label: "取消标记",
-  //   icon: "mark",
-  //   action: () => {
-  //     markHandle(false);
-  //     emit("hide", false);
-  //   },
-  //   show: () => {
-  //     return (
-  //       selections.mode == 1 &&
-  //       selections.pen?.name == "combine" &&
-  //       selections.pen?.showChild != undefined &&
-  //       selections.pen?.tags?.includes("mark")
-  //     );
-  //   },
-  // },
   {
-    label: "粘贴并删除复制的图元",
+    label: "取消标记",
+    icon: "mark",
+    action: () => {
+      markHandle(false);
+      emit("hide", false);
+    },
+    show: () => {
+      return (
+        selections.mode == 1 &&
+        selections.pen?.name == "combine" &&
+        selections.pen?.showChild != undefined &&
+        selections.pen?.tags?.includes("mark")
+      );
+    },
+  },
+  {
+    label: "替换为标记的图元",
     icon: "save",
     action: () => {
       customToolbarClick("svgs");
@@ -266,45 +266,72 @@ const customToolbarClick = (code?: string) => {
     });
     if (!mark) {
       NotifyPlugin.error({
-        title: "请先拷贝信息",
+        title: "请先标记一个组合",
       });
       return;
     }
-    // 1.获取当前选中的图元 要把这个数据做更改
-    let seletPen:any = selections.pen;
-    const getChildren = getAllChildren(seletPen,meta2d.store); // 获取所有子节点
-    meta2d.delete([seletPen]); // 删除当前图元
-    // 2.获取被复制的图元 只有一个
-    let copyPen: any;
+    // // 1.获取当前选中的图元 要把这个数据做更改
+    let penConfig: any = selections.pen;
+    meta2d.delete([penConfig]); // 删除当前图元
+    // // 2.获取被标记的图元 只有一个
+    let pens =[];
     meta2d.data().pens.forEach((item) => {
       if (item.tags?.includes("mark")) {
-        copyPen = {...item};
+        // toPen = item;
+        let parent = item;
+        // 获取被标记的图元下的子节点
+        let children = findChildren(parent, meta2d.data().pens);
+        // console.log("children=====", children);
+        // 组装数据
+        children.forEach((item) => {
+          if (parent.children.includes(item.id)) {
+            item.parentId = penConfig?.id;
+          }
+          
+        });
+        pens = [...children];
       }
     });
-    meta2d.delete([copyPen]); // 删除被复制的图元
-    console.log("getChildren=======", getChildren); // 获取所有子节点
-    // 查找要替换的子节点                                      
-    // 这里的子节点parentId没有变
-    seletPen.children.forEach((item) => {
-      getChildren.forEach((item2) => {
-        if (item2.id == item) {
-          item2.parentId = copyPen.id;
-          console.log("item2====", item2);
-        }
-      })
-    })
-    // 组合的主节点进行替换 好操作
-    seletPen.id = copyPen?.id;
-    seletPen.description = copyPen?.description;
-    seletPen.tags = copyPen.tags.filter(tag => tag !== 'mark');;
-    if (copyPen?.anchors) {
-      seletPen.anchors.forEach((anchor:any) => (copyPen.anchors = [anchor]));
-    }
-    console.log("getChildren====", getChildren);
-    console.log("seletPen====", seletPen);
-    meta2d.addPens([seletPen, ...getChildren]);
+    console.log("传入的SVG===== ", pens, "以前的图元数据=====", penConfig);
+    // 拿到之前的图元父节点进行组装吧
+    const parent = pens.find((v) => v.name == "combine" && !v.parentId);
+    let del = getAllChildren(parent,meta2d.store);
+    // 获取所有的paths
+    let paths = meta2d.data().paths;
+    meta2d.delete([...del,parent]);
+    Object.assign(parent, {
+      id: penConfig?.id,
+      x: penConfig?.x,
+      y: penConfig?.y,
+      description: penConfig?.description,
+      text: penConfig?.text,
+      withh: penConfig?.width,
+      height: penConfig?.height,
+      showChild: penConfig?.showChild,
+      //rotate: rotateAngelMap[item.rotateAngel] || 0, // 跟预期不一致
+      tags: penConfig?.tags,
+    });
+    meta2d.store.data.paths = paths;
+    // //处理子节点数据
+    meta2d.addPens(pens);
   }
 };
+function findChildren(parent: any, list: any[]) {
+  if (!parent) return;
+  if (!list) return;
+  const result = [];
+  const queue = [parent];
+  while (queue.length) {
+    const current = queue.shift();
+    result.push(current);
+    for (const data of list) {
+      if (data.parentId == current.id) {
+        queue.push(data);
+      }
+    }
+  }
+  return result;
+}
 </script>
 <style lang="postcss" scoped>
 .context-menu {
