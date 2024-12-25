@@ -184,23 +184,17 @@
         </svg>
       </span>
     </t-tooltip>
-    <t-tooltip content="连线">
-      <svg
-        width="1em"
-        height="1em"
-        viewBox="0 0 1024 1024"
-        xmlns="http://www.w3.org/2000/svg"
-        @click="drawLine"
+
+    <t-tooltip content="钢笔" placement="bottom">
+      <a
         :style="{
           color: isDrawLine ? ' #1677ff' : '',
         }"
-      >
-        <path
-          d="M192 64a128 128 0 0 1 123.968 96H384a160 160 0 0 1 159.68 149.504L544 320v384a96 96 0 0 0 86.784 95.552L640 800h68.032a128 128 0 1 1 0 64.064L640 864a160 160 0 0 1-159.68-149.504L480 704V320a96 96 0 0 0-86.784-95.552L384 224l-68.032 0.064A128 128 0 1 1 192 64z m640 704a64 64 0 1 0 0 128 64 64 0 0 0 0-128zM192 128a64 64 0 1 0 0 128 64 64 0 0 0 0-128z"
-          fill="currentColor"
-        ></path>
-      </svg>
+        @click="drawLine">
+        <t-icon name="pen" />
+      </a>
     </t-tooltip>
+
     <t-dropdown
       :minColumnWidth="160"
       :maxHeight="560"
@@ -282,6 +276,7 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
+
     <div style="width: 64px"></div>
     <div v-show="scale > 0" style="line-height: 40px">{{ scale }}%</div>
     <t-tooltip content="100%视图" placement="bottom">
