@@ -124,6 +124,20 @@ const menuOptions = [
 
   // 组合
   {
+    label: "组合",
+    icon: "group",
+    action: () => {
+      if (selections.pens) {
+        meta2d.combine(selections.pens);
+      }
+      emit("hide", false);
+    },
+    show: () => {
+      return selections.mode == 2;
+    },
+  },
+
+  {
     label: "组合为状态",
     icon: "group",
     action: () => {
@@ -287,7 +301,7 @@ const customToolbarClick = (code?: string) => {
           if (parent.children.includes(item.id)) {
             item.parentId = penConfig?.id;
           }
-          
+
         });
         pens = [...children];
       }
