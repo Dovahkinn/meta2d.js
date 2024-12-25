@@ -196,7 +196,32 @@
             <t-form-item label="垂直翻转" name="flipY">
               <t-switch v-model="pen.flipY" @change="changeValue('flipY')" />
             </t-form-item>
-
+            <t-divider>图片</t-divider>
+            <t-form-item label="背景图片">
+              <t-upload
+                ref="uploadRef"
+                v-model="uploadValue"
+                :action="
+                  $attrs.uploadUrl ||
+                  'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+                "
+                :headers="headers"
+                name="object"
+                :sizeLimit="sizeLimit"
+                theme="image"
+                tips="请选择单张小于1MB的图片上传"
+                accept="image/*"
+                @fail="handleFail"
+                @success="handleSuccess"
+              />
+            </t-form-item>
+            <t-form-item label="背景图片地址" name="backgroundImage">
+              <t-input
+                v-model="pen.image"
+                clearable
+                @change="changeValue('image')"
+              />
+            </t-form-item>
             <t-divider />
 
             <template v-if="pen.name == 'combine' && pen.showChild != undefined">
@@ -508,7 +533,9 @@ const changeValue = (prop: string) => {
     const frames = PenFrames[animateType];
     v.frames = frames;
   }
+  console.log("change value: ", v);
   meta2d.setValue(v, { render: true });
+  console.log("meta2d: ", meta2d);
 };
 
 const changeRect = (prop: string) => {
