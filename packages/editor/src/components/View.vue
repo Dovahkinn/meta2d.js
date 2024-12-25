@@ -99,6 +99,10 @@ onMounted(() => {
     // 判断是否为运行查看，是-设置为预览模式
     if (location.pathname === "/preview" || props.preview) {
       data.locked = 1;
+      if (data.lockState) {
+        // meta2d.lock(data.lockState);
+        data.locked = data.lockState;
+      }
       const msgTypes = (data.msgTypes || [])
         .map((item: string) => {
           return Number(item);

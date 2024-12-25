@@ -103,7 +103,6 @@
               />
             </t-form-item>
 
-            <!-- 连线相交弯曲  -->
             <t-form-item label="连线相交弯曲" name="lineCross">
               <t-tooltip
                 content="当直线或折线两两相交时，其中相交的交点会自动弯曲显示"
@@ -111,6 +110,15 @@
                 <t-switch v-model="data.lineCross" @change="onChangeData" />
               </t-tooltip>
             </t-form-item>
+            <t-divider />
+            <t-form-item label="预览时锁定" name="lockState">
+              <t-tooltip
+                content="仅预览时有效"
+              >
+                <t-select v-model="data.lockState" :options="lockStateOptions" clearable @change="onChangeData" />
+              </t-tooltip>
+            </t-form-item>
+
           </t-form>
         </div>
       </template>
@@ -231,6 +239,21 @@ import CodeEditor from "./CodeEditor.vue";
 import MessageHandlers from "./MessageHandlers.vue";
 import { useWsHandlers } from "../services/useHandlers";
 
+enum LockState {
+  // 0 -未锁定
+  None,
+  // 1 - 禁止拖拽/编辑图元；图元可选中、高亮、触发事件等
+  DisableEdit,
+  // 2 - 禁止编辑图元、禁止左键移动画布；图元可选中、高亮、触发事件等
+  DisableMove,
+  // 3 - 禁止缩放画布
+  DisableScale,
+  // 4 - 禁止左键移动和缩放画布
+  DisableMoveScale,
+  // 10 -画布不能移动和缩放，图元不能触发任何事件
+  Disable = 10,
+}
+
 // 图纸数据
 const data = reactive<any>({
   name: "",
@@ -249,6 +272,7 @@ const data = reactive<any>({
   ruleColor: undefined,
   wsMsgFields: [],
   wsMsgHandlers: [],
+  lockState: LockState.None,
 });
 
 // 画布选项
@@ -278,6 +302,15 @@ const tabs = [
   },
 ];
 
+const lockStateOptions = [
+  { label: '未锁定', value: LockState.None },
+  { label: '禁止拖拽/编辑图元；图元可选中、高亮、触发事件等', value: LockState.DisableEdit },
+  { label: '禁止编辑图元、禁止左键移动画布；图元可选中、高亮、触发事件等', value: LockState.DisableMove },
+  { label: '禁止缩放画布', value: LockState.DisableScale },
+  { label: '禁止左键移动和缩放画布', value: LockState.DisableMoveScale },
+  { label: '画布不能移动和缩放，图元不能触发任何事件', value: LockState.Disable },
+];
+
 onMounted(() => {
   const d: any = meta2d.data();
   data.name = d.name || "";
@@ -298,7 +331,7 @@ onMounted(() => {
   data.onMessageJsCode = d.onMessageJsCode;
   data.wsMsgFields = d.wsMsgFields || [];
   data.wsMsgHandlers = d.wsMsgHandlers || [];
-
+  data.lockState = d.lockState || LockState.None;
   Object.assign(options, meta2d.getOptions());
 });
 
