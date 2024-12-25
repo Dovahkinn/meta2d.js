@@ -1,18 +1,10 @@
 <template>
   <div class="app-header header__top">
-    <a
-      class="logo"
-      href="https://doc.le5le.com/document/119359590"
-      target="_blank"
-    >
+    <a class="logo" href="https://doc.le5le.com/document/119359590" target="_blank">
       <img src="/favicon.ico" />
       <span>Meta2D</span>
     </a>
-    <t-dropdown
-      :minColumnWidth="200"
-      :maxHeight="560"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="200" :maxHeight="560" overlayClassName="header-dropdown">
       <a> 文件 </a>
       <t-dropdown-menu>
         <t-dropdown-item @click="newFile">
@@ -34,11 +26,7 @@
         <!-- </t-dropdown-item> -->
       </t-dropdown-menu>
     </t-dropdown>
-    <t-dropdown
-      :minColumnWidth="180"
-      :maxHeight="500"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="180" :maxHeight="500" overlayClassName="header-dropdown">
       <a> 编辑 </a>
       <t-dropdown-menu>
         <t-dropdown-item>
@@ -96,11 +84,7 @@
       <span @click="customToolbarClick()">添加/删除锚点</span>
     </a>
 
-    <t-dropdown
-      :minColumnWidth="200"
-      :maxHeight="560"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="200" :maxHeight="560" overlayClassName="header-dropdown">
       <a> 批量选择图元 </a>
       <t-dropdown-menu>
         <t-dropdown-item @click="selectPens()">
@@ -120,12 +104,8 @@
         <span @click="customToolbarClick('svg')">导入 SVG</span>
       </t-tooltip>
     </a>
-    <t-popconfirm
-      :visible="visible"
-      theme="default"
-      content="是否导入 ElectricEditor 生成的 JSON 文件?"
-      @visible-change="onVisibleChange"
-    >
+    <t-popconfirm :visible="visible" theme="default" content="是否导入 ElectricEditor 生成的 JSON 文件?"
+      @visible-change="onVisibleChange">
       <a class="logo">
         <span>导入</span>
       </a>
@@ -136,12 +116,7 @@
       <span @click="customToolbarClick('save')">保存图纸</span>
     </a>
 
-    <t-dropdown
-      :minColumnWidth="180"
-      :maxHeight="500"
-      :delay2="[10, 150]"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="180" :maxHeight="500" :delay2="[10, 150]" overlayClassName="header-dropdown">
       <a> 帮助 </a>
       <t-dropdown-menu>
         <t-dropdown-item v-for="item in assets.helps" :divider="item.divider">
@@ -165,20 +140,12 @@
       </svg>
     </t-tooltip>
     <t-tooltip content="直线">
-      <span
-        :draggable="true"
-        @dragstart="onAddShape($event, 'line')"
-        @click="onAddShape($event, 'line')"
-      >
+      <span :draggable="true" @dragstart="onAddShape($event, 'line')" @click="onAddShape($event, 'line')">
         <t-icon name="slash" />
       </span>
     </t-tooltip>
     <t-tooltip content="文字">
-      <span
-        :draggable="true"
-        @dragstart="onAddShape($event, 'text')"
-        @click="onAddShape($event, 'text')"
-      >
+      <span :draggable="true" @dragstart="onAddShape($event, 'text')" @click="onAddShape($event, 'text')">
         <svg class="l-icon" aria-hidden="true">
           <use xlink:href="#l-text"></use>
         </svg>
@@ -186,27 +153,21 @@
     </t-tooltip>
 
     <t-tooltip content="钢笔" placement="bottom">
-      <a
-        :style="{
-          color: isDrawLine ? ' #1677ff' : '',
-        }"
-        @click="drawLine">
+      <a :style="{
+        color: isDrawLine ? ' #1677ff' : '',
+      }" @click="drawLine">
         <t-icon name="pen" />
       </a>
     </t-tooltip>
 
-    <t-dropdown
-      :minColumnWidth="160"
-      :maxHeight="560"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="160" :maxHeight="560" overlayClassName="header-dropdown">
       <a>
+        <span class="button__text">
+          连线
+        </span>
         <svg class="l-icon" aria-hidden="true">
-          <use
-            :xlink:href="
-              lineTypes.find((item) => item.value === currentLineType)?.icon
-            "
-          ></use>
+          <use :xlink:href="lineTypes.find((item) => item.value === currentLineType)?.icon
+            "></use>
         </svg>
       </a>
       <t-dropdown-menu>
@@ -220,28 +181,20 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-    <t-dropdown
-      :minColumnWidth="160"
-      :maxHeight="560"
-      :delay2="[10, 150]"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="160" :maxHeight="560" :delay2="[10, 150]" overlayClassName="header-dropdown">
       <a>
+        <span class="button__text">
+          起点
+        </span>
+
         <svg class="l-icon" aria-hidden="true">
-          <use
-            :xlink:href="
-              fromArrows.find((item) => item.value === fromArrow)?.icon
-            "
-          ></use>
+          <use :xlink:href="fromArrows.find((item) => item.value === fromArrow)?.icon
+            "></use>
         </svg>
       </a>
       <t-dropdown-menu>
         <t-dropdown-item v-for="item in fromArrows">
-          <div
-            class="flex middle"
-            style="height: 30px"
-            @click="changeFromArrow(item.value)"
-          >
+          <div class="flex middle" style="height: 30px" @click="changeFromArrow(item.value)">
             <svg class="l-icon" aria-hidden="true">
               <use :xlink:href="item.icon"></use>
             </svg>
@@ -249,26 +202,19 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-    <t-dropdown
-      :minColumnWidth="160"
-      :maxHeight="560"
-      :delay2="[10, 150]"
-      overlayClassName="header-dropdown"
-    >
+    <t-dropdown :minColumnWidth="160" :maxHeight="560" :delay2="[10, 150]" overlayClassName="header-dropdown">
       <a>
+        <span class="button__text">
+          终点
+        </span>
+
         <svg class="l-icon" aria-hidden="true">
-          <use
-            :xlink:href="toArrows.find((item) => item.value === toArrow)?.icon"
-          ></use>
+          <use :xlink:href="toArrows.find((item) => item.value === toArrow)?.icon"></use>
         </svg>
       </a>
       <t-dropdown-menu>
         <t-dropdown-item v-for="item in toArrows">
-          <div
-            class="flex middle"
-            style="height: 30px"
-            @click="changeToArrow(item.value)"
-          >
+          <div class="flex middle" style="height: 30px" @click="changeToArrow(item.value)">
             <svg class="l-icon" aria-hidden="true">
               <use :xlink:href="item.icon"></use>
             </svg>
@@ -283,9 +229,7 @@
       <a @click="onScaleDefault"><t-icon name="refresh" /></a>
     </t-tooltip>
     <t-tooltip content="窗口大小" placement="bottom">
-      <a @click="onScaleWindow" style="margin-left: -16px"
-        ><t-icon name="fullscreen-exit"
-      /></a>
+      <a @click="onScaleWindow" style="margin-left: -16px"><t-icon name="fullscreen-exit" /></a>
     </t-tooltip>
     <div style="width: 36px"></div>
     <t-tooltip content="运行查看">
@@ -773,11 +717,17 @@ const selectPens = (type?: number | string) => {
       background-color: var(--color-primary-hover);
       color: #ffffff;
     }
+
+    .button__text {
+      margin-right: 5px;
+    }
+
   }
 
   svg {
     height: 40px;
     margin: 0 8px;
+
     &:hover {
       color: var(--color-primary);
       cursor: pointer;
