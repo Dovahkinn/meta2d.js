@@ -1,35 +1,25 @@
 <template>
-  <t-tree
-    hover
-    line
-    expand-all
-    :data="pensTree"
-    :keys="{ label: 'name', value: 'id', children: 'list' }"
-    :icon="icon"
-    :scroll="{
-        rowHeight: 34,
-        bufferSize: 30,
-        threshold: 50,
-        type: 'virtual',
-    }"
-    style="padding: 10px; height: 100%;"
-  >
+  <t-tree hover line expand-all activable v-model:actived="actived" :data="pensTree"
+    :keys="{ label: 'name', value: 'id', children: 'list' }" :icon="icon" :scroll="{
+      rowHeight: 34,
+      bufferSize: 30,
+      threshold: 50,
+      type: 'virtual',
+    }" style="padding: 10px; height: 100%;">
     <template #label="{ node }">
       <span @click="click(node)"> {{ node.label }} - {{ node.data.text || node.data.description || node.value }}</span>
     </template>
     <template #operations="{ node }">
       <div class="tdesign-demo-block-row">
-        <t-icon
-          :name="node.data.visible !== false ? 'browse' : 'browse-off'"
-          @click ="toggleVisible(node)"
-        ></t-icon>
+        <t-icon :name="node.data.visible !== false ? 'browse' : 'browse-off'" @click="toggleVisible(node)"></t-icon>
       </div>
     </template>
   </t-tree>
 </template>
 <script setup lang="ts">
-import { defineProps, computed, onMounted, ref, onUnmounted, } from "vue";
+import { defineProps, computed, onMounted, ref, onUnmounted, watch, } from "vue";
 import { Icon, TreeNodeModel } from "tdesign-vue-next";
+import { useSelection } from '../services/selections.ts'
 
 const props = defineProps({});
 
@@ -60,15 +50,38 @@ const updateData = () => {
   data.value = meta2d.data();
 }
 
+const { selections } = useSelection()
+const actived = ref([])
+watch(selections, (val) => {
+  // console.log("structure selections: ", val);
+  const { mode } = val;
+  if (mode == 1 && val.pen) {
+    actived.value = [val.pen.id]
+    // const active = pensTree.value.find((pen) => pen.id === val.pen.id);
+    // if (active) {
+    // actived.value = [active.id]
+    // }
+  }
+  // ! 高亮只会存在一个
+  // else if (mode == 2 && val.pens) {
+  //   actived.value = val.pens.map((pen: Pen) => pen.id)
+  // }
+  else {
+    actived.value = []
+  }
+}, {
+  immediate: true,
+})
+
 onMounted(() => {
   meta2d.on('add', updateData)
-  meta2d.on('delete',updateData)
+  meta2d.on('delete', updateData)
   meta2d.on('clear', updateData)
 })
 
 onUnmounted(() => {
   meta2d.off('add', updateData)
-  meta2d.off('delete',updateData)
+  meta2d.off('delete', updateData)
 })
 
 
