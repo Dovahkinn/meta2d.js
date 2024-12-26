@@ -9,7 +9,20 @@
           @change="changeValue('duration')"
         />
       </t-form-item>
-
+      <!-- 偏移x -->
+      <t-form-item label="偏移x" name="x">
+        <t-input-number
+          v-model="data.x"
+          @change="changeValue('x')"
+        />
+      </t-form-item>
+      <!-- 偏移y -->
+      <t-form-item label="偏移y" name="y">
+        <t-input-number
+          v-model="data.y"
+          @change="changeValue('y')"
+        />
+      </t-form-item>
       <t-form-item label="颜色" name="color">
         <t-color-picker
           class="w-full"
