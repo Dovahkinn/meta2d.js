@@ -1,25 +1,13 @@
 <template>
   <div class="app-page is--preview">
-    <transition
-      name="sidebar-transition"
-      @after-leave="afterLeave"
-      @after-enter="afterEnter"
-    >
+    <transition name="sidebar-transition" @after-leave="afterLeave" @after-enter="afterEnter">
       <div v-if="!isCollapsed" class="left__panel">
         <t-row justify="end">
           <t-col :span="2">
-            <t-icon
-              name="fullscreen"
-              size="large"
-              @click="handleToolClick('fullscreen')"
-            ></t-icon>
+            <t-icon name="fullscreen" size="large" @click="handleToolClick('fullscreen')"></t-icon>
           </t-col>
           <t-col :span="2">
-            <t-icon
-              name="rectangle"
-              size="large"
-              @click="handleToolClick('fit')"
-            ></t-icon>
+            <t-icon name="rectangle" size="large" @click="handleToolClick('fit')"></t-icon>
           </t-col>
         </t-row>
         <t-divider></t-divider>
@@ -27,33 +15,17 @@
       </div>
     </transition>
 
-    <View
-      v-bind="$attrs"
-      preview
-      :data="data"
-      :customWsHandler="customWsHandler"
-      @ready="emit('ready', $event)"
-      ref="childComponentRef"
-    />
+    <View v-bind="$attrs" preview :data="data" :customWsHandler="customWsHandler" @ready="emit('ready', $event)"
+      ref="childComponentRef" />
 
     <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel"> </slot>
     </div>
 
-    <t-sticky-tool
-      v-if="showStickyTool"
-      type="compact"
-      placement="left-bottom"
-      style="z-index: 999"
-      @click="handleClick"
-    >
+    <t-sticky-tool v-if="showStickyTool" type="compact" placement="left-bottom" style="z-index: 999"
+      @click="handleClick">
       <template v-for="tool in sidebarTools" :key="tool.label">
-        <t-sticky-item
-          v-if="tool.show()"
-          :label="tool.label"
-          :icon="renderIcon(tool.icon)"
-          :popup="tool.popup"
-        >
+        <t-sticky-item v-if="tool.show()" :label="tool.label" :icon="renderIcon(tool.icon)" :popup="tool.popup">
         </t-sticky-item>
       </template>
     </t-sticky-tool>
@@ -78,6 +50,9 @@ import { toggleFullScreen } from "../utils";
 import { usePlayer } from "../services/usePlayer.ts";
 import { EventAction } from "../types/Event.ts";
 import { deepClone } from "@meta2d/core";
+import { useRoute, } from 'vue-router'
+
+
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
 const props = defineProps({
@@ -145,6 +120,8 @@ const isInElectron = () => {
 };
 const _electronArgvData = ref([]);
 
+const route = useRoute()
+
 onMounted(() => {
   if (isInElectron()) {
     if (globalThis.versions?.projectListSync) {
@@ -180,6 +157,21 @@ onMounted(() => {
         });
     } else {
       meta2d.clear();
+    }
+  } else {
+    try {
+      const filePath = route.query['open-file']
+      if (filePath) {
+        fetch(filePath).then((res) => res.json()).then((res) => {
+          // console.log('open file: ', res)
+          meta2d.open(res);
+          meta2d.emit("clear");
+          meta2d.fitView();
+          applyStateSet();
+        })
+      }
+    } catch (error) {
+      console.log('open file error: ', error)
     }
   }
 });
@@ -523,7 +515,8 @@ if (props.enableBackgroundUpdate) {
 .sidebar-transition-enter,
 .sidebar-transition-leave-to
 
-/* .sidebar-transition-leave-active in <2.1.8 */ {
+/* .sidebar-transition-leave-active in <2.1.8 */
+  {
   transform: translateX(-250px);
   opacity: 0;
 }
