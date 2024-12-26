@@ -55,6 +55,28 @@
         " label="目标">
           <t-input v-model="item.value" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
         </t-form-item>
+
+        <template v-if="item.action === EventAction.Dialog">
+           <t-form-item label="窗口标题">
+            <t-input v-model="item.value" clearable @change="eventChange"></t-input>
+          </t-form-item>
+           <t-form-item label="URL">
+            <t-input v-model="item.params" clearable @change="eventChange"></t-input>
+          </t-form-item>
+          <t-form-item v-if="item.extend" label="窗口宽度">
+            <t-input-number v-model="item.extend.width" @change="eventChange"></t-input-number>
+          </t-form-item>
+          <t-form-item v-if="item.extend" label="窗口高度">
+            <t-input-number v-model="item.extend.height" @change="eventChange"></t-input-number>
+          </t-form-item>
+          <t-form-item v-if="item.extend" label="X偏移">
+            <t-input-number v-model="item.extend.x" @change="eventChange"></t-input-number>
+          </t-form-item>
+          <t-form-item v-if="item.extend" label="Y偏移">
+            <t-input-number v-model="item.extend.y" @change="eventChange"></t-input-number>
+          </t-form-item>
+        </template>
+
       </t-form>
       <template #headerRightContent>
         <t-button size="small" variant="outline" theme="danger" :style="{ marginLeft: '8px' }"
@@ -136,10 +158,10 @@ const eventActionOptions = [
     label: "停止动画",
     value: EventAction.StopAnimate,
   },
-  {
-    label: "执行JS代码",
-    value: EventAction.JS,
-  },
+  // {
+  //   label: "执行JS代码",
+  //   value: EventAction.JS,
+  // },
   //   {
   //     label: "执行全局函数",
   //     value: EventAction.GlobalFn,
@@ -168,6 +190,10 @@ const eventActionOptions = [
   //     label: "发送绑定变量",
   //     value: EventAction.SendVarData,
   //   },
+  {
+    label: '对话框',
+    value: EventAction.Dialog,
+  }
 ];
 
 const templateCodeStringOptions = [
@@ -192,6 +218,7 @@ const insert = () => {
     value: "",
     params: "",
     where: {},
+    extend: {},
   });
 };
 const deleteEvent = (event: any) => {

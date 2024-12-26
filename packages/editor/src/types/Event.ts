@@ -55,6 +55,7 @@ export enum EventAction {
   StopVideo, // 停止视频
   SendPropData, // 发送图元数据
   SendVarData, // 发送绑定变量
+  Dialog = 14, //对话框 14
 }
 
 
