@@ -6,7 +6,7 @@
     </t-tabs>
 </template>
 <script setup lang="ts">
-import { defineProps, ref, } from 'vue'
+import { defineProps, ref, watch, } from 'vue'
 
 type Tab = {
     label: string,
@@ -26,6 +26,10 @@ const props = defineProps({
 })
 
 const activePanel = ref(props.defaultValue)
+
+watch(() => props.defaultValue, (value) => {
+  activePanel.value = value
+})
 
 const emit = defineEmits(['change'])
 const changeValue = (value: number) => {

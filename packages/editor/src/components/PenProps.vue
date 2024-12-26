@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <PropsTab v-if="pen" :tabs="tabs" :defaultValue="activePanel">
+    <PropsTab v-if="pen" :tabs="tabs" :defaultValue="activePanel" @change="v => activePanel = v">
       <template #pen>
         <div class="props-panel">
           <t-form label-align="left">
