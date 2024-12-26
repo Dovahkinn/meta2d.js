@@ -204,6 +204,20 @@ export const defaultGraphics = [
           // crossOrigin: 'undefined', // 没啥用
         },
       },
+      {
+        name: '视频',
+        icon: 'l-shipin',
+        id: 'd-1-1',
+        data: {
+          name: 'video',
+          x: 100,
+          y: 100,
+          width: 300,
+          height: 200,
+          video: 'https://video.699pic.com/videos/17/69/11/a_aa3jeKZ0D63g1556176911_10s.mp4',
+          autoPlay: true,
+        },
+      }
     ],
   },
   {

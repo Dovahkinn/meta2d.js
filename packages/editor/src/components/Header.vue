@@ -222,6 +222,9 @@
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
+    <t-tooltip content="自动锚点" placement="bottom">
+      <a><t-switch v-model="autoAnchor" @change="onAutoAnchor" size="small" /></a>
+    </t-tooltip>
 
     <div style="width: 64px"></div>
     <div v-show="scale > 0" style="line-height: 40px">{{ scale }}%</div>
@@ -418,6 +421,12 @@ const changeToArrow = (value: string) => {
     meta2d.render();
   }
 };
+
+// 自动锚点
+const autoAnchor = ref(meta2d?.store?.options?.autoAnchor || true);
+const onAutoAnchor = (value: boolean) => {
+  meta2d.store.options.autoAnchor = value;
+}
 
 const newFile = () => {
   meta2d.open({ name: "新建项目", pens: [] } as any);
