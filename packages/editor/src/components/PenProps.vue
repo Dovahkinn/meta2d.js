@@ -198,29 +198,13 @@
             </t-form-item>
             <t-divider>图片</t-divider>
             <t-form-item label="背景图片">
-              <t-upload
-                ref="uploadRef"
-                v-model="uploadValue"
-                :action="
-                  $attrs.uploadUrl ||
-                  'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
-                "
-                :headers="headers"
-                name="object"
-                :sizeLimit="sizeLimit"
-                theme="image"
-                tips="请选择单张小于1MB的图片上传"
-                accept="image/*"
-                @fail="handleFail"
-                @success="handleSuccess"
-              />
+              <t-upload ref="uploadRef" v-model="uploadValue" :action="$attrs.uploadUrl ||
+                'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+                " :headers="headers" name="object" :sizeLimit="sizeLimit" theme="image" tips="请选择单张小于1MB的图片上传"
+                accept="image/*" @fail="handleFail" @success="handleSuccess" />
             </t-form-item>
             <t-form-item label="背景图片地址" name="backgroundImage">
-              <t-input
-                v-model="pen.image"
-                clearable
-                @change="changeValue('image')"
-              />
+              <t-input v-model="pen.image" clearable @change="changeValue('image')" />
             </t-form-item>
             <t-divider />
 
@@ -265,60 +249,77 @@
       </template>
       <template #animate>
         <div class="props-panel">
-          <t-form label-align="left">
-            <template v-if="isLine">
-              <t-form-item label="动画效果" name="lineAnimateType">
-                <t-select v-model="pen.lineAnimateType" clearable @change="changeValue('lineAnimateType')">
-                  <t-option v-for="item in LineAnimateOption" :key="item.value" :value="item.value"
-                    :label="item.label"></t-option>
-                </t-select>
-              </t-form-item>
-              <t-form-item label="反向流动" name="reverse">
-                <t-switch v-model="pen.animateReverse" @change="changeValue('animateReverse')" />
-              </t-form-item>
-              <t-form-item label="线宽" name="animateLineWidth">
-                <t-input-number v-model="pen.animateLineWidth" @change="changeValue('animateLineWidth')" />
-              </t-form-item>
+          <t-collapse :default-value="[0]">
+            <t-collapse-panel header="动画" name="animate">
+              <t-form label-align="left">
+                <template v-if="isLine">
+                  <t-form-item label="动画效果" name="lineAnimateType">
+                    <t-select v-model="pen.lineAnimateType" clearable @change="changeValue('lineAnimateType')">
+                      <t-option v-for="item in LineAnimateOption" :key="item.value" :value="item.value"
+                        :label="item.label"></t-option>
+                    </t-select>
+                  </t-form-item>
+                  <t-form-item label="反向流动" name="reverse">
+                    <t-switch v-model="pen.animateReverse" @change="changeValue('animateReverse')" />
+                  </t-form-item>
+                  <t-form-item label="线宽" name="animateLineWidth">
+                    <t-input-number v-model="pen.animateLineWidth" @change="changeValue('animateLineWidth')" />
+                  </t-form-item>
 
-              <t-form-item label="速度" name="animateSpan">
-                <t-input-number v-model="pen.animateSpan" :min="1" :max="5" @change="changeValue('animateSpan')" />
-              </t-form-item>
-              <t-form-item label="颜色" name="color">
-                <t-color-picker class="w-full" v-model="pen.animateColor" :show-primary-color-preview="false"
-                  format="CSS" :color-modes="['monochrome']" @change="changeValue('animateColor')" />
-              </t-form-item>
-              <t-form-item label="动画发光" name="animateShadow">
-                <t-switch v-model="pen.animateShadow" @change="changeValue('animateShadow')" />
-              </t-form-item>
-              <t-form-item label="发光颜色" name="animateShadowColor">
-                <t-color-picker class="w-full" v-model="pen.animateShadowColor" :show-primary-color-preview="false"
-                  format="CSS" :color-modes="['monochrome']" @change="changeValue('animateShadowColor')" />
-              </t-form-item>
-            </template>
-            <template v-else>
-              <t-form-item label="动画效果" name="animateType">
-                <t-select v-model="pen.animateType" clearable @change="changeValue('animateType')">
-                  <t-option v-for="item in PenFrameOptions" :key="item.value" :value="item.value"
-                    :label="item.label"></t-option>
-                </t-select>
-              </t-form-item>
+                  <t-form-item label="速度" name="animateSpan">
+                    <t-input-number v-model="pen.animateSpan" :min="1" :max="5" @change="changeValue('animateSpan')" />
+                  </t-form-item>
+                  <t-form-item label="颜色" name="color">
+                    <t-color-picker class="w-full" v-model="pen.animateColor" :show-primary-color-preview="false"
+                      format="CSS" :color-modes="['monochrome']" @change="changeValue('animateColor')" />
+                  </t-form-item>
+                  <t-form-item label="动画发光" name="animateShadow">
+                    <t-switch v-model="pen.animateShadow" @change="changeValue('animateShadow')" />
+                  </t-form-item>
+                  <t-form-item label="发光颜色" name="animateShadowColor">
+                    <t-color-picker class="w-full" v-model="pen.animateShadowColor" :show-primary-color-preview="false"
+                      format="CSS" :color-modes="['monochrome']" @change="changeValue('animateShadowColor')" />
+                  </t-form-item>
+                </template>
+                <template v-else>
+                  <t-form-item label="动画效果" name="animateType">
+                    <t-select v-model="pen.animateType" clearable @change="changeValue('animateType')">
+                      <t-option v-for="item in PenFrameOptions" :key="item.value" :value="item.value"
+                        :label="item.label"></t-option>
+                    </t-select>
+                  </t-form-item>
 
-              <t-form-item v-if="pen.animateType == 'x-custom'" label="自定义动画帧">
-                <t-button variant="text" theme="primary" @click="showFramesDrawer">编辑
-                </t-button>
-              </t-form-item>
-            </template>
+                  <t-form-item v-if="pen.animateType == 'x-custom'" label="自定义动画帧">
+                    <t-button variant="text" theme="primary" @click="showFramesDrawer">编辑
+                    </t-button>
+                  </t-form-item>
+                </template>
 
-            <t-form-item label="自动播放" name="autoPlay">
-              <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
-            </t-form-item>
+                <t-form-item label="自动播放" name="autoPlay">
+                  <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
+                </t-form-item>
 
-            <t-divider />
-            <t-space>
-              <t-button @click="animate(true)">播放</t-button>
-              <t-button @click="animate()">停止</t-button>
-            </t-space>
-          </t-form>
+                <t-divider />
+                <t-space>
+                  <t-button @click="animate(true)">播放</t-button>
+                  <t-button @click="animate()">停止</t-button>
+                </t-space>
+              </t-form>
+
+            </t-collapse-panel>
+
+            <t-collapse-panel v-if="pen.name == 'video'" header="视频">
+              <t-form label-align="left">
+                <t-form-item label="视频地址" name="video">
+                  <t-input v-model="pen.video" placeholder="视频地址不能为空" clearable @change="changeValue('video')" />
+                </t-form-item>
+                <t-form-item label="自动播放" name="autoPlay">
+                  <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
+                </t-form-item>
+
+              </t-form>
+            </t-collapse-panel>
+          </t-collapse>
         </div>
       </template>
 

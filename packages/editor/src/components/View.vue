@@ -233,6 +233,7 @@ onUnmounted(() => {
 #meta2d {
   height: calc(100vh - 80px);
   z-index: 1;
+  overflow: hidden;
 
   &.is--preview {
     height: 100%;
