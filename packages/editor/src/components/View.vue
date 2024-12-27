@@ -1,6 +1,6 @@
 <template>
   <div id="meta2d" :class="{ 'is--preview': preview }"></div>
-  <ContextMenu v-bind="contextMenuParams" @hide="hideContextMenu" />
+  <ContextMenu v-bind="contextMenuParams" @hide="hideContextMenu" @send="sendMessageSocket"/>
 </template>
 
 <script lang="ts" setup>
@@ -53,20 +53,24 @@ const contextMenuParams = reactive({
   x: 0,
   y: 0,
   visible: false,
+  isPreview:false,
 });
 const showContextMenu = (event: any) => {
-  if (props.preview) return;
+  // if (props.preview) return;
   if (selections.mode === 0) return;
   contextMenuParams.x = event.e.clientX;
   contextMenuParams.y = event.e.clientY;
   contextMenuParams.visible = true;
+  contextMenuParams.isPreview =props.preview;
 };
 const hideContextMenu = () => {
   contextMenuParams.visible = false;
 };
+const sendMessage = () =>{
 
+}
 const emit = defineEmits(["ready"]);
-
+let wsClient: any;
 onMounted(() => {
   // 创建实例
   new Meta2d("meta2d", meta2dOptions);
@@ -112,8 +116,9 @@ onMounted(() => {
         });
 
       const jsStr = data.onMessageJsCode;
+      console.log("data:====", data);
       if (data.wsUrl) {
-        const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+        wsClient = WebSocketClient.getInstance(data.wsUrl, {
           busName: data.busName,
           msgTypes,
           enableLog: false,
@@ -143,18 +148,12 @@ onMounted(() => {
 
         // test: 模拟修改状态
         // setTimeout(() => {
-        //   wsClient.sendMessage(data.busName, 1, {
-        //     action: 1,
-        //     // name: "setProps",
-        //     id: "",
-        //     tag: 'Switch',
-        //     value: {
-        //       color: "red",
-        //       text: "ws",
-        //       lineWidth: 2,
-        //     },
+        //   wsClient.sendMessage(data.busName, 3000, {
+        //     Name: "xxx",
+        //     Type: 28,
+        //     State: 0,
         //   });
-        // }, 10e3);
+        // }, 10000);
       }
     } else {
       data.locked = 0;
@@ -184,7 +183,7 @@ const reconnectWebSocket = (data: any) => {
       });
 
     const jsStr = data.onMessageJsCode;
-    const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+    wsClient = WebSocketClient.getInstance(data.wsUrl, {
       busName: data.busName,
       msgTypes,
       enableLog: false,
@@ -213,8 +212,25 @@ const reconnectWebSocket = (data: any) => {
     wsClient.connect();
   }
 };
+// 发送消息设置为故障
+const sendMessageSocket = (pen: any) => {
+  let data: any = localStorage.getItem("meta2d");
+  if (props.data || data) {
+    data = props.data || JSON.parse(data);
+  }
+  console.log("sendMessageSocket======== ", data);
+  console.log("sendMessageSocketpen======== ", pen);
+  if (data.wsUrl) {
+    // test: 模拟修改状态
+    wsClient.sendMessage(data.busName, 3000, {
+      Name: pen.text,
+      Type: 28,
+      State: 200,
+    });
+  }
+};
 defineExpose({
-  reconnectWebSocket
+  reconnectWebSocket,
 });
 
 const active = (pens?: Pen[]) => {

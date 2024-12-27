@@ -43,6 +43,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isPreview: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const style = computed(() => {
@@ -52,12 +56,25 @@ const style = computed(() => {
   };
 });
 
-const emit = defineEmits(["hide"]);
+const emit = defineEmits(["hide","send"]);
 
 const { selections } = useSelection();
 const { saveComponentShow } = useData(true);
 
 const menuOptions = [
+  {
+    label: "设置为故障",
+    icon: "group",
+    action: () => {
+      if (selections.pen) {
+        emit("send", selections.pen);
+        emit("hide", false);
+      }
+    },
+    show: () => {
+      return props.isPreview;
+    },
+  },
   {
     label: "锁定",
     icon: "lock",

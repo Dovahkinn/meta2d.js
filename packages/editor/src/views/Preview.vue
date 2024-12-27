@@ -165,7 +165,6 @@ onMounted(() => {
                   meta2d.fitView();
                   applyStateSet();
                   if (childComponentRef.value) {
-                    // 假设子组件有一个名为childMethod的方法
                     childComponentRef.value.reconnectWebSocket(res);
                   }
                 }
@@ -252,7 +251,6 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
       meta2d.fitView();
       applyStateSet();
       if (childComponentRef.value) {
-        // 假设子组件有一个名为childMethod的方法
         childComponentRef.value.reconnectWebSocket(node.data.json);
       }
     }
@@ -271,7 +269,6 @@ const changeData = ({ e, node }: { e: MouseEvent; node: any }) => {
           applyStateSet();
           // 程序内先不做处理
           // if (childComponentRef.value) {
-          //   // 假设子组件有一个名为childMethod的方法
           //   childComponentRef.value.reconnectWebSocket(node.data.json);
           // }
         }
