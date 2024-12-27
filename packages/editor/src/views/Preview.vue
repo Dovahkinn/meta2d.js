@@ -160,7 +160,7 @@ onMounted(() => {
     }
   } else {
     try {
-      const filePath = route.query['open-file']
+      const filePath = route?.query?.['open-file']
       if (filePath) {
         fetch(filePath).then((res) => res.json()).then((res) => {
           // console.log('open file: ', res)
@@ -278,129 +278,18 @@ const afterLeave = () => {
 };
 
 // * 控制逻辑，页面切换
-const {
-  playList,
-  currentStepData,
-  prev,
-  next,
-  apply,
-  play,
-  pause,
-  stop,
-  replay,
-} = usePlayer();
-playList.value = [
-  {
-    name: "page1",
-    description: "text1",
-    duration: 6000,
-    // stateList: [
-    //   {
-    //     Name: "Switch",
-    //     Type: 28,
-    //     State: 0,
-    //   },
-    //   {
-    //     Name: "继电器A",
-    //     Type: 18,
-    //     Value: 1, // 有电无电
-    //   },
-    // ],
-    // currentStateList: [
-    //   {
-    //     name: "LineA",
-    //     value: 1.1, // 电流值
-    //   },
-    // ],
-    privatePropList: [
-      {
-        tag: "Switch",
-        showChild: 1,
-      },
-      {
-        tag: "L32",
-        lineWidth: 2,
-        color: "blue",
-      },
-    ],
-  },
-  {
-    name: "page2",
-    description: "text2",
-    duration: 9000,
-    // stateList: [
-    //   {
-    //     Name: "Switch",
-    //     Type: 28,
-    //     State: 1,
-    //   },
-    //   {
-    //     Name: "继电器",
-    //     Type: 17,
-    //     Value: 0,
-    //   },
-    // ],
-    // currentStateList: [
-    //   {
-    //     name: "LineB",
-    //     value: 1.1, // 电流值
-    //   },
-    // ],
-    privatePropList: [
-      {
-        tag: "Switch",
-        showChild: 0,
-      },
-      {
-        tag: "L32",
-        lineWidth: 3,
-        color: "green",
-      },
-      {
-        tag: "L32",
-        action: 2,
-      },
-    ],
-  },
-  {
-    name: "page3",
-    description: "text3",
-    duration: 7000,
-    // stateList: [
-    //   {
-    //     Name: "Switch",
-    //     Type: 28,
-    //     State: 2,
-    //   },
-    //   {
-    //     Name: "R",
-    //     Type: 0,
-    //     Value: 1,
-    //   },
-    // ],
-    // currentStateList: [
-    //   {
-    //     name: "LineC",
-    //     value: 1.1, // 电流值
-    //   },
-    // ],
-    privatePropList: [
-      {
-        tag: "Switch",
-        showChild: 1,
-      },
-      {
-        tag: "L32",
-        lineWidth: 1,
-        color: "red",
-      },
-      {
-        tag: "L32",
-        action: 3,
-      },
-    ],
-  },
-];
+// const {
+//   playList,
+//   currentStepData,
+//   prev,
+//   next,
+//   apply,
+//   play,
+//   pause,
+//   stop,
+//   replay,
+// } = usePlayer();
+// playList.value = [];
 
 // * ws 消息处理
 let customWsHandler;
