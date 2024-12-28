@@ -357,6 +357,7 @@ export const loadElectricJson = (data: any) => {
                 y: Number(item.posY),
                 width,
                 height,
+                fault:0,
               });
               // 添加tag
               if (parent.tags && !parent.tags?.includes(item.name)) {
@@ -397,6 +398,7 @@ export const loadElectricJson = (data: any) => {
                 height: cHeight || parent.height,
                 color:' #4E6EF2',
                 lineWidth:4,
+                fault:0
               });
               console.log(
                 '单一 svg: ',
@@ -466,7 +468,8 @@ export const loadElectricJson = (data: any) => {
             lineWidth:3,
             lineAnimateType:1,
             animateLineWidth:3,
-            animateColor:' #FF0000'
+            animateColor:' #FF0000',
+            textBaseline:'bottom'
           };
           console.log('连线: ', pen);
           penList.push(pen);

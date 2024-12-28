@@ -63,16 +63,17 @@ const { saveComponentShow } = useData(true);
 
 const menuOptions = [
   {
-    label: "设置为故障",
+    label: "设置",
     icon: "group",
     action: () => {
       if (selections.pen) {
+        // 弹窗
         emit("send", selections.pen);
         emit("hide", false);
       }
     },
     show: () => {
-      return props.isPreview;
+      return selections.mode == 1 && selections.pen?.name == "combine" && props.isPreview;
     },
   },
   {
