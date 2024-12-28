@@ -42,15 +42,15 @@
         <t-form-item label="悬停">
           <t-switch v-model="tableProps.hover" @change="change"></t-switch>
         </t-form-item>
-        <t-form-item label="斑马纹">
-          <t-switch v-model="tableProps.stripe" @change="change"></t-switch>
-        </t-form-item>
         <t-form-item label="显示表头">
           <t-switch v-model="tableProps.showHeader" @change="change"></t-switch>
         </t-form-item>
-        <t-form-item label="奇数行">
+        <t-form-item label="斑马纹">
+          <t-switch v-model="tableProps.stripe" @change="change"></t-switch>
+        </t-form-item>
+        <t-form-item label="行默认背景">
           <t-color-picker
-            v-model="tableProps.style.oddRowBackgroundColor"
+            v-model="tableProps.style.evenRowBackgroundColor"
             class="w-full"
             :show-primary-color-preview="false"
             format="CSS"
@@ -59,9 +59,9 @@
             @change="change"
           ></t-color-picker>
         </t-form-item>
-        <t-form-item label="偶数行">
+        <t-form-item v-if="tableProps.stripe" label="奇数行背景">
           <t-color-picker
-            v-model="tableProps.style.evenRowBackgroundColor"
+            v-model="tableProps.style.oddRowBackgroundColor"
             class="w-full"
             :show-primary-color-preview="false"
             format="CSS"
