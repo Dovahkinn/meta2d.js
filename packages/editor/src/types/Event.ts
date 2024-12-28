@@ -39,6 +39,7 @@ export type EventConfig = {
   value: any;
   params: string;
   where: object;
+  extend: object;
 };
 
 export enum EventAction {

@@ -112,13 +112,15 @@
             </t-form-item>
             <t-divider />
             <t-form-item label="预览时锁定" name="lockState">
-              <t-tooltip
-                content="仅预览时有效"
-              >
-                <t-select v-model="data.lockState" :options="lockStateOptions" clearable @change="onChangeData" />
+              <t-tooltip content="仅预览时有效">
+                <t-select
+                  v-model="data.lockState"
+                  :options="lockStateOptions"
+                  clearable
+                  @change="onChangeData"
+                />
               </t-tooltip>
             </t-form-item>
-
           </t-form>
         </div>
       </template>
@@ -223,6 +225,13 @@
           </t-collapse>
         </div>
       </template>
+
+      <template #preset-script>
+        <div class="props-panel">
+          <ScriptsEditor @change="changePresetScript"></ScriptsEditor>
+        </div>
+      </template>
+
     </PropsTab>
     <CodeEditor ref="codeEditor" @confirm="saveJsStr" />
   </div>
@@ -238,6 +247,7 @@ import { NotifyPlugin } from "tdesign-vue-next";
 import CodeEditor from "./CodeEditor.vue";
 import MessageHandlers from "./MessageHandlers.vue";
 import { useWsHandlers } from "../services/useHandlers";
+import ScriptsEditor from "./ScriptsEditor.vue";
 
 enum LockState {
   // 0 -未锁定
@@ -300,15 +310,29 @@ const tabs = [
     value: 3,
     slot: "comm-props",
   },
+  {
+    label: "预设脚本",
+    value: 4,
+    slot: "preset-script",
+  },
 ];
 
 const lockStateOptions = [
-  { label: '未锁定', value: LockState.None },
-  { label: '禁止拖拽/编辑图元；图元可选中、高亮、触发事件等', value: LockState.DisableEdit },
-  { label: '禁止编辑图元、禁止左键移动画布；图元可选中、高亮、触发事件等', value: LockState.DisableMove },
-  { label: '禁止缩放画布', value: LockState.DisableScale },
-  { label: '禁止左键移动和缩放画布', value: LockState.DisableMoveScale },
-  { label: '画布不能移动和缩放，图元不能触发任何事件', value: LockState.Disable },
+  { label: "未锁定", value: LockState.None },
+  {
+    label: "禁止拖拽/编辑图元；图元可选中、高亮、触发事件等",
+    value: LockState.DisableEdit,
+  },
+  {
+    label: "禁止编辑图元、禁止左键移动画布；图元可选中、高亮、触发事件等",
+    value: LockState.DisableMove,
+  },
+  { label: "禁止缩放画布", value: LockState.DisableScale },
+  { label: "禁止左键移动和缩放画布", value: LockState.DisableMoveScale },
+  {
+    label: "画布不能移动和缩放，图元不能触发任何事件",
+    value: LockState.Disable,
+  },
 ];
 
 onMounted(() => {
@@ -463,6 +487,13 @@ const wsHandlersChange = (handlers: any) => {
   data.wsMsgHandlers = handlers;
   changeConnectProp("wsMsgHandlers");
 };
+
+
+const changePresetScript = (scriptConfig: any) => {
+  console.log("scriptConfig: ", scriptConfig);
+  data.presetScriptsConfig = scriptConfig;
+  Object.assign(meta2d.store.data, data);
+}
 </script>
 <style lang="postcss" scoped>
 .props-panel {

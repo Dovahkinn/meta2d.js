@@ -1,13 +1,25 @@
 <template>
   <div class="app-page is--preview">
-    <transition name="sidebar-transition" @after-leave="afterLeave" @after-enter="afterEnter">
+    <transition
+      name="sidebar-transition"
+      @after-leave="afterLeave"
+      @after-enter="afterEnter"
+    >
       <div v-if="!isCollapsed" class="left__panel">
         <t-row justify="end">
           <t-col :span="2">
-            <t-icon name="fullscreen" size="large" @click="handleToolClick('fullscreen')"></t-icon>
+            <t-icon
+              name="fullscreen"
+              size="large"
+              @click="handleToolClick('fullscreen')"
+            ></t-icon>
           </t-col>
           <t-col :span="2">
-            <t-icon name="rectangle" size="large" @click="handleToolClick('fit')"></t-icon>
+            <t-icon
+              name="rectangle"
+              size="large"
+              @click="handleToolClick('fit')"
+            ></t-icon>
           </t-col>
         </t-row>
         <t-divider></t-divider>
@@ -15,17 +27,44 @@
       </div>
     </transition>
 
-    <View v-bind="$attrs" preview :data="data" :customWsHandler="customWsHandler" @ready="emit('ready', $event)"
-      ref="childComponentRef" />
+    <View
+      v-bind="$attrs"
+      preview
+      :data="data"
+      :customWsHandler="customWsHandler"
+      @ready="emit('ready', $event)"
+      ref="childComponentRef"
+    />
 
     <div v-if="showRightPanel" class="right__panel">
-      <slot name="right-panel"> </slot>
+      <slot name="right-panel">
+        <t-table
+          class="table-flex-right"
+          row-key="index"
+          :data="tableLogData"
+          :columns="columns"
+          active-row-type="single"
+          lazy-load
+          v-bind="tableProps"
+          :style="tableStyle"
+        ></t-table>
+      </slot>
     </div>
 
-    <t-sticky-tool v-if="showStickyTool" type="compact" placement="left-bottom" style="z-index: 999"
-      @click="handleClick">
+    <t-sticky-tool
+      v-if="showStickyTool"
+      type="compact"
+      placement="left-bottom"
+      style="z-index: 999"
+      @click="handleClick"
+    >
       <template v-for="tool in sidebarTools" :key="tool.label">
-        <t-sticky-item v-if="tool.show()" :label="tool.label" :icon="renderIcon(tool.icon)" :popup="tool.popup">
+        <t-sticky-item
+          v-if="tool.show()"
+          :label="tool.label"
+          :icon="renderIcon(tool.icon)"
+          :popup="tool.popup"
+        >
         </t-sticky-item>
       </template>
     </t-sticky-tool>
@@ -47,11 +86,11 @@ import {
 import View from "../components/View.vue";
 import { Icon } from "tdesign-vue-next";
 import { toggleFullScreen } from "../utils";
-import { usePlayer } from "../services/usePlayer.ts";
 import { EventAction } from "../types/Event.ts";
 import { deepClone } from "@meta2d/core";
-import { useRoute, } from 'vue-router'
-
+import { useRoute } from "vue-router";
+import { usePlayer } from "../services/usePlayer.ts";
+import { useLogTable } from "../services/useTable.ts";
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -66,10 +105,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+
   showRightPanel: {
     type: Boolean,
-    default: false,
+    default: true,
   },
+  rightPanelWidth: {
+    type: Number,
+    default: 400,
+  },
+
 
   // * 后台更新模式，用于一个项目包含多张电路的情形
   enableBackgroundUpdate: {
@@ -120,7 +165,7 @@ const isInElectron = () => {
 };
 const _electronArgvData = ref([]);
 
-const route = useRoute()
+const route = useRoute();
 
 onMounted(() => {
   if (isInElectron()) {
@@ -160,20 +205,23 @@ onMounted(() => {
     }
   } else {
     try {
-      const filePath = route?.query?.['open-file']
+      const filePath = route?.query?.["open-file"];
       if (filePath) {
-        fetch(filePath).then((res) => res.json()).then((res) => {
-          // console.log('open file: ', res)
-          meta2d.open(res);
-          meta2d.emit("clear");
-          meta2d.fitView();
-          applyStateSet();
-        })
+        fetch(filePath as string)
+          .then((res) => res.json())
+          .then((res) => {
+            // console.log('open file: ', res)
+            meta2d.open(res);
+            meta2d.emit("clear");
+            meta2d.fitView();
+            applyStateSet();
+          });
       }
     } catch (error) {
-      console.log('open file error: ', error)
+      console.log("open file error: ", error);
     }
   }
+  meta2d?.resize();
 });
 
 const treeData = computed(() => {
@@ -344,11 +392,10 @@ const applyState = (msg: PenState) => {
           _props.showChild = msg.State;
         }
         //颜色color 是否有电 1有电显示蓝色 2无电红色
-        if (pen.name == 'line') {
+        if (pen.name == "line") {
           _props.animateColor = msg.Value == 1 ? "#0000FF" : "#FF0000";
           meta2d.startAnimate([pen]);
         }
-        console.log("修改的属性值_props======", _props);
         meta2d.setValue(_props, { render: false });
       });
 
@@ -393,9 +440,25 @@ if (props.enableBackgroundUpdate) {
     }
   };
 }
+
+
+// * 日志表格
+let dataJson: any = localStorage.getItem("meta2d");
+let meta2dData: any;
+try {
+  meta2dData = JSON.parse(dataJson);
+} catch (error) {
+  
+}
+
+const { columns, tableLogData, tableProps, tableStyle, } = useLogTable(props.data || meta2dData);
+const cssRightPanelWidth = computed(() => {
+  return `${props.rightPanelWidth}px`
+})
+
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
 .sidebar-transition-enter-active,
 .sidebar-transition-leave-active {
   transition: transform 0.3s ease, opacity 0.3s ease;
@@ -403,9 +466,7 @@ if (props.enableBackgroundUpdate) {
 
 .sidebar-transition-enter,
 .sidebar-transition-leave-to
-
-/* .sidebar-transition-leave-active in <2.1.8 */
-  {
+{
   transform: translateX(-250px);
   opacity: 0;
 }
@@ -415,10 +476,7 @@ if (props.enableBackgroundUpdate) {
   opacity: 1;
 }
 
-.sidebar-transition-leave-to {
-  transform: translateX(-250px);
-  opacity: 0;
-}
+
 
 .app-page {
   height: 100vh;
@@ -433,7 +491,8 @@ if (props.enableBackgroundUpdate) {
   }
 
   .right__panel {
-    width: 250px;
+    width: v-bind(cssRightPanelWidth);
+    max-width: 50%;
     height: 100%;
     border-left: 2px solid #f5f5f5;
     padding: 20px;

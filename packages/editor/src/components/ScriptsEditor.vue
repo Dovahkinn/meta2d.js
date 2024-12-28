@@ -1,0 +1,150 @@
+<template>
+  <t-collapse defaultExpandAll class="meta-collapse">
+    <t-collapse-panel header="表格列">
+      <t-row justify="start">
+        <t-col :span="5">
+          <div>名称</div>
+        </t-col>
+        <t-col :span="5">
+          <div>字段</div>
+        </t-col>
+        <t-col :span="2">
+          <t-button variant="text" @click="addColumn">
+            <t-icon name="add"></t-icon>
+          </t-button>
+        </t-col>
+      </t-row>
+      <t-row
+        v-for="(item, index) in columns"
+        :key="index"
+        justify="start"
+        :gutter="4"
+        style="margin-bottom: 4px"
+      >
+        <t-col :span="5">
+          <t-input v-model="item.title" @change="change"></t-input>
+        </t-col>
+        <t-col :span="5">
+          <t-input v-model="item.colKey" @change="change"></t-input>
+        </t-col>
+        <t-col :span="2">
+          <t-button variant="text" @click="deleteColumn(index)">
+            <t-icon name="delete"></t-icon>
+          </t-button>
+        </t-col>
+      </t-row>
+    </t-collapse-panel>
+    <t-collapse-panel header="样式">
+      <t-form labelAlign="left">
+        <t-form-item label="边框">
+          <t-switch v-model="tableProps.bordered" @change="change"></t-switch>
+        </t-form-item>
+        <t-form-item label="悬停">
+          <t-switch v-model="tableProps.hover" @change="change"></t-switch>
+        </t-form-item>
+        <t-form-item label="斑马纹">
+          <t-switch v-model="tableProps.stripe" @change="change"></t-switch>
+        </t-form-item>
+        <t-form-item label="显示表头">
+          <t-switch v-model="tableProps.showHeader" @change="change"></t-switch>
+        </t-form-item>
+        <t-form-item label="奇数行">
+          <t-color-picker
+            v-model="tableProps.style.oddRowBackgroundColor"
+            class="w-full"
+            :show-primary-color-preview="false"
+            format="CSS"
+            :color-modes="['monochrome']"
+            clearable
+            @change="change"
+          ></t-color-picker>
+        </t-form-item>
+        <t-form-item label="偶数行">
+          <t-color-picker
+            v-model="tableProps.style.evenRowBackgroundColor"
+            class="w-full"
+            :show-primary-color-preview="false"
+            format="CSS"
+            :color-modes="['monochrome']"
+            clearable
+            @change="change"
+          ></t-color-picker>
+        </t-form-item>
+      </t-form>
+    </t-collapse-panel>
+
+    <t-collapse-panel header="预设消息">
+      <t-button block theme="primary" @click="insert">添加</t-button>
+    </t-collapse-panel>
+  </t-collapse>
+</template>
+<script setup lang="ts">
+import { defineProps, reactive } from "vue";
+import { s12 } from "@meta2d/core";
+
+const props = defineProps({});
+
+const emit = defineEmits(["change"]);
+
+type ColumnType = {
+  title: string;
+  colKey: string;
+  sid?: string;
+  width?: string;
+};
+
+const columns = reactive<Array<ColumnType>>([
+  { colKey: "serial-number", title: "序号", width: "100" },
+  {
+    title: "名称",
+    colKey: "name",
+    sid: s12(),
+  },
+  {
+    title: "描述",
+    colKey: "description",
+    sid: s12(),
+  },
+]);
+
+const addColumn = () => {
+  columns.push({
+    title: "",
+    colKey: "",
+    sid: s12(),
+  });
+  change();
+};
+const change = (column?: any) => {
+  emit("change", {
+    columns,
+    scripts,
+    ...tableProps,
+  });
+};
+
+const deleteColumn = (index: number) => {
+  columns.splice(index, 1);
+  change();
+};
+
+const tableProps = reactive({
+  bordered: false,
+  height: null,
+  hover: false,
+  showHeader: true,
+  stripe: false,
+  style: {
+    evenRowBackgroundColor: "#f8f8f8",
+    oddRowBackgroundColor: "#ffffff",
+  },
+});
+
+const scripts = reactive([]);
+
+const insert = () => {
+  console.log("insert");
+  change();
+};
+</script>
+<style lang="scss" scoped></style>

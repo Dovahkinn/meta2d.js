@@ -1,6 +1,5 @@
 import { parseSvg } from '@meta2d/svg';
 import { deepClone } from '@meta2d/core';
-import { describe } from 'node:test';
 
 export function parseSvgStr(svgString: string, penConfig: any, manual = true) {
   if (!svgString) return [];

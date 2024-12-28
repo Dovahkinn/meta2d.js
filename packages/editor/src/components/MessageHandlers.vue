@@ -265,7 +265,6 @@ const propChange = (event: EventConfig) => {
   });
   event.value = value;
   emit("change", handlers.value);
-console.log('prop change: ', event, handlers.value)
 };
 
 const updatePropList = (index: number[]) => {
