@@ -209,6 +209,9 @@ onMounted(() => {
                 if (first.json) {
                   const res = deepClone(first.json);
                   res.locked = 1;
+                  if (res.lockState) {
+                    res.locked = res.lockState;
+                  }
                   meta2d.open(res);
                   meta2d.emit("clear");
                   meta2d.fitView();
@@ -239,6 +242,10 @@ onMounted(() => {
           .then((res) => res.json())
           .then((res) => {
             // console.log('open file: ', res)
+            res.locked = 1;
+            if (res.lockState) {
+              res.locked = res.lockState;
+            }
             meta2d.open(res);
             meta2d.emit("clear");
             meta2d.fitView();
@@ -483,8 +490,6 @@ try {
     applyTable(props.data || meta2dData);
   }
 } catch (error) {}
-
-
 </script>
 
 <style lang="scss" scoped>
