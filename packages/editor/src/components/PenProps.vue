@@ -209,7 +209,7 @@
             <t-divider />
 
             <template v-if="pen.name == 'combine' && pen.showChild != undefined">
-              <t-form-item label="状态" name="status">
+              <t-form-item label="" name="status">
                 <t-select v-model="pen.showChild" @change="changeValue('showChild')">
                   <t-option v-for="(item, index) in statusList" :key="item.value" :value="index"
                     :label="item.label"></t-option>

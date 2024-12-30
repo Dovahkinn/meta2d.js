@@ -8,7 +8,7 @@
   >
     <t-list>
       <t-list-item
-        v-for="item in menuOptions"
+        v-for="item in (isPreview?menuOptions1:menuOptions)"
         v-show="item.show ? item.show() : true"
       >
         <t-button
@@ -62,20 +62,6 @@ const { selections } = useSelection();
 const { saveComponentShow } = useData(true);
 
 const menuOptions = [
-  {
-    label: "设置",
-    icon: "group",
-    action: () => {
-      if (selections.pen) {
-        // 弹窗
-        emit("send", selections.pen);
-        emit("hide", false);
-      }
-    },
-    show: () => {
-      return selections.mode == 1 && selections.pen?.name == "combine" && props.isPreview;
-    },
-  },
   {
     label: "锁定",
     icon: "lock",
@@ -254,6 +240,22 @@ const menuOptions = [
     },
   },
 ];
+const menuOptions1 =[
+  {
+    label: "设置",
+    icon: "group",
+    action: () => {
+      if (selections.pen) {
+        // 弹窗
+        emit("send", selections.pen);
+        emit("hide", false);
+      }
+    },
+    show: () => {
+      return selections.mode == 1 && selections.pen?.name == "combine" && props.isPreview;
+    },
+  }
+]
 // 添加标记
 const markHandle = (type: any) => {
   console.log("meta2d", meta2d.data());

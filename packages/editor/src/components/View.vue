@@ -21,10 +21,11 @@
         <t-form-item label="名称" name="Name">
           <t-input placeholder="请输入内容" v-model="formData.Name" disabled/>
         </t-form-item>
-        <t-form-item label="状态" name="State">
+        <t-form-item label="开关状态" name="State" v-if="formData.State != -1">
           <t-select
             v-model="formData.State"
             class="demo-select-base"
+            :disabled ="formData.fault == 1"
           >
             <t-option
               v-for="(item, index) in options"
@@ -285,10 +286,11 @@ const sendMessageSocket = (pen: any) => {
   console.log("sendMessageSocketpen======== ", pen);
   // 模拟故障
   if (pen.fault == 1) {
-    meta2d.setValue({id: pen.id, color: 'red', fault: 1}, { render: false });
+    meta2d.setValue({id: pen.id, color: 'red', fault: 1,showChild: pen.State}, { render: false });
   }else{
-    meta2d.setValue({id: pen.id, color: '#4E6EF2', fault: 0}, { render: false });
+    meta2d.setValue({id: pen.id, color: '#4E6EF2', fault: 0,showChild: pen.State}, { render: false });
   }
+
   if (data.wsUrl) {
     // test: 模拟修改状态
     wsClient.sendMessage(data.busName, 3000, {
@@ -303,8 +305,9 @@ const modelHandle = (data: any) => {
   visible.value = true;
   formData.id = data.id;
   formData.Name = data.text;
-  formData.State = data.showChild;
+  formData.State = +(data?.showChild ?? -1);
   formData.fault = data.fault;
+  
 };
 const close = () => {
   visible.value = false;
