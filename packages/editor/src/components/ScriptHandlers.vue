@@ -1,4 +1,9 @@
 <template>
+  <t-form labelAlign="left">
+    <t-form-item label="时长" name="name">
+      <t-input-number v-model="defaultScript.duration" placeholder="单位: ms" @change="eventChange"/>
+    </t-form-item> 
+  </t-form>
   <t-button block theme="primary" @click="insert">添加脚本</t-button>
   <t-collapse class="meta-collapse" expand-mutex @change="changeHandler">
     <t-collapse-panel v-if="fields.length" header="数据">
@@ -172,6 +177,8 @@ const deleteEvent = (item: any) => {
 const emit = defineEmits(["change"]);
 const eventChange = () => {
   emit("change", {
+    sid: props.defaultScript?.sid || s12(),
+    duration: props.defaultScript?.duration || 3000,
     rowPropList: rowPropList.value,
     handlers: handlers.value,
   });

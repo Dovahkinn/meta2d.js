@@ -73,8 +73,14 @@
       </t-form>
     </t-collapse-panel>
 
-    <t-collapse-panel header="预设指令">
-       <script-handlers :fields="scriptFields" :defaultScript="scripts[0]" @change="scriptChange"></script-handlers>
+    <t-collapse-panel v-for="(script, index) in scripts" :key="script.sid" :header="`预设指令-${index+1}`">
+      <template #headerRightContent>
+        <t-space size="small">
+          <t-button v-if="index == scripts.length - 1" theme="primary" size="small" @click="addScript">追加</t-button>
+          <t-button v-if="index > 0" theme="danger" size="small" @click="deleteScript(index)">删除</t-button>
+        </t-space>
+      </template>
+       <script-handlers :key="script.sid" :fields="scriptFields" :defaultScript="script" @change="scriptChange($event, index)"></script-handlers>
     </t-collapse-panel>
   </t-collapse>
 </template>
@@ -143,16 +149,28 @@ const tableProps = reactive({
   },
 });
 
-const scripts = reactive(presetScriptsConfig?.scripts || []);
+const scripts = reactive(presetScriptsConfig?.scripts || [
+  {
+    sid: s12(),
+  },
+]);
 const scriptFields = computed(() => {
   return columns.filter(item => item.colKey != 'serial-number');
 })
 
-const scriptChange = (data: any) => {
-  console.log("scriptChange: ", data);
-  // test
-  scripts[0] = data;
+const scriptChange = (data: any, index: number) => {
+  scripts[index] = data;
+  change();
+};
 
+const addScript = () => {
+  scripts.push({
+    sid: s12(),
+  })
+}
+
+const deleteScript = (index: number) => {
+  scripts.splice(index, 1);
   change();
 };
 

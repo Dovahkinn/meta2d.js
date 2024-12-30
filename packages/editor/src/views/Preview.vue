@@ -458,12 +458,15 @@ const cssRightPanelWidth = computed(() => {
 
 const { tasks } = useScripts(props.data || meta2dData);
 
-setTimeout(() => {
-  console.log('==================', tasks)
-  tasks.forEach((task) => {
-    task()
-  })
-}, 10e3)
+setTimeout(async () => {
+
+  for (const task of tasks) {
+    const res = await task()
+    if (res) {
+      tableLogData.value.push(res)
+    }
+  }
+}, 1e3)
 
 </script>
 

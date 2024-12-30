@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, ref, } from 'vue';
 import { EventAction } from '../types/Event'
 
 const testStepData = [
@@ -105,25 +105,26 @@ export const useLogTable = (metaData: any = {}) => {
     style,
     ...tableProps
   } = presetScriptsConfig || {};
-  const tableLogData: any[] = [];
-  if (Array.isArray(scripts)) {
-    scripts.forEach((item, index) => {
-      const list = item.rowPropList || [];
-      const row: any = {};
+  const tableLogData = ref([]);
+  // const tableLogData = reactive([...testStepData])
 
-      if (Array.isArray(list) && list.length) {
-        list.forEach((rowItem) => {
-          const { prop, value } = rowItem;
-          if (prop) {
-            row[prop] = value;
-          }
-        });
-        tableLogData.push(row);
-      }
-    });
+  if (Array.isArray(scripts)) {
+    // scripts.forEach((item, index) => {
+    //   const list = item.rowPropList || [];
+    //   const row: any = {};
+
+    //   if (Array.isArray(list) && list.length) {
+    //     list.forEach((rowItem) => {
+    //       const { prop, value } = rowItem;
+    //       if (prop) {
+    //         row[prop] = value;
+    //       }
+    //     });
+    //     tableLogData.push(row);
+    //   }
+    // });
   }
 
-  // const tableLogData = reactive([...testStepData])
   let tableStyle = {};
   if (style) {
     const { evenRowBackgroundColor, oddRowBackgroundColor } = style;
@@ -167,7 +168,7 @@ export const useScripts = (metaData: any = {}) => {
   const tasks: Function[] = [];
   if (Array.isArray(scripts)) {
     scripts.forEach((item, index) => {
-      const { handlers = [], duration } = item;
+      const { handlers = [], duration = 3000, rowPropList = [], } = item;
       // TODO: 创建任务
       if (Array.isArray(handlers) && handlers.length) {
         const fn = () => {
@@ -206,7 +207,25 @@ export const useScripts = (metaData: any = {}) => {
           });
         };
 
-        tasks.push(fn)
+        const task = () => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              const row: any = {};
+              if (Array.isArray(rowPropList) && rowPropList.length) {
+                rowPropList.forEach((rowItem) => {
+                  const { prop, value } = rowItem;
+                  if (prop) {
+                    row[prop] = value;
+                  }
+                });
+              }
+              fn();
+              resolve(row);
+            }, duration);
+          })
+        }
+
+        tasks.push(task)
       }
     });
   }
