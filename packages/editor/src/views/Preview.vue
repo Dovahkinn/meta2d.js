@@ -39,12 +39,12 @@
     <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel">
         <t-table
+          ref="tableRef"
           class="table-flex-right"
-          row-key="index"
+          row-key="sid"
           :data="tableLogData"
-          :columns="columns"
+          :columns="tableColumns"
           active-row-type="single"
-          lazy-load
           v-bind="tableProps"
           :style="tableStyle"
         ></t-table>
@@ -82,6 +82,7 @@ import {
   watch,
   nextTick,
   onMounted,
+  toRefs,
 } from "vue";
 import View from "../components/View.vue";
 import { Icon } from "tdesign-vue-next";
@@ -90,7 +91,7 @@ import { EventAction } from "../types/Event.ts";
 import { deepClone } from "@meta2d/core";
 import { useRoute } from "vue-router";
 import { usePlayer } from "../services/usePlayer.ts";
-import { useLogTable, useScripts, } from "../services/useTable.ts";
+import { useLogTable, useScripts } from "../services/useTable.ts";
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -114,7 +115,6 @@ const props = defineProps({
     type: Number,
     default: 400,
   },
-
 
   // * 后台更新模式，用于一个项目包含多张电路的情形
   enableBackgroundUpdate: {
@@ -164,8 +164,35 @@ const isInElectron = () => {
   return globalThis.navigator.userAgent.includes("Electron");
 };
 const _electronArgvData = ref([]);
+const tableRef = ref(null);
 
 const route = useRoute();
+
+const tableColumns = ref([]);
+const tableLogData = ref([]);
+const tableProps = ref({});
+const tableStyle = ref({});
+
+const applyTable = (res: any) => {
+  const {
+    columns: _columns,
+    tableProps: _tableProps,
+    tableStyle: _tableStyle,
+  } = useLogTable(res);
+  const { tasks } = useScripts(res);
+  tableColumns.value = _columns;
+  tableProps.value = _tableProps;
+  tableStyle.value = _tableStyle;
+
+  setTimeout(async () => {
+    for (const task of tasks) {
+      const r = await task();
+      if (r) {
+        tableLogData.value.push(r);
+      }
+    }
+  });
+};
 
 onMounted(() => {
   if (isInElectron()) {
@@ -189,6 +216,7 @@ onMounted(() => {
                   if (childComponentRef.value) {
                     childComponentRef.value.reconnectWebSocket(res);
                   }
+                  applyTable(res);
                 }
               }
             } else {
@@ -215,6 +243,8 @@ onMounted(() => {
             meta2d.emit("clear");
             meta2d.fitView();
             applyStateSet();
+            // -----
+            applyTable(res);
           });
       }
     } catch (error) {
@@ -441,32 +471,19 @@ if (props.enableBackgroundUpdate) {
   };
 }
 
-
+const cssRightPanelWidth = computed(() => {
+  return `${props.rightPanelWidth}px`;
+});
 // * 日志表格
 let dataJson: any = localStorage.getItem("meta2d");
 let meta2dData: any;
 try {
   meta2dData = JSON.parse(dataJson);
-} catch (error) {
-  
-}
-
-const { columns, tableLogData, tableProps, tableStyle, } = useLogTable(props.data || meta2dData);
-const cssRightPanelWidth = computed(() => {
-  return `${props.rightPanelWidth}px`
-})
-
-const { tasks } = useScripts(props.data || meta2dData);
-
-setTimeout(async () => {
-
-  for (const task of tasks) {
-    const res = await task()
-    if (res) {
-      tableLogData.value.push(res)
-    }
+  if (!isInElectron() && !route?.query?.["open-file"]) {
+    applyTable(props.data || meta2dData);
   }
-}, 1e3)
+} catch (error) {}
+
 
 </script>
 
@@ -477,8 +494,7 @@ setTimeout(async () => {
 }
 
 .sidebar-transition-enter,
-.sidebar-transition-leave-to
-{
+.sidebar-transition-leave-to {
   transform: translateX(-250px);
   opacity: 0;
 }
@@ -487,8 +503,6 @@ setTimeout(async () => {
   transform: translateX(0);
   opacity: 1;
 }
-
-
 
 .app-page {
   height: 100vh;

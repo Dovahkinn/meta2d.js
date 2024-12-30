@@ -205,6 +205,10 @@ const eventActionOptions = [
     label: "弹窗",
     value: EventAction.Dialog,
   },
+  {
+    label: '关闭弹窗',
+    value: -14, // ! 官方没有定义
+  }
 ];
 
 const propOptions = [

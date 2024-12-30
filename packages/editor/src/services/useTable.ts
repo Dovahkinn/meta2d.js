@@ -1,5 +1,6 @@
-import { reactive, ref, } from 'vue';
-import { EventAction } from '../types/Event'
+import { reactive, ref } from 'vue';
+import { EventAction } from '../types/Event';
+import { s12 } from "@meta2d/core";
 
 const testStepData = [
   // L1 流动
@@ -112,7 +113,6 @@ export const useLogTable = (metaData: any = {}) => {
     // scripts.forEach((item, index) => {
     //   const list = item.rowPropList || [];
     //   const row: any = {};
-
     //   if (Array.isArray(list) && list.length) {
     //     list.forEach((rowItem) => {
     //       const { prop, value } = rowItem;
@@ -160,7 +160,6 @@ function executeAnimate(type: string, target: string[]) {
   }
 }
 
-
 export const useScripts = (metaData: any = {}) => {
   const { presetScriptsConfig = {} } = metaData || {};
   const { scripts = [] } = presetScriptsConfig || {};
@@ -168,7 +167,7 @@ export const useScripts = (metaData: any = {}) => {
   const tasks: Function[] = [];
   if (Array.isArray(scripts)) {
     scripts.forEach((item, index) => {
-      const { handlers = [], duration = 3000, rowPropList = [], } = item;
+      const { handlers = [], duration = 3000, rowPropList = [] } = item;
       // TODO: 创建任务
       if (Array.isArray(handlers) && handlers.length) {
         const fn = () => {
@@ -200,8 +199,11 @@ export const useScripts = (metaData: any = {}) => {
                   executeAnimate('2', target);
                   break;
                 case EventAction.Dialog:
-                  meta2d.canvas.dialog.show(value, handler.params)                  
-                  break;  
+                  meta2d.canvas.dialog.show(value, handler.params);
+                  break;
+                case -14:
+                  meta2d.canvas.dialog.hide();
+                  break;
               }
             }
           });
@@ -210,7 +212,9 @@ export const useScripts = (metaData: any = {}) => {
         const task = () => {
           return new Promise((resolve) => {
             setTimeout(() => {
-              const row: any = {};
+              const row: any = {
+                sid: s12(),
+              };
               if (Array.isArray(rowPropList) && rowPropList.length) {
                 rowPropList.forEach((rowItem) => {
                   const { prop, value } = rowItem;
@@ -222,10 +226,10 @@ export const useScripts = (metaData: any = {}) => {
               fn();
               resolve(row);
             }, duration);
-          })
-        }
+          });
+        };
 
-        tasks.push(task)
+        tasks.push(task);
       }
     });
   }
