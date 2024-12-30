@@ -358,6 +358,7 @@ export const loadElectricJson = (data: any) => {
                 width,
                 height,
                 fault:0,
+                titleFnJs: 'return `${pen.text}  ${pen.description}`;'
               });
               // 添加tag
               if (parent.tags && !parent.tags?.includes(item.name)) {
@@ -398,7 +399,8 @@ export const loadElectricJson = (data: any) => {
                 height: cHeight || parent.height,
                 color:' #4E6EF2',
                 lineWidth:4,
-                fault:0
+                fault:0,
+                titleFnJs: 'return `${pen.text}  ${pen.description}`;'
               });
               console.log(
                 '单一 svg: ',

@@ -1,7 +1,7 @@
 {
   "name": "web-meta2d-editor",
-  "version": "1.0.0",
-  "description": "Meta2D 编辑器",
+  "version": "1.0.1",
+  "description": "图形编辑器",
   "main": "index.js",
   "scripts": {
     "dev": "electron . --project-file=list.json",
