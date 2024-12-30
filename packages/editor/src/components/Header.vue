@@ -1,8 +1,8 @@
 <template>
   <div class="app-header header__top">
-    <a class="logo" href="https://doc.le5le.com/document/119359590" target="_blank">
-      <img src="/favicon.ico" />
-      <span>Meta2D</span>
+    <a class="logo" href="" target="_blank">
+      <img src="/public/logo.png" />
+      <span>图形编辑器</span>
     </a>
     <t-dropdown :minColumnWidth="200" :maxHeight="560" overlayClassName="header-dropdown">
       <a> 文件 </a>
