@@ -73,18 +73,21 @@
       </t-form>
     </t-collapse-panel>
 
-    <t-collapse-panel header="预设消息">
-      <t-button block theme="primary" @click="insert">添加</t-button>
+    <t-collapse-panel header="预设指令">
+       <script-handlers :fields="scriptFields" :defaultScript="scripts[0]" @change="scriptChange"></script-handlers>
     </t-collapse-panel>
   </t-collapse>
 </template>
 <script setup lang="ts">
-import { defineProps, reactive } from "vue";
+import { defineProps, reactive, computed, defineEmits, } from "vue";
 import { s12 } from "@meta2d/core";
+import ScriptHandlers from "./ScriptHandlers.vue";
 
 const props = defineProps({});
 
 const emit = defineEmits(["change"]);
+
+const { presetScriptsConfig } = meta2d.data();
 
 type ColumnType = {
   title: string;
@@ -93,7 +96,7 @@ type ColumnType = {
   width?: string;
 };
 
-const columns = reactive<Array<ColumnType>>([
+const columns = reactive<Array<ColumnType>>(presetScriptsConfig?.columns || [
   { colKey: "serial-number", title: "序号", width: "100" },
   {
     title: "名称",
@@ -140,11 +143,19 @@ const tableProps = reactive({
   },
 });
 
-const scripts = reactive([]);
+const scripts = reactive(presetScriptsConfig?.scripts || []);
+const scriptFields = computed(() => {
+  return columns.filter(item => item.colKey != 'serial-number');
+})
 
-const insert = () => {
-  console.log("insert");
+const scriptChange = (data: any) => {
+  console.log("scriptChange: ", data);
+  // test
+  scripts[0] = data;
+
   change();
 };
+
+
 </script>
 <style lang="scss" scoped></style>

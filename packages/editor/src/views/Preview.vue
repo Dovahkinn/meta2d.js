@@ -90,7 +90,7 @@ import { EventAction } from "../types/Event.ts";
 import { deepClone } from "@meta2d/core";
 import { useRoute } from "vue-router";
 import { usePlayer } from "../services/usePlayer.ts";
-import { useLogTable } from "../services/useTable.ts";
+import { useLogTable, useScripts, } from "../services/useTable.ts";
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -455,6 +455,15 @@ const { columns, tableLogData, tableProps, tableStyle, } = useLogTable(props.dat
 const cssRightPanelWidth = computed(() => {
   return `${props.rightPanelWidth}px`
 })
+
+const { tasks } = useScripts(props.data || meta2dData);
+
+setTimeout(() => {
+  console.log('==================', tasks)
+  tasks.forEach((task) => {
+    task()
+  })
+}, 10e3)
 
 </script>
 
