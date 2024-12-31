@@ -490,7 +490,7 @@ const wsHandlersChange = (handlers: any) => {
 
 
 const changePresetScript = (scriptConfig: any) => {
-  console.log("scriptConfig: ", scriptConfig);
+  console.log("preset script config: ", scriptConfig);
   data.presetScriptsConfig = scriptConfig;
   Object.assign(meta2d.store.data, data);
 }

@@ -169,7 +169,6 @@ onMounted(() => {
     if (location.pathname === "/preview" || props.preview) {
       data.locked = 1;
       if (data.lockState) {
-        // meta2d.lock(data.lockState);
         data.locked = data.lockState;
       }
       const msgTypes = (data.msgTypes || [])
@@ -181,7 +180,7 @@ onMounted(() => {
         });
 
       const jsStr = data.onMessageJsCode;
-      console.log("data:====", data);
+
       if (data.wsUrl) {
         wsClient = WebSocketClient.getInstance(data.wsUrl, {
           busName: data.busName,
