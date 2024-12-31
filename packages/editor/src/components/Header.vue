@@ -1,7 +1,7 @@
 <template>
   <div class="app-header header__top">
     <a class="logo" href="" target="_blank">
-      <img src="/public/logo.png" />
+      <img src="/src/assets/logo.png" alt="logo" />
       <span>图形编辑器</span>
     </a>
     <t-dropdown :minColumnWidth="200" :maxHeight="560" overlayClassName="header-dropdown">

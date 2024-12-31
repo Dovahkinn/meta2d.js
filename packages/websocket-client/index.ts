@@ -336,14 +336,14 @@ export class WebSocketClient {
   private reconnect() {
     if (this.reconnectTimer) return;
 
-    if (this.maxReconnectTimes <= 0) {
-      console.log('Max reconnect times reached.');
-      return;
-    }
+    // if (this.maxReconnectTimes <= 0) {
+    //   console.log('Max reconnect times reached.');
+    //   return;
+    // }
 
     this.reconnectTimer = setTimeout(() => {
-      console.log('Reconnecting...', this.maxReconnectTimes);
-      this.maxReconnectTimes--;
+      // console.log('Reconnecting...', this.maxReconnectTimes);
+      // this.maxReconnectTimes--;
       this.connect();
       this.reconnectTimer = null;
     }, this.reconnectInterval);

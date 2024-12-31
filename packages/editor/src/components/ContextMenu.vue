@@ -247,12 +247,40 @@ const menuOptions1 =[
     action: () => {
       if (selections.pen) {
         // 弹窗
-        emit("send", selections.pen);
+        emit("send", selections.pen, 'setting');
         emit("hide", false);
       }
     },
     show: () => {
       return selections.mode == 1 && selections.pen?.name == "combine" && props.isPreview;
+    },
+  },{
+    label: "设置故障",
+    icon: "group",
+    action: () => {
+      if (selections.pen) {
+        const v = { id: selections.pen.id, fault: 1 };
+        meta2d.setValue(v, { render: true });
+        emit("send", selections.pen,'fault');
+        emit("hide", false);
+      }
+    },
+    show: () => {
+      return selections.mode == 1 && selections.pen?.name == "combine" && props.isPreview && selections.pen?.fault == 0;
+    },
+  },{
+    label: "取消故障",
+    icon: "group",
+    action: () => {
+      if (selections.pen) {
+        const v = { id: selections.pen.id, fault: 0 };
+        meta2d.setValue(v, { render: true });
+        emit("send", selections.pen,'fault');
+        emit("hide", false);
+      }
+    },
+    show: () => {
+      return selections.mode == 1 && selections.pen?.name == "combine" && props.isPreview && selections.pen?.fault == 1;
     },
   }
 ]

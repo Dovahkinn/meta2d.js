@@ -16,16 +16,16 @@
     <template #body>
       <t-form ref="form" :data="formData">
         <t-form-item label="ID" name="id" disabled>
-          <t-input placeholder="请输入内容" v-model="formData.id" disabled/>
+          <t-input placeholder="请输入内容" v-model="formData.id" disabled />
         </t-form-item>
         <t-form-item label="名称" name="Name">
-          <t-input placeholder="请输入内容" v-model="formData.Name" disabled/>
+          <t-input placeholder="请输入内容" v-model="formData.Name" disabled />
         </t-form-item>
         <t-form-item label="开关状态" name="State" v-if="formData.State != -1">
           <t-select
             v-model="formData.State"
             class="demo-select-base"
-            :disabled ="formData.fault == 1"
+            :disabled="formData.fault == 1"
           >
             <t-option
               v-for="(item, index) in options"
@@ -37,13 +37,10 @@
             </t-option>
           </t-select>
         </t-form-item>
-        <t-form-item label="设置故障" name="fault">
-          <t-select
-            v-model="formData.fault"
-            class="demo-select-base"
-          >
+        <!-- <t-form-item label="设置故障" name="fault">
+          <t-select v-model="formData.fault" class="demo-select-base">
             <t-option
-              v-for="(item, index) in options"
+              v-for="(item, index) in faultOptions"
               :key="index"
               :value="item.value"
               :label="item.label"
@@ -51,7 +48,7 @@
               {{ item.label }}
             </t-option>
           </t-select>
-        </t-form-item>
+        </t-form-item> -->
       </t-form>
     </template>
   </t-dialog>
@@ -117,8 +114,12 @@ let formData = reactive({
   State: 0,
 });
 const options = [
-  { label: "关闭", value: 0 },
-  { label: "开启", value: 1 },
+  { label: "打开", value: 0 },
+  { label: "闭合", value: 1 },
+];
+const faultOptions = [
+  { label: "正常", value: 0 },
+  { label: "有故障", value: 1 },
 ];
 const showContextMenu = (event: any) => {
   // if (props.preview) return;
@@ -276,47 +277,60 @@ const reconnectWebSocket = (data: any) => {
     wsClient.connect();
   }
 };
-// 发送消息设置为故障
-const sendMessageSocket = (pen: any) => {
+// 发送消息设置  1设置元器件属性  2设置元器件故障分别发送消息
+const sendMessageSocket = (pen: any,type: any) => {
   let data: any = localStorage.getItem("meta2d");
   if (props.data || data) {
     data = props.data || JSON.parse(data);
   }
   console.log("sendMessageSocket======== ", data);
   console.log("sendMessageSocketpen======== ", pen);
-  // 模拟故障
-  if (pen.fault == 1) {
-    meta2d.setValue({id: pen.id, color: 'red', fault: 1,showChild: pen.State}, { render: false });
-  }else{
-    meta2d.setValue({id: pen.id, color: '#4E6EF2', fault: 0,showChild: pen.State}, { render: false });
+  // 发送故障
+  if (data.wsUrl && type === "fault") {
+    wsClient.sendMessage(data.busName, 7000, {
+        Name: pen.Name,
+        Type: 28,
+        Code: pen.fault,
+      });
+      let color = pen.fault == 0 ? "#4E6EF2" : "red";
+      meta2d.setValue(
+      { id: pen.id, color: color, fault: pen.fault },
+      { render: false }
+    );
   }
-
-  if (data.wsUrl) {
-    // test: 模拟修改状态
+  // 发送开关状态
+  if (data.wsUrl && type === "setting") {
     wsClient.sendMessage(data.busName, 3000, {
-      Name: pen.Name,
-      Type: 28,
-      State: pen.State,
-      fault: pen.fault,
-    });
+        Name: pen.Name,
+        Type: 28,
+        State: pen.State,
+      });
+      meta2d.setValue(
+      { id: pen.id, showChild: pen.State },
+      { render: false }
+    );
   }
 };
-const modelHandle = (data: any) => {
-  visible.value = true;
+const modelHandle = (data: any, type: string) => {
+  console.log("modelHandletype======== ", type);
   formData.id = data.id;
   formData.Name = data.text;
   formData.State = +(data?.showChild ?? -1);
-  formData.fault = data.fault;
-  
+  formData.fault = data.fault; // 故障
+  if (type === "setting") {
+    // 设置属性
+    visible.value = true;
+  }else if (type === "fault") {
+    sendMessageSocket(formData,type);
+  }
 };
 const close = () => {
   visible.value = false;
 };
 const onConfirmAnother = (context: any) => {
   visible.value = false;
-  sendMessageSocket(formData);
+  sendMessageSocket(formData,'setting');
   // sendMessageSocket 点击确定后发送消息
-
 };
 defineExpose({
   reconnectWebSocket,
