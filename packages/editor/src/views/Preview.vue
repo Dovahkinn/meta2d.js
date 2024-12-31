@@ -525,10 +525,17 @@ try {
     width: v-bind(cssRightPanelWidth);
     max-width: 50%;
     height: 100%;
-    border-left: 2px solid #f5f5f5;
-    padding: 20px;
+    // border-left: 2px solid #f5f5f5;
+    padding: 0;
     overflow-y: auto;
     z-index: 999;
+
+    .t-table {
+      background-image: var(--table-background-image-url);
+      height: 100%;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
   }
 }
 </style>
