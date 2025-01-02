@@ -6,15 +6,15 @@ var __meta2d_env__ = {
             children: [
                 {
                     label: 'test1',
-                    value: '/project/测试/test-1.json',
+                    value: '/project/测试/test11.json',
                 },
                 {
                     label: 'test2',
-                    value: '/project/测试/test-2.json',
+                    value: '/project/测试/test22.json',
                 },
                 {
                     label: 'test3',
-                    value: '/project/测试/test-3.json',
+                    value: '/project/测试/test33.json',
                 },
             ],
         }

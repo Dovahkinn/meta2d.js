@@ -66,6 +66,8 @@ app.whenReady().then(() => {
         console.log('app ready: ', arg)
         projectFile = arg.replace(prefix, '')
     }
+    // projectFile = 'default' 默认是list.json
+    projectFile = projectFile || 'list.json'
     ipcMain.handle('argv:project-file', () => projectListSync(projectFile))
 
     const [server, url] = triggerServer("localhost", "8081", "dist");

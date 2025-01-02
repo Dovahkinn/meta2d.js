@@ -180,7 +180,7 @@ onMounted(() => {
         });
 
       const jsStr = data.onMessageJsCode;
-
+      console.log("jsStr: ", jsStr);
       if (data.wsUrl) {
         wsClient = WebSocketClient.getInstance(data.wsUrl, {
           busName: data.busName,
@@ -189,6 +189,7 @@ onMounted(() => {
           onReady: () => {
             console.log("%c连接成功！", "color: green; font-weight: bold;");
             wsClient.subscribe(data.busName, msgTypes, (response: any) => {
+              console.log("response: ", response);
               try {
                 if (jsStr) {
                   const fn = new Function("data", jsStr);
@@ -247,6 +248,7 @@ const reconnectWebSocket = (data: any) => {
       });
 
     const jsStr = data.onMessageJsCode;
+    console.log("reconnectWebSocket======== ", jsStr);
     wsClient = WebSocketClient.getInstance(data.wsUrl, {
       busName: data.busName,
       msgTypes,
@@ -274,10 +276,13 @@ const reconnectWebSocket = (data: any) => {
       },
     });
     wsClient.connect();
+    wsClient.sendMessage(data.busName, 2001, {
+      TaskName:"任务名称"
+    });
   }
 };
 // 发送消息设置  1设置元器件属性  2设置元器件故障分别发送消息
-const sendMessageSocket = (pen: any,type: any) => {
+const sendMessageSocket = (pen: any, type: any) => {
   let data: any = localStorage.getItem("meta2d");
   if (props.data || data) {
     data = props.data || JSON.parse(data);
@@ -287,12 +292,12 @@ const sendMessageSocket = (pen: any,type: any) => {
   // 发送故障
   if (data.wsUrl && type === "fault") {
     wsClient.sendMessage(data.busName, 7000, {
-        Name: pen.Name,
-        Type: 28,
-        Code: pen.fault,
-      });
-      let color = pen.fault == 0 ? "#4E6EF2" : "red";
-      meta2d.setValue(
+      Name: pen.Name,
+      Type: 28,
+      Code: pen.fault,
+    });
+    let color = pen.fault == 0 ? "" : "#FF0000";
+    meta2d.setValue(
       { id: pen.id, color: color, fault: pen.fault },
       { render: false }
     );
@@ -300,16 +305,23 @@ const sendMessageSocket = (pen: any,type: any) => {
   // 发送开关状态
   if (data.wsUrl && type === "setting") {
     wsClient.sendMessage(data.busName, 3000, {
-        Name: pen.Name,
-        Type: 28,
-        State: pen.State,
-      });
-      meta2d.setValue(
-      { id: pen.id, showChild: pen.State },
-      { render: false }
-    );
+      Name: pen.Name,
+      Type: 28,
+      State: pen.State,
+    });
+    meta2d.setValue({ id: pen.id, showChild: pen.State }, { render: false });
   }
 };
+// 发送请求同步电路
+const Sendrequestsyn = () => {
+  let data: any = localStorage.getItem("meta2d");
+  if (props.data || data) {
+    data = props.data || JSON.parse(data);
+  }
+  if (data.wsUrl) {
+    wsClient.sendMessage(data.busName, 1002, {});
+  }
+}
 const modelHandle = (data: any, type: string) => {
   console.log("modelHandletype======== ", type);
   formData.id = data.id;
@@ -319,8 +331,8 @@ const modelHandle = (data: any, type: string) => {
   if (type === "setting") {
     // 设置属性
     visible.value = true;
-  }else if (type === "fault") {
-    sendMessageSocket(formData,type);
+  } else if (type === "fault") {
+    sendMessageSocket(formData, type);
   }
 };
 const close = () => {
@@ -328,11 +340,12 @@ const close = () => {
 };
 const onConfirmAnother = (context: any) => {
   visible.value = false;
-  sendMessageSocket(formData,'setting');
+  sendMessageSocket(formData, "setting");
   // sendMessageSocket 点击确定后发送消息
 };
 defineExpose({
   reconnectWebSocket,
+  Sendrequestsyn,
 });
 
 const active = (pens?: Pen[]) => {
@@ -345,6 +358,8 @@ const inactive = () => {
 
 onUnmounted(() => {
   meta2d.destroy();
+  wsClient.close();
+
 });
 </script>
 <style lang="postcss" scoped>

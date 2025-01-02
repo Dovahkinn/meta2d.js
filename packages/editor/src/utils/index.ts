@@ -450,13 +450,18 @@ export const loadElectricJson = (data: any) => {
             return;
           }
           const { length = 0, anchors = [] } = calcLinePos(item);
-
+          let extractname; // 提取前缀
+          if (item.name.includes("CenterLineName")) {
+             extractname = extractPrefixOrEmpty(item.name);
+          }else{
+            extractname = item.name;
+          }
           const pen = {
             type: 1,
             id: item.uuid,
             name: 'line',
             lineName: 'curve',
-            text: item.name,
+            text: extractname,
             //   title: item.name,
             x: Number(item.startX),
             y: Number(item.startY),
@@ -507,7 +512,15 @@ export const loadElectricJson = (data: any) => {
     }
   });
 };
-
+function extractPrefixOrEmpty(name: string) {
+  if (name.includes("CenterLineName")) {
+    const parts = name.split("_");
+    return parts[0]; // 返回第一个部分作为前缀
+  } else {
+    // 如果不包含，则返回空字符串
+    return "";
+  }
+}
 function calcLinePos(item: any) {
   const { startX, startY, endX, endY } = item;
   const length = Math.sqrt(

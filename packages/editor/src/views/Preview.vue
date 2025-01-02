@@ -21,6 +21,13 @@
               @click="handleToolClick('fit')"
             ></t-icon>
           </t-col>
+          <t-col :span="2">
+            <t-icon
+              name="refresh"
+              size="large"
+              @click="handleToolClick('refresh')"
+            ></t-icon>
+          </t-col>
         </t-row>
         <t-divider></t-divider>
         <t-tree :data="treeData" expandAll activable @click="changeData" />
@@ -109,7 +116,7 @@ const props = defineProps({
 
   showRightPanel: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   rightPanelWidth: {
     type: Number,
@@ -198,7 +205,7 @@ onMounted(() => {
   if (isInElectron()) {
     if (globalThis.versions?.projectListSync) {
       globalThis.versions
-        .projectListSync()
+        .projectListSync("list.json")
         .then((res) => {
           console.log("projectListSync res: ", res);
           if (Array.isArray(res)) {
@@ -216,6 +223,7 @@ onMounted(() => {
                   meta2d.emit("clear");
                   meta2d.fitView();
                   applyStateSet();
+                  localStorage.setItem("meta2d", JSON.stringify(res));
                   if (childComponentRef.value) {
                     childComponentRef.value.reconnectWebSocket(res);
                   }
@@ -303,6 +311,10 @@ const handleToolClick = (code: string) => {
     meta2d.fitView(true, 20);
   } else if (code == "fullscreen") {
     toggleFullScreen();
+  } else if (code == "refresh") {
+    if (childComponentRef.value) {
+      childComponentRef.value.Sendrequestsyn();
+    }
   }
 };
 
@@ -391,15 +403,19 @@ type PenState = {
   [t: string]: any;
 };
 
-const penStateSet: any[] = [];
+let penStateSet: any[] = [];
 const combineState = (msg: PenState) => {
-  const state = penStateSet.find((s) => s.id == msg.id || s.tag == msg.tag);
+  console.log("penStateSet==== ", penStateSet);
+  const state = penStateSet.find((s) => s.Name === msg.Name);
+  console.log("state==== ", state);
+
   if (state) {
     const { id, tag, ...rest } = msg;
     Object.assign(state, rest);
     return;
+  } else {
+    penStateSet.push(msg);
   }
-  penStateSet.push(msg);
 };
 
 const applyState = (msg: PenState) => {
@@ -430,8 +446,14 @@ const applyState = (msg: PenState) => {
         }
         //颜色color 是否有电 1有电显示蓝色 2无电红色
         if (pen.name == "line") {
-          _props.animateColor = msg.Value == 1 ? "#0000FF" : "#FF0000";
-          meta2d.startAnimate([pen]);
+          if (msg.Value == 1) {
+            _props.color = "#4E6EF2"; //线条的颜色
+            _props.animateColor = "#0000FF"; //流动的颜色
+            meta2d.startAnimate([pen]);
+          } else {
+            meta2d.stopAnimate([pen]);
+            _props.color = "#FF0000"; //线条的颜色
+          }
         }
         meta2d.setValue(_props, { render: false });
       });
@@ -452,7 +474,7 @@ if (props.enableBackgroundUpdate) {
   customWsHandler = (data: ResponseMsgType) => {
     const { busName, msg, msgType } = data || {};
 
-    // TODO: 可以根据 msgType 进行判断
+    console.log("ws msg: ", data);
 
     // 更新处理
     if (msg) {
@@ -473,6 +495,7 @@ if (props.enableBackgroundUpdate) {
       } else {
         // 未加载的图纸
         // 暂定在打开时从状态集合全量更新一次
+        // applyStateSet();
       }
     }
   };
