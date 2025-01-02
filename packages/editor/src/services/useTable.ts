@@ -127,11 +127,17 @@ export const useLogTable = (metaData: any = {}) => {
 
   let tableStyle = {};
   if (style) {
-    const { evenRowBackgroundColor, oddRowBackgroundColor } = style;
+    const { evenRowBackgroundColor, oddRowBackgroundColor, textColor, backgroundImageUrl, } = style;
     tableStyle = {
       '--td-bg-color-secondarycontainer': oddRowBackgroundColor,
       '--td-bg-color-container': evenRowBackgroundColor,
+      '--td-text-color-primary': textColor || '#FFFFFF',
+      '--td-text-color-placeholder': textColor || '#FFFFFF',
+      '--table-background-image-url': `url(${backgroundImageUrl || ''})`,
     };
+    if (backgroundImageUrl) {
+      tableStyle['--td-bg-color-container'] = 'transparent';
+    }
   }
 
   return {

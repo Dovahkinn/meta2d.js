@@ -70,6 +70,27 @@
             @change="change"
           ></t-color-picker>
         </t-form-item>
+
+        <t-form-item label="字体颜色">
+          <t-color-picker
+            v-model="tableProps.style.textColor"
+            class="w-full"
+            :show-primary-color-preview="false"
+            format="CSS"
+            :color-modes="['monochrome']"
+            clearable
+            @change="change"
+          ></t-color-picker>
+        </t-form-item>
+
+        <t-form-item label="背景图片">
+          <t-input
+            v-model="tableProps.style.backgroundImageUrl"
+            class="w-full"
+            clearable
+            @change="change"
+          ></t-input>
+        </t-form-item>
       </t-form>
     </t-collapse-panel>
 
@@ -146,6 +167,8 @@ const tableProps = reactive({
   style: {
     evenRowBackgroundColor: "#f8f8f8",
     oddRowBackgroundColor: "#ffffff",
+    textColor: "#000000",
+    backgroundImageUrl: '',
   },
 });
 
