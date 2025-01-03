@@ -6,7 +6,7 @@
       @after-enter="afterEnter"
     >
       <div v-if="!isCollapsed" class="left__panel">
-        <t-row justify="end">
+        <t-row justify="end" style="cursor: pointer;">
           <t-col :span="2">
             <t-icon
               name="fullscreen"
@@ -220,12 +220,13 @@ onMounted(() => {
                     res.locked = res.lockState;
                   }
                   meta2d.open(res);
-                  meta2d.emit("clear");
+                  // meta2d.emit("clear");
                   meta2d.fitView();
                   applyStateSet();
-                  localStorage.setItem("meta2d", JSON.stringify(res));
+                  localStorage.setItem("meta2d", JSON.stringify(first.json));
                   if (childComponentRef.value) {
-                    childComponentRef.value.reconnectWebSocket(res);
+                    childComponentRef.value.Sendrequestsyn();
+                    childComponentRef.value.reconnectWebSocket(res); // 同步一下电路状态
                   }
                   applyTable(res);
                 }
@@ -312,6 +313,7 @@ const handleToolClick = (code: string) => {
   } else if (code == "fullscreen") {
     toggleFullScreen();
   } else if (code == "refresh") {
+    console.log("refresh同步一下数据");
     if (childComponentRef.value) {
       childComponentRef.value.Sendrequestsyn();
     }
@@ -444,16 +446,17 @@ const applyState = (msg: PenState) => {
         if ("showChild" in pen) {
           _props.showChild = msg.State;
         }
-        //颜色color 是否有电 1有电显示蓝色 2无电红色
-        if (pen.name == "line") {
-          if (msg.Value == 1) {
-            _props.color = "#4E6EF2"; //线条的颜色
-            _props.animateColor = "#0000FF"; //流动的颜色
-            meta2d.startAnimate([pen]);
-          } else {
-            meta2d.stopAnimate([pen]);
-            _props.color = "#FF0000"; //线条的颜色
-          }
+        //颜色color 是否有电 1有电显示红色 2无电蓝色
+
+        if (msg.Value == 1) {
+          _props.color = "rgb(255, 0, 0)"; //线条的颜色
+          _props.lineWidth = 2; //线条的宽度
+          _props.animateColor = "rgb(255, 0, 0)"; //流动的颜色
+          meta2d.startAnimate([pen]);
+        } else {
+          meta2d.stopAnimate([pen]);
+          _props.color = "rgb(0, 0, 128)"; //线条的颜色
+          _props.lineWidth = 2; //线条的宽度
         }
         meta2d.setValue(_props, { render: false });
       });

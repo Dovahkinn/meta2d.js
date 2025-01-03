@@ -114,7 +114,7 @@ let formData = reactive({
   State: 0,
 });
 const options = [
-  { label: "打开", value: 0 },
+  { label: "断开", value: 0 },
   { label: "闭合", value: 1 },
 ];
 const faultOptions = [

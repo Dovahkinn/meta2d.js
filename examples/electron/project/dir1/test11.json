@@ -4863,7 +4863,7 @@
   "name": "",
   "wsUrl": "ws://10.1.14.14:13809",
   "busName": "BusName_ECS",
-  "msgTypes": ["1001", "3000", "7000"],
+  "msgTypes": ["1001", "3000", "7000", "1002"],
   "wsMsgFields": [],
   "wsMsgHandlers": [],
   "lockState": 0

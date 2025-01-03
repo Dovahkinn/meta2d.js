@@ -358,7 +358,9 @@ export const loadElectricJson = (data: any) => {
                 width,
                 height,
                 fault:0,
-                titleFnJs: 'return `${pen.text}  ${pen.description}`;'
+                titleFnJs: 'return `${pen.text}  ${pen.description}`;',
+                color:'rgba(0, 0, 128, 1)',
+                lineWidth:2,
               });
               // 添加tag
               if (parent.tags && !parent.tags?.includes(item.name)) {
@@ -397,8 +399,8 @@ export const loadElectricJson = (data: any) => {
                 tags: [item.type, item.name],
                 width: cWidth || parent.width,
                 height: cHeight || parent.height,
-                color:' #4E6EF2',
-                lineWidth:4,
+                color:'rgba(0, 0, 128, 1)',
+                lineWidth:2,
                 fault:0,
                 titleFnJs: 'return `${pen.text}  ${pen.description}`;'
               });
@@ -430,6 +432,7 @@ export const loadElectricJson = (data: any) => {
               height: Number(config?.['高度(Y向)'] || 100),
               rotate: rotateAngelMap[item.rotateAngel] || 0,
               tags: [item.type, item.name],
+              color:'rgba(0, 0, 128, 1)',
               // fontSize: 10,
             };
             // 特殊处理，和电路编辑器默认角度保持一致 ！！！！！！！！！！！！！！！
@@ -470,12 +473,12 @@ export const loadElectricJson = (data: any) => {
             anchors,
             tags: [item.name],
             fontSize: 14,
-            color:' #4E6EF2',
+            color:'rgb(0, 0, 128)',
             textColor:"#000",
-            lineWidth:3,
+            lineWidth:2,
             lineAnimateType:1,
             animateLineWidth:3,
-            animateColor:' #FF0000',
+            animateColor:'rgb(255, 0, 0)',
             textBaseline:'bottom'
           };
           console.log('连线: ', pen);
@@ -498,7 +501,7 @@ export const loadElectricJson = (data: any) => {
             //   title: item.name,
             x: Number(item.posX),
             y: Number(item.posY),
-            width: 200,
+            width: 100,
             height: 50,
             color: item.color,
             textAutoAdjust: true,
