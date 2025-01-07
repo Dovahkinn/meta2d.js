@@ -46,6 +46,7 @@
     <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel">
         <t-table
+          v-if="tableColumns.length"
           ref="tableRef"
           class="table-flex-right"
           row-key="sid"
@@ -116,7 +117,7 @@ const props = defineProps({
 
   showRightPanel: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   rightPanelWidth: {
     type: Number,
