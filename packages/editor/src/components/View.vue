@@ -276,9 +276,6 @@ const reconnectWebSocket = (data: any) => {
       },
     });
     wsClient.connect();
-    wsClient.sendMessage(data.busName, 2001, {
-      TaskName:"任务名称"
-    });
   }
 };
 // 发送消息设置  1设置元器件属性  2设置元器件故障分别发送消息
