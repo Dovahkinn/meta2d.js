@@ -1,5 +1,5 @@
 import { reactive, ref } from 'vue';
-import { EventAction } from '../types/Event';
+import { EventAction, ExtendAction } from '../types/Event';
 import { s12 } from "@meta2d/core";
 
 const testStepData = [
@@ -207,8 +207,26 @@ export const useScripts = (metaData: any = {}) => {
                 case EventAction.Dialog:
                   meta2d.canvas.dialog.show(value, handler.params);
                   break;
-                case -14:
+                case ExtendAction.DialogClose:
                   meta2d.canvas.dialog.hide();
+                  break;
+                case ExtendAction.AnimateReverse:
+                  target.forEach((tag) => {
+                    const pens = meta2d.find(tag);
+                    pens.forEach(pen => {
+                      const { id, animateReverse } = pen;
+                      meta2d.setValue({
+                        id,
+                        animateReverse: !animateReverse,
+                      }, {
+                        render: false,
+                      })
+                    })
+                  })
+
+                  break;
+                default:
+                  console.log('unknown action:', action, handler);
                   break;
               }
             }

@@ -117,7 +117,7 @@ const props = defineProps({
 
   showRightPanel: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   rightPanelWidth: {
     type: Number,

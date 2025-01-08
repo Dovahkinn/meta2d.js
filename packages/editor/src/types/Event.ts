@@ -74,3 +74,9 @@ export type HandlerType = {
     comparison: ComparisonType,
   }
 }
+
+export enum ExtendAction {
+  DialogClose = -14,
+  // 连线动画反向
+  AnimateReverse,
+}

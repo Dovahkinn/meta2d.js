@@ -2,7 +2,7 @@
   <t-form labelAlign="left">
     <t-form-item label="时长" name="name">
       <t-input-number v-model="defaultScript.duration" placeholder="单位: ms" @change="eventChange"/>
-    </t-form-item> 
+    </t-form-item>
   </t-form>
   <t-button block theme="primary" @click="insert">添加脚本</t-button>
   <t-collapse class="meta-collapse" expand-mutex @change="changeHandler">
@@ -58,7 +58,7 @@
             @change="eventChange"
           ></t-select>
         </t-form-item>
-        <t-form-item v-if="[EventAction.SetProps, EventAction.StartAnimate, EventAction.StopAnimate, EventAction.PauseAnimate].includes(item.action)" label="目标">
+        <t-form-item v-if="[EventAction.SetProps, EventAction.StartAnimate, EventAction.StopAnimate, EventAction.PauseAnimate, ExtendAction.AnimateReverse].includes(item.action)" label="目标">
           <t-tag-input
             v-model="item.target"
             placeholder="标签或ID"
@@ -143,7 +143,7 @@
 </template>
 <script setup lang="ts">
 import { defineProps, ref, shallowReactive } from "vue";
-import { EventAction, EventConfig } from "../types/Event";
+import { EventAction, ExtendAction, EventConfig } from "../types/Event";
 import { MessagePlugin } from "tdesign-vue-next";
 import { s12 } from "@meta2d/core";
 
@@ -207,7 +207,11 @@ const eventActionOptions = [
   },
   {
     label: '关闭弹窗',
-    value: -14, // ! 官方没有定义
+    value: ExtendAction.DialogClose, // ! 官方没有定义
+  },
+  {
+    label: '连线动画反向',
+    value: ExtendAction.AnimateReverse,
   }
 ];
 
@@ -299,7 +303,7 @@ const changeHandler = (value: number[]) => {
 const rowPropList = ref<any>(props.defaultScript?.rowPropList || []);
 const addRowProp = () => {
   if (rowPropList.value.length >= props.fields.length) {
-    MessagePlugin.warning(`最多只能添加${props.fields.length}个属性`);    
+    MessagePlugin.warning(`最多只能添加${props.fields.length}个属性`);
     return
   }
   rowPropList.value.push({
