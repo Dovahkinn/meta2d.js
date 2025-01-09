@@ -185,7 +185,7 @@
   </t-collapse>
 </template>
 <script setup lang="ts">
-import { defineProps, ref } from "vue";
+import { defineProps, ref, watch, } from "vue";
 import { MessagePlugin } from "tdesign-vue-next";
 import {
   EventAction,
@@ -203,6 +203,14 @@ const props = defineProps({
 const events = ref<Array<EventConfig>>(
   props.defaultEventsValue as EventConfig[]
 );
+
+watch(() => props.defaultEventsValue, (val) => {
+  if (val) {
+    events.value = val as EventConfig[];
+  } else {
+    events.value = [];
+  }
+})
 
 const eventTypeOptions = [
   {
@@ -422,6 +430,7 @@ const propChange = (event: EventConfig) => {
 
 const updatePropList = (index: number[]) => {
   const event = events.value[Number(index)];
+  if (!event) return
   if (event.value && typeof event.value === "object") {
     propList.value = Object.keys(event.value).map((key: string) => {
       return {
