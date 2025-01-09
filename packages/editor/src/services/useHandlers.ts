@@ -1,5 +1,12 @@
 import { Where } from '@meta2d/core';
-import { HandlerType, EventAction } from '../types/Event';
+import {
+  HandlerType,
+  EventAction,
+  ExtendEventNameKey,
+  ExtendAction,
+  ExtendEventSource,
+  ExtendActionEventNameMap,
+} from '../types/Event';
 
 /**
  * 根据 where 推断是否执行 handler
@@ -102,7 +109,7 @@ export const useWsHandlers = (data: any) => {
                   },
                   {
                     render: false,
-                  },
+                  }
                 );
               });
               meta2d.render();
@@ -115,7 +122,7 @@ export const useWsHandlers = (data: any) => {
                   },
                   {
                     render: false,
-                  },
+                  }
                 );
               });
               meta2d.render();
@@ -130,6 +137,10 @@ export const useWsHandlers = (data: any) => {
           case EventAction.StopAnimate:
             executeAnimate('2', ids, tags);
             break;
+
+          default:
+            console.log('unknown action: ', action);
+            break;
         }
       });
     }
@@ -137,5 +148,59 @@ export const useWsHandlers = (data: any) => {
 
   return {
     resolver,
+  };
+};
+
+/**
+ * @description 可供全局使用的扩展能力调用函数
+ * @param sourceType 
+ * @param eventOptions 
+ * @returns 
+ */
+const callExtendAction = (sourceType: ExtendEventSource, eventOptions: any) => {
+  console.log('callExtendAction  ------------> ', sourceType, eventOptions);
+  if (!eventOptions) {
+    console.error('自定义消息参数不存在！');
+    return;
+  }
+  const { params = {}, ...rest } = eventOptions;
+
+  // sourceType == 0:
+  // rest = { pen, context, }
+
+  switch (params.action) {
+    case ExtendAction.Video:
+      // TODO: 视频
+      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
+      break;
+
+    default:
+      console.error('未知扩展能力调用: ', params.action);
+      break;
+  }
+};
+
+globalThis.$_callExtendAction = callExtendAction;
+
+export const useExtendEvent = () => {
+  const extendOn = () => {
+    if (meta2d) {
+      meta2d.on(ExtendEventNameKey, (...args) => {
+        console.log('--------------', args);
+      });
+    } else {
+      console.error('meta2d is not ready');
+    }
+  };
+
+  const extendOff = (fn: any) => {
+    if (meta2d) {
+      meta2d.off(ExtendEventNameKey, fn);
+    }
+  };
+
+  return {
+    extendOn,
+    extendOff,
   };
 };

@@ -37,7 +37,7 @@ export type EventConfig = {
   name: string;
   action: EventAction;
   value: any;
-  params: string;
+  params: any;
   where: object;
   extend: object;
 };
@@ -79,4 +79,34 @@ export enum ExtendAction {
   DialogClose = -14,
   // 连线动画反向
   AnimateReverse,
+  // 弹窗播放视频
+  Video,
+  // TODO:
+}
+
+export const ExtendEventNameKey = "__extend_event__"
+
+
+export const ExtendActionJsCodeMap = {
+  [ExtendAction.DialogClose]: '',
+  [ExtendAction.Video]: `
+const fn = globalThis.$_callExtendAction;
+if (fn) {
+  fn(0, {
+pen,
+params,
+context,
+})
+}
+`
+}
+
+
+export enum ExtendEventSource {
+  ReservedEvents,
+  ExternalCall,
+}
+
+export enum ExtendActionEventNameMap {
+  Dialog = "__extend_event_dialog__",
 }

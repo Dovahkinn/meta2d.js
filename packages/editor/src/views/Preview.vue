@@ -77,6 +77,7 @@
       </template>
     </t-sticky-tool>
   </div>
+  <extend-dialog></extend-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -100,6 +101,9 @@ import { deepClone } from "@meta2d/core";
 import { useRoute } from "vue-router";
 import { usePlayer } from "../services/usePlayer.ts";
 import { useLogTable, useScripts } from "../services/useTable.ts";
+import { useExtendEvent } from '../services/useHandlers.ts'
+import ExtendDialog from './dialog/ExtendDialog.vue'
+
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -202,6 +206,8 @@ const applyTable = (res: any) => {
   });
 };
 
+const { extendOn, } = useExtendEvent()
+
 onMounted(() => {
   if (isInElectron()) {
     if (globalThis.versions?.projectListSync) {
@@ -269,6 +275,9 @@ onMounted(() => {
     }
   }
   meta2d?.resize();
+
+  // * 扩展事件
+  extendOn()
 });
 
 const treeData = computed(() => {

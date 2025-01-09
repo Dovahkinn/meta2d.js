@@ -17,6 +17,7 @@
   "main-": "./lib/diagram-editor-vue3.umd.js",
   "module-": "./lib/diagram-editor-vue3.mjs",
   "dependencies": {
+    "@guolao/vue-monaco-editor": "^1.5.4",
     "@meta2d/activity-diagram": "workspace:*",
     "@meta2d/chart-diagram": "workspace:*",
     "@meta2d/class-diagram": "workspace:*",
@@ -29,11 +30,12 @@
     "@meta2d/svg": "workspace:*",
     "@meta2d/utils": "workspace:*",
     "@qs/websocket-client": "workspace:*",
-    "@guolao/vue-monaco-editor": "^1.5.4",
+    "@types/video.js": "^7.3.58",
     "file-saver": "^2.0.5",
     "sass": "^1.80.6",
     "sass-loader": "^16.0.3",
     "tdesign-vue-next": "^1.3.10",
+    "video.js": "^8.21.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"
   },

@@ -5,17 +5,34 @@
     <t-collapse-panel v-for="item in events" header="事件">
       <t-form labelAlign="left">
         <t-form-item label="事件类型">
-          <t-select v-model="item.name" :options="eventTypeOptions" @change="eventChange"></t-select>
+          <t-select
+            v-model="item.name"
+            :options="eventTypeOptions"
+            @change="eventChange"
+          ></t-select>
         </t-form-item>
         <t-form-item label="事件行为">
-          <t-select v-model="item.action" :options="eventActionOptions" @change="eventChange"></t-select>
+          <t-select
+            v-model="item.action"
+            :options="eventActionOptions"
+            @change="actionChange(item)"
+          ></t-select>
         </t-form-item>
         <t-form-item v-if="item.action === EventAction.Link" label="链接地址">
-          <t-input v-model="item.value" clearable @change="eventChange"></t-input>
+          <t-input
+            v-model="item.value"
+            clearable
+            @change="eventChange"
+          ></t-input>
         </t-form-item>
         <template v-if="item.action === EventAction.SetProps">
           <t-form-item label="目标">
-            <t-input v-model="item.params" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
+            <t-input
+              v-model="item.params"
+              placeholder="可输入目标图元的ID/Tag"
+              clearable
+              @change="eventChange"
+            ></t-input>
           </t-form-item>
           <!-- 属性列表修改 -->
           <t-row justify="start">
@@ -31,13 +48,25 @@
               </t-button>
             </t-col>
           </t-row>
-          <t-row v-for="(propItem, index) in propList" :key="index" justify="start" :gutter="4"
-            style="margin-bottom: 4px">
+          <t-row
+            v-for="(propItem, index) in propList"
+            :key="index"
+            justify="start"
+            :gutter="4"
+            style="margin-bottom: 4px"
+          >
             <t-col :span="5">
-              <t-select v-model="propItem.prop" :options="propOptions" @change="propChange(item)"></t-select>
+              <t-select
+                v-model="propItem.prop"
+                :options="propOptions"
+                @change="propChange(item)"
+              ></t-select>
             </t-col>
             <t-col :span="5">
-              <t-input v-model="propItem.value" @change="propChange(item)"></t-input>
+              <t-input
+                v-model="propItem.value"
+                @change="propChange(item)"
+              ></t-input>
             </t-col>
             <t-col :span="2">
               <t-button variant="text" @click="deleteProp(propItem)">
@@ -46,41 +75,109 @@
             </t-col>
           </t-row>
         </template>
-        <t-form-item v-if="
-          [
-            EventAction.PauseAnimate,
-            EventAction.StopAnimate,
-            EventAction.StartAnimate,
-          ].includes(item.action)
-        " label="目标">
-          <t-input v-model="item.value" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
+        <t-form-item
+          v-if="
+            [
+              EventAction.PauseAnimate,
+              EventAction.StopAnimate,
+              EventAction.StartAnimate,
+            ].includes(item.action)
+          "
+          label="目标"
+        >
+          <t-input
+            v-model="item.value"
+            placeholder="可输入目标图元的ID/Tag"
+            clearable
+            @change="eventChange"
+          ></t-input>
         </t-form-item>
 
         <template v-if="item.action === EventAction.Dialog">
-           <t-form-item label="窗口标题">
-            <t-input v-model="item.value" clearable @change="eventChange"></t-input>
+          <t-form-item label="窗口标题">
+            <t-input
+              v-model="item.value"
+              clearable
+              @change="eventChange"
+            ></t-input>
           </t-form-item>
-           <t-form-item label="URL">
-            <t-input v-model="item.params" clearable @change="eventChange"></t-input>
+          <t-form-item label="URL">
+            <t-input
+              v-model="item.params"
+              clearable
+              @change="eventChange"
+            ></t-input>
           </t-form-item>
           <t-form-item v-if="item.extend" label="窗口宽度">
-            <t-input-number v-model="item.extend.width" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.width"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="窗口高度">
-            <t-input-number v-model="item.extend.height" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.height"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="X偏移">
-            <t-input-number v-model="item.extend.x" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.x"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="Y偏移">
-            <t-input-number v-model="item.extend.y" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.y"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
         </template>
 
+        <template v-else-if="item.action === EventAction.JS">
+          <t-form-item label="扩展行为">
+            <t-select
+              v-model="item.params.action"
+              :options="templateCodeStringOptions"
+              @change="codeJsChange($event, item)"
+            ></t-select>
+          </t-form-item>
+          <template v-if="item.params.action === ExtendAction.Video">
+            <t-form-item label="窗口标题">
+              <t-input
+                v-model="item.params.title"
+                clearable
+                @change="eventChange"
+              ></t-input>
+            </t-form-item>
+            <t-form-item label="视频URL">
+              <t-input
+                v-model="item.params.url"
+                clearable
+                @change="eventChange"
+              ></t-input>
+            </t-form-item>
+            <t-form-item v-if="item.params" label="窗口宽度">
+              <t-input
+                v-model="item.params.width"
+                placeholder="示例：320, '500px', '80%'"
+                @change="eventChange"
+              ></t-input>
+            </t-form-item>
+            <t-form-item v-if="item.params" label="对话框类型">
+              <t-select v-model="item.params.mode" clearable :options="dialogModeOptions"></t-select>
+            </t-form-item>
+          </template>
+        </template>
       </t-form>
       <template #headerRightContent>
-        <t-button size="small" variant="outline" theme="danger" :style="{ marginLeft: '8px' }"
-          @click="deleteEvent(item)">
+        <t-button
+          size="small"
+          variant="outline"
+          theme="danger"
+          :style="{ marginLeft: '8px' }"
+          @click="deleteEvent(item)"
+        >
           <t-icon name="delete"></t-icon>
         </t-button>
       </template>
@@ -90,7 +187,12 @@
 <script setup lang="ts">
 import { defineProps, ref } from "vue";
 import { MessagePlugin } from "tdesign-vue-next";
-import { EventAction, EventConfig } from '../types/Event'
+import {
+  EventAction,
+  ExtendAction,
+  EventConfig,
+  ExtendActionJsCodeMap,
+} from "../types/Event";
 const props = defineProps({
   defaultEventsValue: {
     type: Array,
@@ -158,10 +260,10 @@ const eventActionOptions = [
     label: "停止动画",
     value: EventAction.StopAnimate,
   },
-  // {
-  //   label: "执行JS代码",
-  //   value: EventAction.JS,
-  // },
+  {
+    label: "执行JS代码",
+    value: EventAction.JS,
+  },
   //   {
   //     label: "执行全局函数",
   //     value: EventAction.GlobalFn,
@@ -191,23 +293,38 @@ const eventActionOptions = [
   //     value: EventAction.SendVarData,
   //   },
   {
-    label: '对话框',
+    label: "对话框",
     value: EventAction.Dialog,
-  }
+  },
+  // {
+  //   label: '扩展-视频',
+  //   value: ExtendAction.Video,
+  // }
 ];
 
 const templateCodeStringOptions = [
   {
-    label: '开关切换',
-    value: '',
+    label: "视频",
+    value: ExtendAction.Video,
+  },
+  // {
+  //   label: '',
+  //   value: '',
+  // },
+  // {
+  //   label: '',
+  //   value: '',
+  // }
+];
+
+const dialogModeOptions = [
+  {
+    label: "模态",
+    value: "modal",
   },
   {
-    label: '动画播放停止',
-    value: '',
-  },
-  {
-    label: '',
-    value: '',
+    label: '全屏',
+    value: 'full-screen'
   }
 ]
 
@@ -223,12 +340,32 @@ const insert = () => {
 };
 const deleteEvent = (event: any) => {
   events.value = events.value.filter((item: any) => item !== event);
-  eventChange()
+  eventChange();
 };
 
 const emit = defineEmits(["change"]);
 const eventChange = () => {
   emit("change", events.value);
+};
+
+const actionChange = (event: any) => {
+  console.log("action change: ", event);
+  if (event.action == EventAction.JS) {
+    event.params = {
+      url: "",
+      action: "", // ExtendAction.Video,
+    };
+    event.value = ``; // 代码字符串，通过选择预定义的模板更新
+  }
+  eventChange();
+};
+
+const codeJsChange = (action: ExtendAction, event: any) => {
+  const code = ExtendActionJsCodeMap[action] as string;
+  if (code) {
+    event.value = code;
+  }
+  eventChange();
 };
 
 const propOptions = [

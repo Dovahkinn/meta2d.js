@@ -8,4 +8,5 @@ declare global {
   var meta2d: Meta2d;
   var C2S: any;
   var __meta2d_env__: Meta2DEnv;
+  var $_callExtendAction: Function
 }
