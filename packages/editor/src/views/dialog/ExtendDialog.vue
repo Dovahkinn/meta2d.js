@@ -21,7 +21,7 @@ import {
   computed,
   defineAsyncComponent,
 } from "vue";
-import { ExtendActionEventNameMap, ExtendAction } from "../../types/Event";
+import { ExtendActionEventNameMap, ExtendAction, ExtendActionMessageTypeMap, } from "../../types/Event";
 
 type ModeValues = "full-screen" | "modal" | undefined;
 type WidthValues = Number | String | undefined;
@@ -84,17 +84,19 @@ onBeforeUnmount(() => {
   meta2d.off(ExtendActionEventNameMap.Dialog);
 });
 
-const onEnd = (event: any) => {
-  console.log("video end: ", event);
-  // TODO: 联动逻辑
+const onEnd = (event: any, params: any) => {
+  console.log("video end: ", event, params);
+  // 通过消息实现联动逻辑
+  meta2d.emit(ExtendActionEventNameMap.CustomMessage, {
+    type: ExtendActionMessageTypeMap.VideoEnded,
+    key: params?.src,
+  })
 }
 </script>
 <style lang="scss" scoped>
-:global(.extend-action__dialog) {
-  &.t-dialog__fullscreen {
-    --td-comp-paddingTB-xl: 0;
-    --td-comp-paddingLR-xxl: 0;
-  }
+:global(.extend-action__dialog.t-dialog__fullscreen) {
+  --td-comp-paddingTB-xl: 0;
+  --td-comp-paddingLR-xxl: 0;
 }
 
 :global(.t-dialog__position_fullscreen) {

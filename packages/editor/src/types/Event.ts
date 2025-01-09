@@ -109,4 +109,9 @@ export enum ExtendEventSource {
 
 export enum ExtendActionEventNameMap {
   Dialog = "__extend_event_dialog__",
+  CustomMessage = "__extend_event_custom_message__",
+}
+
+export enum ExtendActionMessageTypeMap {
+  VideoEnded,
 }

@@ -1,6 +1,7 @@
 import { reactive, ref } from 'vue';
-import { EventAction, ExtendAction } from '../types/Event';
+import { EventAction, ExtendAction, ExtendEventSource, ExtendActionEventNameMap, ExtendActionMessageTypeMap, } from '../types/Event';
 import { s12 } from "@meta2d/core";
+import { callExtendAction } from './useHandlers'
 
 const testStepData = [
   // L1 流动
@@ -178,57 +179,78 @@ export const useScripts = (metaData: any = {}) => {
       if (Array.isArray(handlers) && handlers.length) {
         const fn = () => {
           handlers.forEach((handler) => {
-            const { target, action, value = {} } = handler;
-            if (Array.isArray(target)) {
-              switch (action) {
-                case EventAction.SetProps:
-                  target.forEach((tag) => {
-                    meta2d.setValue(
-                      {
-                        tag,
-                        ...value,
-                      },
-                      {
-                        render: false,
-                      }
-                    );
-                  });
-                  meta2d.render();
-                  break;
-                case EventAction.StartAnimate:
-                  executeAnimate('0', target);
-                  break;
-                case EventAction.PauseAnimate:
-                  executeAnimate('1', target);
-                  break;
-                case EventAction.StopAnimate:
-                  executeAnimate('2', target);
-                  break;
-                case EventAction.Dialog:
-                  meta2d.canvas.dialog.show(value, handler.params);
-                  break;
-                case ExtendAction.DialogClose:
-                  meta2d.canvas.dialog.hide();
-                  break;
-                case ExtendAction.AnimateReverse:
-                  target.forEach((tag) => {
-                    const pens = meta2d.find(tag);
-                    pens.forEach(pen => {
-                      const { id, animateReverse } = pen;
-                      meta2d.setValue({
-                        id,
-                        animateReverse: !animateReverse,
-                      }, {
-                        render: false,
+            const { target, action, value = {}, where, } = handler;
+            console.log('----------- script fn call -------------: ', handler);
+            const executer = () => {
+              if (Array.isArray(target)) {
+                switch (action) {
+                  case EventAction.SetProps:
+                    target.forEach((tag) => {
+                      meta2d.setValue(
+                        {
+                          tag,
+                          ...value,
+                        },
+                        {
+                          render: false,
+                        }
+                      );
+                    });
+                    meta2d.render();
+                    break;
+                  case EventAction.StartAnimate:
+                    executeAnimate('0', target);
+                    break;
+                  case EventAction.PauseAnimate:
+                    executeAnimate('1', target);
+                    break;
+                  case EventAction.StopAnimate:
+                    executeAnimate('2', target);
+                    break;
+                  case EventAction.Dialog:
+                    meta2d.canvas.dialog.show(value, handler.params);
+                    break;
+                  case ExtendAction.DialogClose:
+                    meta2d.canvas.dialog.hide();
+                    break;
+                  case ExtendAction.AnimateReverse:
+                    target.forEach((tag) => {
+                      const pens = meta2d.find(tag);
+                      pens.forEach(pen => {
+                        const { id, animateReverse } = pen;
+                        meta2d.setValue({
+                          id,
+                          animateReverse: !animateReverse,
+                        }, {
+                          render: false,
+                        })
                       })
                     })
-                  })
-
-                  break;
-                default:
-                  console.log('unknown action:', action, handler);
-                  break;
+  
+                    break;
+  
+                    case ExtendAction.Video:
+                      callExtendAction(ExtendEventSource.ExternalCall, handler)
+                      break;
+  
+                  default:
+                    console.log('unknown action:', action, handler);
+                    break;
+                }
               }
+            }
+            if (where && where.type == ExtendActionEventNameMap.CustomMessage && where.value !== null) {
+              // * 自定义消息: 视频播放结束              
+              if (where.value === ExtendActionMessageTypeMap.VideoEnded) {
+                meta2d.on(ExtendActionEventNameMap.CustomMessage, ({ type, key, }) => {
+                  if (type == ExtendActionMessageTypeMap.VideoEnded && key == where.key) {
+                    executer()
+                  }
+                })
+              }
+              
+            } else {
+              executer()
             }
           });
         };

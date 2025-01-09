@@ -1,7 +1,11 @@
 <template>
   <t-form labelAlign="left">
     <t-form-item label="时长" name="name">
-      <t-input-number v-model="defaultScript.duration" placeholder="单位: ms" @change="eventChange"/>
+      <t-input-number
+        v-model="defaultScript.duration"
+        placeholder="单位: ms"
+        @change="eventChange"
+      />
     </t-form-item>
   </t-form>
   <t-button block theme="primary" @click="insert">添加脚本</t-button>
@@ -58,7 +62,18 @@
             @change="eventChange"
           ></t-select>
         </t-form-item>
-        <t-form-item v-if="[EventAction.SetProps, EventAction.StartAnimate, EventAction.StopAnimate, EventAction.PauseAnimate, ExtendAction.AnimateReverse].includes(item.action)" label="目标">
+        <t-form-item
+          v-if="
+            [
+              EventAction.SetProps,
+              EventAction.StartAnimate,
+              EventAction.StopAnimate,
+              EventAction.PauseAnimate,
+              ExtendAction.AnimateReverse,
+            ].includes(item.action)
+          "
+          label="目标"
+        >
           <t-tag-input
             v-model="item.target"
             placeholder="标签或ID"
@@ -108,22 +123,106 @@
         </template>
         <template v-else-if="item.action === EventAction.Dialog">
           <t-form-item label="窗口标题">
-            <t-input v-model="item.value" clearable @change="eventChange"></t-input>
+            <t-input
+              v-model="item.value"
+              clearable
+              @change="eventChange"
+            ></t-input>
           </t-form-item>
-           <t-form-item label="URL">
-            <t-input v-model="item.params" clearable @change="eventChange"></t-input>
+          <t-form-item label="URL">
+            <t-input
+              v-model="item.params"
+              clearable
+              @change="eventChange"
+            ></t-input>
           </t-form-item>
           <t-form-item v-if="item.extend" label="窗口宽度">
-            <t-input-number v-model="item.extend.width" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.width"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="窗口高度">
-            <t-input-number v-model="item.extend.height" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.height"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="X偏移">
-            <t-input-number v-model="item.extend.x" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.x"
+              @change="eventChange"
+            ></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="Y偏移">
-            <t-input-number v-model="item.extend.y" @change="eventChange"></t-input-number>
+            <t-input-number
+              v-model="item.extend.y"
+              @change="eventChange"
+            ></t-input-number>
+          </t-form-item>
+        </template>
+
+        <template v-else-if="item.action === ExtendAction.Video">
+          <t-form-item label="窗口标题">
+            <t-input
+              v-model="item.params.title"
+              clearable
+              @change="eventChange"
+            ></t-input>
+          </t-form-item>
+          <t-form-item label="视频URL">
+            <t-input
+              v-model="item.params.url"
+              clearable
+              @change="eventChange"
+            ></t-input>
+          </t-form-item>
+          <t-form-item v-if="item.params" label="窗口宽度">
+            <t-input
+              v-model="item.params.width"
+              placeholder="示例：320, '500px', '80%'"
+              @change="eventChange"
+            ></t-input>
+          </t-form-item>
+          <t-form-item v-if="item.params" label="对话框类型">
+            <t-select
+              v-model="item.params.mode"
+              clearable
+              :options="dialogModeOptions"
+              @change="eventChange"
+            ></t-select>
+          </t-form-item>
+        </template>
+
+        <t-form-item v-if="item.where" label="触发条件">
+          <t-select
+            v-model="item.where.type"
+            :options="extendWhereTypeOptions"
+            clearable
+            @change="eventChange"
+          ></t-select>
+        </t-form-item>
+        <template
+          v-if="
+            item.where &&
+            item.where.type === ExtendActionEventNameMap.CustomMessage
+          "
+        >
+          <t-form-item label="事件">
+            <t-select
+              v-model="item.where.value"
+              :options="extendWhereMessageTypeOptions"
+              clearable
+              @change="whereValueChange"
+            ></t-select>
+          </t-form-item>
+          <t-form-item v-if="item.where.value === ExtendActionMessageTypeMap.VideoEnded" label="事件来源">
+            <t-select
+              v-model="item.where.key"
+              :options="videoSourceOptions"
+              clearable
+              @change="eventChange"
+            ></t-select>
           </t-form-item>
         </template>
       </t-form>
@@ -142,10 +241,29 @@
   </t-collapse>
 </template>
 <script setup lang="ts">
-import { defineProps, ref, shallowReactive } from "vue";
-import { EventAction, ExtendAction, EventConfig } from "../types/Event";
+import { defineProps, ref, computed, } from "vue";
+import {
+  EventAction,
+  ExtendAction,
+  EventConfig,
+  ExtendActionEventNameMap,
+  ExtendActionMessageTypeMap,
+} from "../types/Event";
 import { MessagePlugin } from "tdesign-vue-next";
 import { s12 } from "@meta2d/core";
+
+type HandlerType = {
+  id: string;
+  action: EventAction;
+  value: any;
+  target: any[];
+  params: any;
+  where: {
+    type: ExtendActionEventNameMap;
+    value: any;
+    key: string | null;
+  };
+}
 
 const props = defineProps({
   fields: {
@@ -157,9 +275,13 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+
+  scripts: {
+    type: Array,
+  }
 });
 
-const handlers = ref<any>(props.defaultScript?.handlers || []);
+const handlers = ref<Array<HandlerType>>(props.defaultScript?.handlers || []);
 
 const insert = () => {
   handlers.value.push({
@@ -167,6 +289,12 @@ const insert = () => {
     action: EventAction.SetProps,
     value: {},
     target: [],
+    params: {},
+    where: {
+      type: ExtendActionEventNameMap.CustomMessage,
+      value: null,
+      key: null,
+    },
   });
 };
 
@@ -205,15 +333,70 @@ const eventActionOptions = [
     label: "弹窗",
     value: EventAction.Dialog,
   },
+
+  // ! 官方没有定义的扩展类型
   {
-    label: '关闭弹窗',
-    value: ExtendAction.DialogClose, // ! 官方没有定义
+    label: "关闭弹窗",
+    value: ExtendAction.DialogClose,
   },
   {
-    label: '连线动画反向',
+    label: "连线动画反向",
     value: ExtendAction.AnimateReverse,
-  }
+  },
+  {
+    label: "视频",
+    value: ExtendAction.Video,
+  },
 ];
+
+const dialogModeOptions = [
+  {
+    label: "模态",
+    value: "modal",
+  },
+  {
+    label: "全屏",
+    value: "full-screen",
+  },
+];
+
+const extendWhereTypeOptions = [
+  {
+    label: "扩展事件",
+    value: ExtendActionEventNameMap.CustomMessage,
+  },
+];
+
+const extendWhereMessageTypeOptions = [
+  {
+    label: "视频播放结束",
+    value: ExtendActionMessageTypeMap.VideoEnded,
+  },
+];
+
+const videoSourceOptions = ref<Array<any>>([])
+
+const whereValueChange = (value: any) => {
+  if (Array.isArray(props.scripts)) {
+    const res: any[] = []
+    props.scripts.forEach((script: any) => {
+      if (Array.isArray(script.handlers)) {
+        script.handlers.forEach((handler: any) => {
+          if (handler.action === ExtendAction.Video) {
+            res.push({
+              label: handler.params?.title || handler.params?.url,
+              value: handler.params?.url,
+            })
+          }
+        })
+      }
+    })
+    videoSourceOptions.value = res
+  }
+
+  eventChange();
+
+}
 
 const propOptions = [
   {
@@ -265,7 +448,7 @@ const propChange = (event: EventConfig) => {
     value[item.prop] = item.value;
   });
   event.value = value;
-  eventChange()
+  eventChange();
 };
 
 const updatePropList = (event: any) => {
@@ -288,7 +471,7 @@ const changeHandler = (value: number[]) => {
   if (!handlers.value.length) return;
   let index = value[0];
   if (props.fields.length) {
-    index -= 1
+    index -= 1;
   }
   if (!handlers.value[index]) return;
   // 拷贝
@@ -298,13 +481,12 @@ const changeHandler = (value: number[]) => {
   }
 };
 
-
 // 步骤信息
 const rowPropList = ref<any>(props.defaultScript?.rowPropList || []);
 const addRowProp = () => {
   if (rowPropList.value.length >= props.fields.length) {
     MessagePlugin.warning(`最多只能添加${props.fields.length}个属性`);
-    return
+    return;
   }
   rowPropList.value.push({
     prop: "",
@@ -314,7 +496,7 @@ const addRowProp = () => {
 
 const rowPropChange = () => {
   // console.log("rowPropChange", rowPropList.value);
-  eventChange()
+  eventChange();
 };
 
 const deleteRowProp = (item: any) => {

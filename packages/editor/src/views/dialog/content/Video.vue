@@ -44,8 +44,8 @@ const initVideo = () => {
   if (videoRef.value) {
     // 创建 video 实例
     videoPlayer = videojs(videoRef.value, options, onPlayerReady)
-    videoPlayer.on('ended', (event) => {
-      emit('ended', event)
+    videoPlayer.on('ended', (event: any) => {
+      emit('ended', event, props)
     })
   }
 }

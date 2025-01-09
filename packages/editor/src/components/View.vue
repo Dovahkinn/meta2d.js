@@ -180,7 +180,6 @@ onMounted(() => {
         });
 
       const jsStr = data.onMessageJsCode;
-      console.log("jsStr: ", jsStr);
       if (data.wsUrl) {
         wsClient = WebSocketClient.getInstance(data.wsUrl, {
           busName: data.busName,

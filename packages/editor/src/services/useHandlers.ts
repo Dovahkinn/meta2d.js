@@ -157,7 +157,7 @@ export const useWsHandlers = (data: any) => {
  * @param eventOptions 
  * @returns 
  */
-const callExtendAction = (sourceType: ExtendEventSource, eventOptions: any) => {
+export const callExtendAction = (sourceType: ExtendEventSource, eventOptions: any) => {
   console.log('callExtendAction  ------------> ', sourceType, eventOptions);
   if (!eventOptions) {
     console.error('自定义消息参数不存在！');
@@ -166,11 +166,14 @@ const callExtendAction = (sourceType: ExtendEventSource, eventOptions: any) => {
   const { params = {}, ...rest } = eventOptions;
 
   // sourceType == 0:
+  if (sourceType == ExtendEventSource.ExternalCall) {
+    params.action = eventOptions.action
+  }
   // rest = { pen, context, }
 
   switch (params.action) {
     case ExtendAction.Video:
-      // TODO: 视频
+      // 弹窗播放视频
       meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
       break;
 

@@ -101,7 +101,7 @@
           <t-button v-if="index > 0" theme="danger" size="small" @click="deleteScript(index)">删除</t-button>
         </t-space>
       </template>
-       <script-handlers :key="script.sid" :fields="scriptFields" :defaultScript="script" @change="scriptChange($event, index)"></script-handlers>
+      <script-handlers :key="script.sid" :fields="scriptFields" :defaultScript="script" :scripts="scripts" @change="scriptChange($event, index)"></script-handlers>
     </t-collapse-panel>
   </t-collapse>
 </template>
