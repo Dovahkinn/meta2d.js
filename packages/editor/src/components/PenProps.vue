@@ -580,6 +580,13 @@
                           从剪切板生成路径动画
                         </t-button>
                       </t-tooltip>
+                      <t-button
+                        v-if="pen.pathFrames?.length"
+                        variant="text"
+                        theme="primary"
+                        @click="showPathDrawer"
+                        >编辑路径
+                      </t-button>
                     </div>
                   </t-form-item>
                 </template>
@@ -590,15 +597,18 @@
                     @change="changeValue('autoPlay')"
                   />
                 </t-form-item>
-                
-                <t-form-item label="保持动画状态" name="keepAnimateState">
-                  <t-switch v-model="pen.keepAnimateState" @change="changeValue('keepAnimateState')" />
-                </t-form-item>
                 <t-form-item label="循环次数" name="animateCycle">
                   <t-input-number
                     v-model="pen.animateCycle"
                     :min="0"
                     @change="changeValue('animateCycle')"
+                  />
+                </t-form-item>
+
+                <t-form-item label="保持动画状态" name="keepAnimateState">
+                  <t-switch
+                    v-model="pen.keepAnimateState"
+                    @change="changeValue('keepAnimateState')"
                   />
                 </t-form-item>
 
@@ -707,6 +717,45 @@
               theme="danger"
               :style="{ marginLeft: '8px' }"
               @click="deleteFrame(item)"
+            >
+              <t-icon name="delete"></t-icon>
+            </t-button>
+          </template>
+        </t-collapse-panel>
+      </t-collapse>
+    </t-drawer>
+
+    <t-drawer v-model:visible="pathDrawerVisible" header="自定义路径" size="20%" :onConfirm="closePathDrawer">
+      <t-collapse v-if="pen && pen.pathFrames" class="meta-collapse" expand-mutex>
+        <t-collapse-panel v-for="(item, index) in pen.pathFrames" :header="`路径-${index+1}`">
+          <t-form label-align="left">
+            <t-form-item label="时长(ms)" name="duration">
+              <t-input-number
+                v-model="item.duration"
+                :min="0"
+              />
+            </t-form-item>
+
+            <t-form-item label="偏移X" name="x">
+              <t-input-number
+                v-model="item.x"
+                placeholder="px"
+              />
+            </t-form-item>
+            <t-form-item label="偏移Y" name="y">
+              <t-input-number
+                v-model="item.y"
+                placeholder="px"
+              />
+            </t-form-item>
+          </t-form>
+          <template #headerRightContent>
+            <t-button
+              size="small"
+              variant="outline"
+              theme="danger"
+              :style="{ marginLeft: '8px' }"
+              @click="deletePathFrame(index)"
             >
               <t-icon name="delete"></t-icon>
             </t-button>
@@ -969,23 +1018,25 @@ const createPathFrames = () => {
         console.log("剪切板数据: ", array);
         if (Array.isArray(array)) {
           // 计算偏移量，相对于前一个点
-          const paths = array.map((item: any, index: number) => {
-            if (index > 0) {
-              const prev = array[index - 1];
-              const x = item.x - prev.x;
-              const y = item.y - prev.y;
-              return { x, y };
-            }
-          }).filter((item: any) => item);
+          const paths = array
+            .map((item: any, index: number) => {
+              if (index > 0) {
+                const prev = array[index - 1];
+                const x = item.x - prev.x;
+                const y = item.y - prev.y;
+                return { x, y };
+              }
+            })
+            .filter((item: any) => item);
           console.log("paths: ", paths);
-          pen.value.frames = paths.map((item: any) => {
+          pen.value.pathFrames = paths.map((item: any) => {
             return {
               x: item.x,
               y: item.y,
               duration: 10000,
             };
           });
-          changeValue("frames");
+          // changeValue("pathFrames");
         }
         MessagePlugin.success({ content: "生成成功" });
       } catch (error) {
@@ -998,6 +1049,21 @@ const createPathFrames = () => {
       MessagePlugin.error({ content: "生成失败" });
     });
 };
+
+const pathDrawerVisible = ref(false);
+const showPathDrawer = () => {
+  pathDrawerVisible.value = true;
+}
+
+const closePathDrawer = () => {
+  pathDrawerVisible.value = false;
+}
+
+const deletePathFrame = (index: number) => {
+  pen.value.pathFrames.splice(index, 1);
+  // changeValue("pathFrames");
+}
+
 </script>
 <style lang="postcss" scoped>
 .props-panel {

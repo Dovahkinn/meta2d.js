@@ -2,6 +2,7 @@ import { reactive, ref } from 'vue';
 import { EventAction, ExtendAction, ExtendEventSource, ExtendActionEventNameMap, ExtendActionMessageTypeMap, } from '../types/Event';
 import { s12 } from "@meta2d/core";
 import { callExtendAction } from './useHandlers'
+import { createPathAnimation } from '../utils/pathAnimate'
 
 const testStepData = [
   // L1 流动
@@ -163,6 +164,28 @@ function executeAnimate(type: string, target: string[]) {
   }
   const fnName = fnMap[type];
   if (fnName) {
+    console.log('=============> ', fnName);
+    pens.forEach((pen) => {
+      if (Array.isArray(pen.pathFrames)) {
+        let control = pen.pathAnimateControl;
+        if (!control) {
+          pen.pathAnimateControl = createPathAnimation(pen, pen.pathFrames);
+          control = pen.pathAnimateControl;
+        } 
+        // console.log('=============> ', control, type);
+        if (type == 0) {
+          if (control.isPaused.value) {
+            control.resume();
+          } else {
+            control.play();
+          }
+        } else if (type == 1) {
+          control.pause();
+        } else if (type == 2) {
+          control.stop();
+        }
+      }
+    })
     meta2d[fnName](pens);
   }
 }
