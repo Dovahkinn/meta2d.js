@@ -360,6 +360,10 @@ const dialogModeOptions = [
     label: "全屏",
     value: "full-screen",
   },
+  {
+    label: '非模态',
+    value: 'modeless'
+  }
 ];
 
 const extendWhereTypeOptions = [
