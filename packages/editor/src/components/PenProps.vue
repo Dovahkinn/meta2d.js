@@ -583,9 +583,7 @@
                     </div>
                   </t-form-item>
                 </template>
-                <t-form-item label="循环次数" name="animateCycle">
-                    <t-input-number v-model="pen.animateCycle" @change="changeValue('animateCycle')" />
-                  </t-form-item>
+
                 <t-form-item label="自动播放" name="autoPlay">
                   <t-switch
                     v-model="pen.autoPlay"
@@ -596,6 +594,14 @@
                 <t-form-item label="保持动画状态" name="keepAnimateState">
                   <t-switch v-model="pen.keepAnimateState" @change="changeValue('keepAnimateState')" />
                 </t-form-item>
+                <t-form-item label="循环次数" name="animateCycle">
+                  <t-input-number
+                    v-model="pen.animateCycle"
+                    :min="0"
+                    @change="changeValue('animateCycle')"
+                  />
+                </t-form-item>
+
                 <t-divider />
                 <t-space>
                   <t-button @click="animate(true)">播放</t-button>
