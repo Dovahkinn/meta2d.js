@@ -94,10 +94,11 @@
       </t-form>
     </t-collapse-panel>
 
-    <t-collapse-panel v-for="(script, index) in scripts" :key="script.sid" :header="`预设指令-${index+1}`">
+    <t-collapse-panel v-for="(script, index) in scripts" :key="script.sid" :header="`指令-${script.sid}`">
       <template #headerRightContent>
         <t-space size="small">
           <t-button v-if="index == scripts.length - 1" theme="primary" size="small" @click="addScript">追加</t-button>
+          <t-button v-else theme="warning" size="small" @click="insertScript(index)">插入</t-button>
           <t-button v-if="index > 0" theme="danger" size="small" @click="deleteScript(index)">删除</t-button>
         </t-space>
       </template>
@@ -188,6 +189,12 @@ const scriptChange = (data: any, index: number) => {
 
 const addScript = () => {
   scripts.push({
+    sid: s12(),
+  })
+}
+
+const insertScript = (index: number) => {
+  scripts.splice(index, 0, {
     sid: s12(),
   })
 }
