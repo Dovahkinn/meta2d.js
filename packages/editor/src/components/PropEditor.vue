@@ -9,7 +9,18 @@
           @change="changeValue('duration')"
         />
       </t-form-item>
-
+      <t-form-item label="x" name="x">
+        <t-input-number
+          v-model="data.x"
+          @change="changeValue('x')"
+        />
+      </t-form-item>
+      <t-form-item label="y" name="y">
+        <t-input-number
+          v-model="data.y"
+          @change="changeValue('y')"
+        />
+      </t-form-item>
       <t-form-item label="颜色" name="color">
         <t-color-picker
           class="w-full"

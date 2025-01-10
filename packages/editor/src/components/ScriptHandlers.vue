@@ -1,4 +1,5 @@
 <template>
+  <div>
   <t-form labelAlign="left">
     <t-form-item label="时长" name="name">
       <t-input-number
@@ -239,6 +240,7 @@
       </template>
     </t-collapse-panel>
   </t-collapse>
+  </div>
 </template>
 <script setup lang="ts">
 import { defineProps, ref, computed, } from "vue";

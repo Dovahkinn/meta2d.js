@@ -223,6 +223,7 @@ onMounted(() => {
       data.locked = 0;
     }
     meta2d.open(data);
+    meta2d.fitView();
   }
 
   meta2d.on("active", active);
