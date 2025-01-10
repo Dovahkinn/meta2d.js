@@ -1,25 +1,58 @@
 <template>
   <div class="">
-    <PropsTab v-if="pen" :tabs="tabs" :defaultValue="activePanel" @change="v => activePanel = v">
+    <PropsTab
+      v-if="pen"
+      :tabs="tabs"
+      :defaultValue="activePanel"
+      @change="(v) => (activePanel = v)"
+    >
       <template #pen>
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="颜色" name="color">
-              <t-color-picker class="w-full" v-model="pen.color" :show-primary-color-preview="false" format="CSS"
-                :color-modes="['monochrome']" clearable @change="changeValue('color')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.color"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('color')"
+              />
             </t-form-item>
             <t-form-item label="浮动颜色" name="hoverColor">
-              <t-color-picker class="w-full" v-model="pen.hoverColor" :show-primary-color-preview="false" format="CSS"
-                :color-modes="['monochrome']" clearable @change="changeValue('hoverColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.hoverColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('hoverColor')"
+              />
             </t-form-item>
             <t-form-item label="选中颜色" name="activeColor">
-              <t-color-picker class="w-full" v-model="pen.activeColor" :show-primary-color-preview="false" format="CSS"
-                :color-modes="['monochrome']" clearable @change="changeValue('activeColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.activeColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('activeColor')"
+              />
             </t-form-item>
 
             <t-form-item label="背景" name="background">
-              <t-color-picker class="w-full" v-model="pen.background" :show-primary-color-preview="false" format="CSS"
-                :color-modes="['monochrome']" clearable @change="changeValue('background')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.background"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('background')"
+              />
             </t-form-item>
             <t-form-item label="线条" name="dash">
               <t-select v-model="pen.dash" @change="changeValue('dash')">
@@ -28,65 +61,130 @@
               </t-select>
             </t-form-item>
             <t-form-item label="线条宽度" name="lineWidth">
-              <t-input-number v-model="pen.lineWidth" @change="changeValue('lineWidth')" />
+              <t-input-number
+                v-model="pen.lineWidth"
+                @change="changeValue('lineWidth')"
+              />
             </t-form-item>
 
             <t-form-item label="圆角" name="borderRadius">
-              <t-input-number :min="0" :max="1" :step="0.01" v-model="pen.borderRadius"
-                @change="changeValue('borderRadius')" />
+              <t-input-number
+                :min="0"
+                :max="1"
+                :step="0.01"
+                v-model="pen.borderRadius"
+                @change="changeValue('borderRadius')"
+              />
             </t-form-item>
             <t-form-item label="不透明度" name="globalAlpha">
-              <t-slider v-model="pen.globalAlpha" :min="0" :max="1" :step="0.01" @change="changeValue('globalAlpha')" />
+              <t-slider
+                v-model="pen.globalAlpha"
+                :min="0"
+                :max="1"
+                :step="0.01"
+                @change="changeValue('globalAlpha')"
+              />
               <span class="ml-16" style="width: 50px; line-height: 30px">
                 {{ pen.globalAlpha }}
               </span>
             </t-form-item>
             <t-form-item label="阴影颜色" name="shadowColor">
-              <t-color-picker class="w-full" v-model="pen.shadowColor" :show-primary-color-preview="false" format="CSS"
-                :color-modes="['monochrome']" clearable @change="changeValue('shadowColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.shadowColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('shadowColor')"
+              />
             </t-form-item>
             <t-form-item label="阴影模糊" name="shadowBlur">
-              <t-input-number v-model="pen.shadowBlur" :min="0" @change="changeValue('shadowBlur')" />
+              <t-input-number
+                v-model="pen.shadowBlur"
+                :min="0"
+                @change="changeValue('shadowBlur')"
+              />
             </t-form-item>
             <t-form-item label="阴影X偏移" name="shadowOffsetX">
-              <t-input-number v-model="pen.shadowOffsetX" @change="changeValue('shadowOffsetX')" />
+              <t-input-number
+                v-model="pen.shadowOffsetX"
+                @change="changeValue('shadowOffsetX')"
+              />
             </t-form-item>
             <t-form-item label="阴影Y偏移" name="shadowOffsetY">
-              <t-input-number v-model="pen.shadowOffsetY" @change="changeValue('shadowOffsetY')" />
+              <t-input-number
+                v-model="pen.shadowOffsetY"
+                @change="changeValue('shadowOffsetY')"
+              />
             </t-form-item>
 
             <t-divider />
             <t-form-item label="文字阴影" name="textHasShadow">
-              <t-switch v-model="pen.textHasShadow" @change="changeValue('textHasShadow')" />
+              <t-switch
+                v-model="pen.textHasShadow"
+                @change="changeValue('textHasShadow')"
+              />
             </t-form-item>
             <t-form-item label="文本" name="text">
-              <t-input v-model="pen.text" clearable @change="changeValue('text')" />
+              <t-input
+                v-model="pen.text"
+                clearable
+                @change="changeValue('text')"
+              />
             </t-form-item>
 
             <t-form-item label="字体" name="fontSize">
-              <t-input-number v-model="pen.fontSize" @change="changeValue('fontSize')" />
+              <t-input-number
+                v-model="pen.fontSize"
+                @change="changeValue('fontSize')"
+              />
             </t-form-item>
 
             <t-form-item label="文字颜色类型" name="textType">
-              <t-select v-model="pen.textType" @change="changeValue('textType')">
+              <t-select
+                v-model="pen.textType"
+                @change="changeValue('textType')"
+              >
                 <t-option key="hex" :value="0" label="纯色"></t-option>
                 <t-option key="rgb" :value="1" label="线性渐变"></t-option>
                 <t-option key="rgba" :value="2" label="径向渐变"></t-option>
               </t-select>
             </t-form-item>
 
-            <t-form-item v-if="[1, 2].includes(pen.textType)" label="文字渐变" name="textGradientColors">
-              <t-color-picker class="w-full" v-model="pen.textGradientColors" :show-primary-color-preview="false"
-                format="CSS" :color-modes="['linear-gradient']" clearable @change="changeValue('textGradientColors')" />
+            <t-form-item
+              v-if="[1, 2].includes(pen.textType)"
+              label="文字渐变"
+              name="textGradientColors"
+            >
+              <t-color-picker
+                class="w-full"
+                v-model="pen.textGradientColors"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['linear-gradient']"
+                clearable
+                @change="changeValue('textGradientColors')"
+              />
             </t-form-item>
 
             <t-form-item v-else label="文字颜色" name="textColor">
-              <t-color-picker class="w-full" v-model="pen.textColor" :show-primary-color-preview="false" format="CSS"
-                :color-modes="['monochrome']" clearable @change="changeValue('textColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.textColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('textColor')"
+              />
             </t-form-item>
 
             <t-form-item label="文本风格" name="fontStyle">
-              <t-select v-model="pen.fontStyle" @change="changeValue('fontStyle')">
+              <t-select
+                v-model="pen.fontStyle"
+                @change="changeValue('fontStyle')"
+              >
                 <t-option key="normal" value="normal" label="常规"></t-option>
                 <t-option key="italic" value="italic" label="斜体"></t-option>
               </t-select>
@@ -94,7 +192,10 @@
 
             <!-- 加粗 -->
             <t-form-item label="文本粗细" name="fontWeight">
-              <t-select v-model="pen.fontWeight" @change="changeValue('fontWeight')">
+              <t-select
+                v-model="pen.fontWeight"
+                @change="changeValue('fontWeight')"
+              >
                 <t-option key="normal" value="normal" label="常规"></t-option>
                 <t-option key="bold" value="bold" label="加粗"></t-option>
                 <t-option key="lighter" value="lighter" label="更细"></t-option>
@@ -102,49 +203,93 @@
             </t-form-item>
 
             <t-form-item label="换行" name="whiteSpace">
-              <t-select v-model="pen.whiteSpace" @change="changeValue('whiteSpace')">
+              <t-select
+                v-model="pen.whiteSpace"
+                @change="changeValue('whiteSpace')"
+              >
                 <t-option key="normal" value="normal" label="常规"></t-option>
                 <t-option key="nowrap" value="nowrap" label="不换行"></t-option>
-                <t-option key="pre-line" value="pre-line" label="换行符换行"></t-option>
-                <t-option key="break-all" value="break-all" label="永远换行"></t-option>
+                <t-option
+                  key="pre-line"
+                  value="pre-line"
+                  label="换行符换行"
+                ></t-option>
+                <t-option
+                  key="break-all"
+                  value="break-all"
+                  label="永远换行"
+                ></t-option>
               </t-select>
             </t-form-item>
 
             <t-form-item label="超出省略" name="ellipsis">
-              <t-switch v-model="pen.ellipsis" @change="changeValue('ellipsis')">
+              <t-switch
+                v-model="pen.ellipsis"
+                @change="changeValue('ellipsis')"
+              >
               </t-switch>
             </t-form-item>
 
             <t-form-item label="下划线" name="textDecoration">
-              <t-switch v-model="pen.textDecoration" @change="changeValue('textDecoration')" />
+              <t-switch
+                v-model="pen.textDecoration"
+                @change="changeValue('textDecoration')"
+              />
             </t-form-item>
 
             <t-form-item label="下划线颜色" name="textDecorationColor">
-              <t-color-picker class="w-full" v-model="pen.textDecorationColor" :show-primary-color-preview="false"
-                format="CSS" :color-modes="['monochrome']" clearable @change="changeValue('textDecorationColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.textDecorationColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('textDecorationColor')"
+              />
             </t-form-item>
 
             <t-form-item label="删除线" name="textStrickout">
-              <t-switch v-model="pen.textStrickout" @change="changeValue('textStrickout')" />
+              <t-switch
+                v-model="pen.textStrickout"
+                @change="changeValue('textStrickout')"
+              />
             </t-form-item>
 
             <t-form-item label="删除线颜色" name="textStrickoutColor">
-              <t-color-picker class="w-full" v-model="pen.textStrickoutColor" :show-primary-color-preview="false"
-                format="CSS" :color-modes="['monochrome']" clearable @change="changeValue('textStrickoutColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.textStrickoutColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('textStrickoutColor')"
+              />
             </t-form-item>
 
             <t-form-item label="文字水平对齐" name="textAlign">
-              <t-select v-model="pen.textAlign" @change="changeValue('textAlign')">
+              <t-select
+                v-model="pen.textAlign"
+                @change="changeValue('textAlign')"
+              >
                 <t-option key="left" value="left" label="左对齐"></t-option>
                 <t-option key="center" value="center" label="居中"></t-option>
                 <t-option key="right" value="right" label="右对齐"></t-option>
               </t-select>
             </t-form-item>
             <t-form-item label="文字垂直对齐" name="textBaseline">
-              <t-select v-model="pen.textBaseline" @change="changeValue('textBaseline')">
+              <t-select
+                v-model="pen.textBaseline"
+                @change="changeValue('textBaseline')"
+              >
                 <t-option key="top" value="top" label="顶部对齐"></t-option>
                 <t-option key="middle" value="middle" label="居中"></t-option>
-                <t-option key="bottom" value="bottom" label="底部对齐"></t-option>
+                <t-option
+                  key="bottom"
+                  value="bottom"
+                  label="底部对齐"
+                ></t-option>
               </t-select>
             </t-form-item>
 
@@ -157,37 +302,71 @@
               <t-input-number v-model="rect.y" @change="changeRect('y')" />
             </t-form-item>
             <t-form-item label="宽" name="width">
-              <t-input-number v-model="rect.width" @change="changeRect('width')" />
+              <t-input-number
+                v-model="rect.width"
+                @change="changeRect('width')"
+              />
             </t-form-item>
             <t-form-item label="高" name="height">
-              <t-input-number v-model="rect.height" @change="changeRect('height')" />
+              <t-input-number
+                v-model="rect.height"
+                @change="changeRect('height')"
+              />
             </t-form-item>
             <t-form-item label="锁定宽高比" name="ratio">
               <t-switch v-model="pen.ratio" @change="changeValue('ratio')" />
             </t-form-item>
             <t-form-item label="旋转角度" name="rotate">
-              <t-input-number v-model="pen.rotate" @change="changeValue('rotate')" />
+              <t-input-number
+                v-model="pen.rotate"
+                @change="changeValue('rotate')"
+              />
             </t-form-item>
 
             <t-divider />
             <t-form-item label="进度" name="progress">
-              <t-input-number v-model="pen.progress" :step="0.1" :min="0" :max="1" @change="changeValue('progress')" />
+              <t-input-number
+                v-model="pen.progress"
+                :step="0.1"
+                :min="0"
+                :max="1"
+                @change="changeValue('progress')"
+              />
             </t-form-item>
             <t-form-item label="进度颜色" name="progressColor">
-              <t-color-picker class="w-full" v-model="pen.progressColor" :show-primary-color-preview="false"
-                format="CSS" :color-modes="['monochrome']" clearable @change="changeValue('progressColor')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.progressColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="changeValue('progressColor')"
+              />
             </t-form-item>
             <t-form-item label="渐变颜色" name="progressGradientColors">
-              <t-color-picker class="w-full" v-model="pen.progressGradientColors" :show-primary-color-preview="false"
-                clearable format="CSS" :color-modes="['linear-gradient']"
-                @change="changeValue('progressGradientColors')" />
+              <t-color-picker
+                class="w-full"
+                v-model="pen.progressGradientColors"
+                :show-primary-color-preview="false"
+                clearable
+                format="CSS"
+                :color-modes="['linear-gradient']"
+                @change="changeValue('progressGradientColors')"
+              />
             </t-form-item>
 
             <t-form-item label="垂直进度" name="verticalProgress">
-              <t-switch v-model="pen.verticalProgress" @change="changeValue('verticalProgress')" />
+              <t-switch
+                v-model="pen.verticalProgress"
+                @change="changeValue('verticalProgress')"
+              />
             </t-form-item>
             <t-form-item label="反向进度" name="reverseProgress">
-              <t-switch v-model="pen.reverseProgress" @change="changeValue('reverseProgress')" />
+              <t-switch
+                v-model="pen.reverseProgress"
+                @change="changeValue('reverseProgress')"
+              />
             </t-form-item>
             <t-form-item label="水平翻转" name="flipX">
               <t-switch v-model="pen.flipX" @change="changeValue('flipX')" />
@@ -198,21 +377,46 @@
             </t-form-item>
             <t-divider>图片</t-divider>
             <t-form-item label="背景图片">
-              <t-upload ref="uploadRef" v-model="uploadValue" :action="$attrs.uploadUrl ||
-                'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
-                " :headers="headers" name="object" :sizeLimit="sizeLimit" theme="image" tips="请选择单张小于1MB的图片上传"
-                accept="image/*" @fail="handleFail" @success="handleSuccess" />
+              <t-upload
+                ref="uploadRef"
+                v-model="uploadValue"
+                :action="
+                  $attrs.uploadUrl ||
+                  'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+                "
+                :headers="headers"
+                name="object"
+                :sizeLimit="sizeLimit"
+                theme="image"
+                tips="请选择单张小于1MB的图片上传"
+                accept="image/*"
+                @fail="handleFail"
+                @success="handleSuccess"
+              />
             </t-form-item>
             <t-form-item label="背景图片地址" name="backgroundImage">
-              <t-input v-model="pen.image" clearable @change="changeValue('image')" />
+              <t-input
+                v-model="pen.image"
+                clearable
+                @change="changeValue('image')"
+              />
             </t-form-item>
             <t-divider />
 
-            <template v-if="pen.name == 'combine' && pen.showChild != undefined">
+            <template
+              v-if="pen.name == 'combine' && pen.showChild != undefined"
+            >
               <t-form-item label="" name="status">
-                <t-select v-model="pen.showChild" @change="changeValue('showChild')">
-                  <t-option v-for="(item, index) in statusList" :key="item.value" :value="index"
-                    :label="item.label"></t-option>
+                <t-select
+                  v-model="pen.showChild"
+                  @change="changeValue('showChild')"
+                >
+                  <t-option
+                    v-for="(item, index) in statusList"
+                    :key="item.value"
+                    :value="index"
+                    :label="item.label"
+                  ></t-option>
                 </t-select>
               </t-form-item>
               <t-divider />
@@ -231,18 +435,37 @@
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="图片上传" name="image">
-              <t-upload ref="uploadRef" v-model="uploadValue" :action="$attrs.uploadUrl ||
-                'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
-                " :headers="headers" name="object" :sizeLimit="sizeLimit" theme="image" tips="请选择单张小于1MB的图片上传"
-                accept="image/*" @fail="handleFail" @success="handleSuccess" />
+              <t-upload
+                ref="uploadRef"
+                v-model="uploadValue"
+                :action="
+                  $attrs.uploadUrl ||
+                  'https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo'
+                "
+                :headers="headers"
+                name="object"
+                :sizeLimit="sizeLimit"
+                theme="image"
+                tips="请选择单张小于1MB的图片上传"
+                accept="image/*"
+                @fail="handleFail"
+                @success="handleSuccess"
+              />
             </t-form-item>
 
             <t-form-item label="图片地址" name="image">
-              <t-input v-model="pen.image" clearable @change="changeValue('image')" />
+              <t-input
+                v-model="pen.image"
+                clearable
+                @change="changeValue('image')"
+              />
             </t-form-item>
 
             <t-form-item label="保持比例" name="imageRatio">
-              <t-switch v-model="pen.imageRatio" @change="changeValue('imageRatio')" />
+              <t-switch
+                v-model="pen.imageRatio"
+                @change="changeValue('imageRatio')"
+              />
             </t-form-item>
           </t-form>
         </div>
@@ -254,51 +477,120 @@
               <t-form label-align="left">
                 <template v-if="isLine">
                   <t-form-item label="动画效果" name="lineAnimateType">
-                    <t-select v-model="pen.lineAnimateType" clearable @change="changeValue('lineAnimateType')">
-                      <t-option v-for="item in LineAnimateOption" :key="item.value" :value="item.value"
-                        :label="item.label"></t-option>
+                    <t-select
+                      v-model="pen.lineAnimateType"
+                      clearable
+                      @change="changeValue('lineAnimateType')"
+                    >
+                      <t-option
+                        v-for="item in LineAnimateOption"
+                        :key="item.value"
+                        :value="item.value"
+                        :label="item.label"
+                      ></t-option>
                     </t-select>
                   </t-form-item>
                   <t-form-item label="反向流动" name="reverse">
-                    <t-switch v-model="pen.animateReverse" @change="changeValue('animateReverse')" />
+                    <t-switch
+                      v-model="pen.animateReverse"
+                      @change="changeValue('animateReverse')"
+                    />
                   </t-form-item>
                   <t-form-item label="线宽" name="animateLineWidth">
-                    <t-input-number v-model="pen.animateLineWidth" @change="changeValue('animateLineWidth')" />
+                    <t-input-number
+                      v-model="pen.animateLineWidth"
+                      @change="changeValue('animateLineWidth')"
+                    />
                   </t-form-item>
 
                   <t-form-item label="速度" name="animateSpan">
-                    <t-input-number v-model="pen.animateSpan" :min="1" :max="5" @change="changeValue('animateSpan')" />
+                    <t-input-number
+                      v-model="pen.animateSpan"
+                      :min="1"
+                      :max="5"
+                      @change="changeValue('animateSpan')"
+                    />
                   </t-form-item>
                   <t-form-item label="颜色" name="color">
-                    <t-color-picker class="w-full" v-model="pen.animateColor" :show-primary-color-preview="false"
-                      format="CSS" :color-modes="['monochrome']" @change="changeValue('animateColor')" />
+                    <t-color-picker
+                      class="w-full"
+                      v-model="pen.animateColor"
+                      :show-primary-color-preview="false"
+                      format="CSS"
+                      :color-modes="['monochrome']"
+                      @change="changeValue('animateColor')"
+                    />
                   </t-form-item>
                   <t-form-item label="动画发光" name="animateShadow">
-                    <t-switch v-model="pen.animateShadow" @change="changeValue('animateShadow')" />
+                    <t-switch
+                      v-model="pen.animateShadow"
+                      @change="changeValue('animateShadow')"
+                    />
                   </t-form-item>
                   <t-form-item label="发光颜色" name="animateShadowColor">
-                    <t-color-picker class="w-full" v-model="pen.animateShadowColor" :show-primary-color-preview="false"
-                      format="CSS" :color-modes="['monochrome']" @change="changeValue('animateShadowColor')" />
+                    <t-color-picker
+                      class="w-full"
+                      v-model="pen.animateShadowColor"
+                      :show-primary-color-preview="false"
+                      format="CSS"
+                      :color-modes="['monochrome']"
+                      @change="changeValue('animateShadowColor')"
+                    />
                   </t-form-item>
                 </template>
                 <template v-else>
                   <t-form-item label="动画效果" name="animateType">
-                    <t-select v-model="pen.animateType" clearable @change="changeValue('animateType')">
-                      <t-option v-for="item in PenFrameOptions" :key="item.value" :value="item.value"
-                        :label="item.label"></t-option>
+                    <t-select
+                      v-model="pen.animateType"
+                      clearable
+                      @change="changeValue('animateType')"
+                    >
+                      <t-option
+                        v-for="item in PenFrameOptions"
+                        :key="item.value"
+                        :value="item.value"
+                        :label="item.label"
+                      ></t-option>
                     </t-select>
                   </t-form-item>
 
-                  <t-form-item v-if="pen.animateType == 'x-custom'" label="自定义动画帧">
-                    <t-button variant="text" theme="primary" @click="showFramesDrawer">编辑
-                    </t-button>
+                  <t-form-item
+                    v-if="pen.animateType == 'x-custom'"
+                    label="自定义动画帧"
+                  >
+                    <div class="button__wrapper">
+                      <t-button
+                        variant="text"
+                        theme="primary"
+                        @click="showFramesDrawer"
+                        >编辑
+                      </t-button>
+                      <br />
+                      <t-tag theme="danger" style="margin-left: 20px"
+                        >或者</t-tag
+                      >
+                      <t-tooltip
+                        content="选中线条提取路径后复制，会覆盖已设置的动画"
+                      >
+                        <t-button
+                          variant="text"
+                          theme="primary"
+                          @click="createPathFrames"
+                        >
+                          从剪切板生成路径动画
+                        </t-button>
+                      </t-tooltip>
+                    </div>
                   </t-form-item>
                 </template>
                 <t-form-item label="循环次数" name="animateCycle">
                     <t-input-number v-model="pen.animateCycle" @change="changeValue('animateCycle')" />
                   </t-form-item>
                 <t-form-item label="自动播放" name="autoPlay">
-                  <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
+                  <t-switch
+                    v-model="pen.autoPlay"
+                    @change="changeValue('autoPlay')"
+                  />
                 </t-form-item>
                 
                 <t-form-item label="保持动画状态" name="keepAnimateState">
@@ -310,18 +602,24 @@
                   <t-button @click="animate()">停止</t-button>
                 </t-space>
               </t-form>
-
             </t-collapse-panel>
 
             <t-collapse-panel v-if="pen.name == 'video'" header="视频">
               <t-form label-align="left">
                 <t-form-item label="视频地址" name="video">
-                  <t-input v-model="pen.video" placeholder="视频地址不能为空" clearable @change="changeValue('video')" />
+                  <t-input
+                    v-model="pen.video"
+                    placeholder="视频地址不能为空"
+                    clearable
+                    @change="changeValue('video')"
+                  />
                 </t-form-item>
                 <t-form-item label="自动播放" name="autoPlay">
-                  <t-switch v-model="pen.autoPlay" @change="changeValue('autoPlay')" />
+                  <t-switch
+                    v-model="pen.autoPlay"
+                    @change="changeValue('autoPlay')"
+                  />
                 </t-form-item>
-
               </t-form>
             </t-collapse-panel>
           </t-collapse>
@@ -336,20 +634,47 @@
         <div class="props-panel">
           <t-form label-align="left">
             <t-form-item label="ID" name="data">
-              <t-tag maxWidth="100%" style="flex: 1;width: 0;">{{ pen.id }}</t-tag>
+              <t-tag maxWidth="100%" style="flex: 1; width: 0">{{
+                pen.id
+              }}</t-tag>
 
-              <t-button theme="primary" variant="text" style="margin-left: 10px" @click="copyId">
+              <t-button
+                theme="primary"
+                variant="text"
+                style="margin-left: 10px"
+                @click="copyId"
+              >
                 <t-icon name="copy"></t-icon>
               </t-button>
             </t-form-item>
 
             <t-form-item label="描述" name="description">
-              <t-input v-model="pen.description" maxlength="50" clearable @change="changeValue('description')" />
+              <t-input
+                v-model="pen.description"
+                maxlength="50"
+                clearable
+                @change="changeValue('description')"
+              />
             </t-form-item>
             <t-form-item label="标签" name="tags">
-              <t-tag-input v-model="pen.tags" clearable placeholder="按回车添加标签，最多10个" :max="10"
-                @change="changeValue('tags')" />
+              <t-tag-input
+                v-model="pen.tags"
+                clearable
+                placeholder="按回车添加标签，最多10个"
+                :max="10"
+                @change="changeValue('tags')"
+              />
             </t-form-item>
+            <template v-if="pen.name == 'line'">
+              <t-form-item label="" name="description">
+                <t-button theme="primary" @click="track">提取轨迹</t-button>
+              </t-form-item>
+              <t-form-item v-if="linePathString">
+                <t-typography-text code copyable>{{
+                  linePathString
+                }}</t-typography-text>
+              </t-form-item>
+            </template>
           </t-form>
         </div>
       </template>
@@ -359,14 +684,24 @@
       </template>
     </PropsTab>
 
-    <t-drawer v-model:visible="drawerVisible" header="自定义动画帧" size="20%" :onConfirm="addFrames">
+    <t-drawer
+      v-model:visible="drawerVisible"
+      header="自定义动画帧"
+      size="20%"
+      :onConfirm="addFrames"
+    >
       <t-button block theme="primary" @click="insertFrame">新增动画帧</t-button>
       <t-collapse class="meta-collapse" expand-mutex>
         <t-collapse-panel v-for="item in customFrames" header="动画帧">
           <prop-editor :data="item" :statusList="statusList"></prop-editor>
           <template #headerRightContent>
-            <t-button size="small" variant="outline" theme="danger" :style="{ marginLeft: '8px' }"
-              @click="deleteFrame(item)">
+            <t-button
+              size="small"
+              variant="outline"
+              theme="danger"
+              :style="{ marginLeft: '8px' }"
+              @click="deleteFrame(item)"
+            >
               <t-icon name="delete"></t-icon>
             </t-button>
           </template>
@@ -449,6 +784,7 @@ onMounted(() => {
 });
 
 const getPen = () => {
+  linePathString.value = "";
   pen.value = selections.pen || {};
   if (pen.value.globalAlpha == undefined) {
     pen.value.globalAlpha = 1;
@@ -599,6 +935,63 @@ const copyId = () => {
 const eventsChange = (events: any) => {
   pen.value.events = events;
 };
+
+const linePathString = ref("");
+const track = () => {
+  const res: any[] = [];
+  // const wAnchors = pen.value.calculative?.worldAnchors;
+  const anchors = pen.value.anchors; // 相对位置
+  const width = pen.value.width;
+  const height = pen.value.height;
+  if (Array.isArray(anchors)) {
+    anchors.forEach((anchor: any) => {
+      res.push({ x: anchor.x * width, y: anchor.y * height });
+    });
+  }
+  console.log("path: ", res);
+  linePathString.value = JSON.stringify(res, null, 2);
+};
+
+const createPathFrames = () => {
+  console.log("create path frames: ", pen.value);
+  // TODO: 剪切板数据
+  navigator.clipboard
+    .readText()
+    .then((text) => {
+      try {
+        const array = JSON.parse(text);
+        console.log("剪切板数据: ", array);
+        if (Array.isArray(array)) {
+          // 计算偏移量，相对于前一个点
+          const paths = array.map((item: any, index: number) => {
+            if (index > 0) {
+              const prev = array[index - 1];
+              const x = item.x - prev.x;
+              const y = item.y - prev.y;
+              return { x, y };
+            }
+          }).filter((item: any) => item);
+          console.log("paths: ", paths);
+          pen.value.frames = paths.map((item: any) => {
+            return {
+              x: item.x,
+              y: item.y,
+              duration: 10000,
+            };
+          });
+          changeValue("frames");
+        }
+        MessagePlugin.success({ content: "生成成功" });
+      } catch (error) {
+        console.log("JSON 解析失败: ", error);
+        MessagePlugin.error({ content: "生成失败, 请检查操作是否正确" });
+      }
+    })
+    .catch((err) => {
+      console.error("读取剪切板数据失败:", err);
+      MessagePlugin.error({ content: "生成失败" });
+    });
+};
 </script>
 <style lang="postcss" scoped>
 .props-panel {
@@ -624,6 +1017,13 @@ const eventsChange = (events: any) => {
     .t-space {
       gap: 4px;
     }
+  }
+}
+</style>
+<style lang="css">
+.t-typography {
+  code {
+    white-space: pre;
   }
 }
 </style>
