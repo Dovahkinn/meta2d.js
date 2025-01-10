@@ -1,7 +1,6 @@
 <template>
   <div class="props-panel__editor">
     <t-form label-align="left">
-      <!-- 时长 -->
       <t-form-item label="时长(ms)" name="duration">
         <t-input-number
           v-model="data.duration"
@@ -9,18 +8,22 @@
           @change="changeValue('duration')"
         />
       </t-form-item>
-      <t-form-item label="x" name="x">
+
+      <t-form-item label="偏移X" name="x">
         <t-input-number
           v-model="data.x"
+          placeholder="px"
           @change="changeValue('x')"
         />
       </t-form-item>
-      <t-form-item label="y" name="y">
+      <t-form-item label="偏移Y" name="y">
         <t-input-number
           v-model="data.y"
+          placeholder="px"
           @change="changeValue('y')"
         />
       </t-form-item>
+
       <t-form-item label="颜色" name="color">
         <t-color-picker
           class="w-full"
