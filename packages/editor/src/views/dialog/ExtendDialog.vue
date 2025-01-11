@@ -76,7 +76,7 @@ onMounted(() => {
       const { action } = params;
     }
 
-    visible.value = true;
+    visible.value = params.action != ExtendAction.DialogClose;
   });
 });
 

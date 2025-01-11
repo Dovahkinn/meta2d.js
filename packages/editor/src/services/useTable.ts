@@ -235,6 +235,8 @@ export const useScripts = (metaData: any = {}) => {
                     break;
                   case ExtendAction.DialogClose:
                     meta2d.canvas.dialog.hide();
+                    // 复用
+                    callExtendAction(ExtendEventSource.ExternalCall, handler)
                     break;
                   case ExtendAction.AnimateReverse:
                     target.forEach((tag) => {

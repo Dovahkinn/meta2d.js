@@ -169,13 +169,16 @@ export const callExtendAction = (sourceType: ExtendEventSource, eventOptions: an
   if (sourceType == ExtendEventSource.ExternalCall) {
     params.action = eventOptions.action
   }
-  // rest = { pen, context, }
+  // else rest = { pen, context, }
 
   switch (params.action) {
     case ExtendAction.Video:
       // 弹窗播放视频
       meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
       break;
+    case ExtendAction.DialogClose: 
+      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
+      break;  
 
     default:
       console.error('未知扩展能力调用: ', params.action);

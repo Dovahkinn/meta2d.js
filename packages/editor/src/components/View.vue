@@ -223,7 +223,7 @@ onMounted(() => {
       data.locked = 0;
     }
     meta2d.open(data);
-    meta2d.fitView();
+    // meta2d.fitView(); // ! 别直接加，所见即所得，初始视角自行设计
   }
 
   meta2d.on("active", active);
