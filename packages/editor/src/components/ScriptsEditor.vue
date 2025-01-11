@@ -111,7 +111,9 @@ import { defineProps, reactive, computed, defineEmits, } from "vue";
 import { s12 } from "@meta2d/core";
 import ScriptHandlers from "./ScriptHandlers.vue";
 
-const props = defineProps({});
+const props = defineProps({
+
+});
 
 const emit = defineEmits(["change"]);
 
@@ -172,6 +174,15 @@ const tableProps = reactive({
     backgroundImageUrl: '',
   },
 });
+
+if (presetScriptsConfig) {
+  tableProps.bordered = presetScriptsConfig.bordered;
+  tableProps.height = presetScriptsConfig.height;
+  tableProps.hover = presetScriptsConfig.hover;
+  tableProps.showHeader = presetScriptsConfig.showHeader;
+  tableProps.stripe = presetScriptsConfig.stripe;
+  tableProps.style = presetScriptsConfig.style;
+}
 
 const scripts = reactive(presetScriptsConfig?.scripts || [
   {

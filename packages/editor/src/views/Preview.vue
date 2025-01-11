@@ -88,10 +88,7 @@ import {
   ref,
   reactive,
   computed,
-  watch,
-  nextTick,
   onMounted,
-  toRefs,
 } from "vue";
 import View from "../components/View.vue";
 import { Icon } from "tdesign-vue-next";
@@ -577,8 +574,12 @@ try {
 }
 
 .app-page {
-  height: 100vh;
   display: flex;
+  height: 100%;
+
+  &.is--full-height {    
+    height: 100vh;
+  }
 
   .left__panel {
     width: 250px;
