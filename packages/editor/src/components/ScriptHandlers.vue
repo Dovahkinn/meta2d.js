@@ -243,7 +243,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineProps, ref, computed, } from "vue";
+import { defineProps, ref, computed, watch, } from "vue";
 import {
   EventAction,
   ExtendAction,
@@ -382,7 +382,7 @@ const extendWhereMessageTypeOptions = [
 
 const videoSourceOptions = ref<Array<any>>([])
 
-const whereValueChange = (value: any) => {
+const whereValueChange = (whereMessageType?: any) => {
   if (Array.isArray(props.scripts)) {
     const res: any[] = []
     props.scripts.forEach((script: any) => {
@@ -403,6 +403,7 @@ const whereValueChange = (value: any) => {
   eventChange();
 
 }
+
 
 const propOptions = [
   {
@@ -484,6 +485,10 @@ const changeHandler = (value: number[]) => {
   const item = JSON.parse(JSON.stringify(handlers.value[index]));
   if (item) {
     updatePropList(item);
+    // 初始化自定义事件源选项
+    if (item.where?.type == ExtendActionEventNameMap.CustomMessage) {
+      whereValueChange()
+    }
   }
 };
 
