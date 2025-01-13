@@ -21,21 +21,16 @@
         <t-form-item label="名称" name="Name">
           <t-input placeholder="请输入内容" v-model="formData.Name" disabled />
         </t-form-item>
-        <t-form-item label="开关状态" name="State" v-if="formData.State != -1">
-          <t-select
+        <t-form-item
+          label="设置状态值"
+          name="State"
+          v-if="formData.State != -1"
+        >
+          <t-input
+            placeholder="请输入"
             v-model="formData.State"
-            class="demo-select-base"
             :disabled="formData.fault == 1"
-          >
-            <t-option
-              v-for="(item, index) in options"
-              :key="index"
-              :value="item.value"
-              :label="item.label"
-            >
-              {{ item.label }}
-            </t-option>
-          </t-select>
+          />
         </t-form-item>
         <!-- <t-form-item label="设置故障" name="fault">
           <t-select v-model="formData.fault" class="demo-select-base">
@@ -318,12 +313,35 @@ const Sendrequestsyn = () => {
   if (data.wsUrl) {
     wsClient.sendMessage(data.busName, 1002, {});
   }
-}
+};
 const modelHandle = (data: any, type: string) => {
   console.log("modelHandletype======== ", type);
+  console.log("modelHandle======== ", data);
   formData.id = data.id;
   formData.Name = data.text;
-  formData.State = +(data?.showChild ?? -1);
+  // Ecomponents 需要做处理
+  if (data.Ecomponents) {
+    // 目前处理开关
+    if (data.tags.includes("Switch")) {
+      const [switchState, switchValue] = data.Ecomponents;
+      if (switchState === "off" || switchState === "on") {
+        const needReverse =
+          (switchState === "off" && switchValue === "1") ||
+          (switchState === "on" && switchValue === "0");
+        // 根据是否需要反转来设置showChild
+        if (needReverse) {
+          formData.State = +data?.showChild;
+        } else {
+          formData.State = +data?.showChild == 0 ? 1 : 0;
+        }
+      }
+    } else {
+      // 没有showChild为-1
+      formData.State = +(data?.showChild ?? -1);
+    }
+  }else{
+    formData.State = +(data?.showChild ?? -1);
+  }
   formData.fault = data.fault; // 故障
   if (type === "setting") {
     // 设置属性
@@ -356,7 +374,6 @@ const inactive = () => {
 onUnmounted(() => {
   meta2d.destroy();
   wsClient.close();
-
 });
 </script>
 <style lang="postcss" scoped>

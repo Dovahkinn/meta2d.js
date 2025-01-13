@@ -6,7 +6,7 @@
       @after-enter="afterEnter"
     >
       <div v-if="!isCollapsed" class="left__panel">
-        <t-row justify="end" style="cursor: pointer;">
+        <t-row justify="end" style="cursor: pointer">
           <t-col :span="2">
             <t-icon
               name="fullscreen"
@@ -101,9 +101,8 @@ import { deepClone } from "@meta2d/core";
 import { useRoute } from "vue-router";
 import { usePlayer } from "../services/usePlayer.ts";
 import { useLogTable, useScripts } from "../services/useTable.ts";
-import { useExtendEvent } from '../services/useHandlers.ts'
-import ExtendDialog from './dialog/ExtendDialog.vue'
-
+import { useExtendEvent } from "../services/useHandlers.ts";
+import ExtendDialog from "./dialog/ExtendDialog.vue";
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -206,7 +205,7 @@ const applyTable = (res: any) => {
   });
 };
 
-const { extendOn, } = useExtendEvent()
+const { extendOn } = useExtendEvent();
 
 onMounted(() => {
   if (isInElectron()) {
@@ -277,7 +276,7 @@ onMounted(() => {
   meta2d?.resize();
 
   // * 扩展事件
-  extendOn()
+  extendOn();
 });
 
 const treeData = computed(() => {
@@ -417,9 +416,9 @@ type PenState = {
 
 let penStateSet: any[] = [];
 const combineState = (msg: PenState) => {
-  console.log("penStateSet==== ", penStateSet);
+  // console.log("penStateSet==== ", penStateSet);
   const state = penStateSet.find((s) => s.Name === msg.Name);
-  console.log("state==== ", state);
+  // console.log("state==== ", state);
 
   if (state) {
     const { id, tag, ...rest } = msg;
@@ -452,9 +451,38 @@ const applyState = (msg: PenState) => {
     default:
       pens.forEach((pen: any) => {
         _props.id = pen.id;
-        //模拟开关状态 showChild
-        if ("showChild" in pen) {
-          _props.showChild = msg.State;
+        // showChild 永远都是打开是0 关闭是1
+        if ("showChild" in pen && pen.Ecomponents?.length > 0) {
+          //  v10: 是触点数量
+          // v12：最上面触点的值
+          // v14：第二个触点对应的值
+          // 以此类推
+          //  多路开关怎么映射 本地开关的0 1 2 值
+
+          // 获取开关状态和值
+          const [switchState, switchValue] = pen.Ecomponents;
+          if (switchState === "off" || switchState === "on") {
+            const needReverse =
+              (switchState === "off" && switchValue === "1") ||
+              (switchState === "on" && switchValue === "0");
+            // 根据是否需要反转来设置showChild
+            let arr;
+            if (needReverse) {
+              arr = [1, 0];
+            }else{
+              arr = [0, 1];
+            }
+            _props.showChild = arr.indexOf(msg.State);
+          }else{
+            // Ecomponents去掉数组第一个值 赋值给一个新的对象components
+            const components = pen.Ecomponents.slice(1);
+            if(switchState > 3){
+              // 找到数组里msg.State的位置下标
+              const index = components.indexOf(msg.State);
+              // 设置showChild
+              _props.showChild = index;
+            }
+          }
         }
         //颜色color 是否有电 1有电显示红色 2无电蓝色
 
@@ -468,6 +496,7 @@ const applyState = (msg: PenState) => {
           _props.color = "rgb(0, 0, 128)"; //线条的颜色
           _props.lineWidth = 2; //线条的宽度
         }
+        console.log("_props: ", _props);
         meta2d.setValue(_props, { render: false });
       });
 
@@ -478,6 +507,7 @@ const applyState = (msg: PenState) => {
 const applyStateSet = () => {
   if (!meta2d) return;
   penStateSet.forEach((state: PenState) => {
+    console.log("state: ", state);
     applyState(state);
   });
 };
