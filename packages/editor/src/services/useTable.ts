@@ -267,7 +267,7 @@ export const useScripts = (metaData: any = {}) => {
                 }
               }
             }
-            if (where && where.type == ExtendActionEventNameMap.CustomMessage && where.value !== null) {
+            if (where && where.type == ExtendActionEventNameMap.CustomMessage && ![null, undefined, ''].includes(where.value)) {
               // * 自定义消息: 视频播放结束              
               if (where.value === ExtendActionMessageTypeMap.VideoEnded) {
                 meta2d.on(ExtendActionEventNameMap.CustomMessage, ({ type, key, }) => {
@@ -278,6 +278,7 @@ export const useScripts = (metaData: any = {}) => {
               }
               
             } else {
+              // 未设置条件，直接执行
               executer()
             }
           });
