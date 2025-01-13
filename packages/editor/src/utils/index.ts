@@ -319,6 +319,7 @@ export const loadElectricJson = (data: any) => {
 
           // 判断是否有三路或者四路开关 StatusTypes数组'Btn_SelfLock','Knob_SelfReset','Switch','Knob_SelfLock','duanluqi_wx','MultipleContact','Btn_SelfReset',
           if (StatusTypes.includes(item.type)) {
+            
             // 查找是否有组合开关 处理组合开关
             let parent = deepClone(
               SwitchCombinesData.pens.find((v) => {
@@ -332,6 +333,12 @@ export const loadElectricJson = (data: any) => {
                 }
               }),
             );
+            // 查找item中带v开头的参数 
+            const vParams = Object.keys(item).filter(key => key.startsWith('v'));
+            if (vParams.length > 0) {
+              parent.Ecomponents = vParams.map(key => item[key]);
+            }
+            console.log('Ecomponents=====: ', parent.Ecomponents);
             //查看自己的组合开关JSON 根据父节点查找自己的组合开关的子节点
             //返回的三路开关的父节点和子节点
             const list = clonePens(
