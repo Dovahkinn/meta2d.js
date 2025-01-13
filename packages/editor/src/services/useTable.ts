@@ -109,23 +109,6 @@ export const useLogTable = (metaData: any = {}) => {
     ...tableProps
   } = presetScriptsConfig || {};
   const tableLogData = ref([]);
-  // const tableLogData = reactive([...testStepData])
-
-  if (Array.isArray(scripts)) {
-    // scripts.forEach((item, index) => {
-    //   const list = item.rowPropList || [];
-    //   const row: any = {};
-    //   if (Array.isArray(list) && list.length) {
-    //     list.forEach((rowItem) => {
-    //       const { prop, value } = rowItem;
-    //       if (prop) {
-    //         row[prop] = value;
-    //       }
-    //     });
-    //     tableLogData.push(row);
-    //   }
-    // });
-  }
 
   let tableStyle: any = {};
   if (style) {
@@ -153,13 +136,13 @@ export const useLogTable = (metaData: any = {}) => {
   };
 };
 
-function executeAnimate(type: string, target: string[]) {
-  const fnMap = {
+function executeAnimate(type: string | number, target: string[]) {
+  const fnMap: any = {
     0: 'startAnimate',
     1: 'pauseAnimate',
     2: 'stopAnimate',
   };
-  const pens = [];
+  const pens: any[] = [];
   if (target?.length) {
     target.forEach((tag) => {
       pens.push(...meta2d.find(tag));
@@ -167,7 +150,6 @@ function executeAnimate(type: string, target: string[]) {
   }
   const fnName = fnMap[type];
   if (fnName) {
-    console.log('=============> ', fnName);
     pens.forEach((pen) => {
       if (Array.isArray(pen.pathFrames)) {
         let control = pen.pathAnimateControl;
@@ -206,7 +188,6 @@ export const useScripts = (metaData: any = {}) => {
         const fn = () => {
           handlers.forEach((handler) => {
             const { target, action, value = {}, where, } = handler;
-            console.log('----------- script fn call -------------: ', handler);
             const executer = () => {
               if (Array.isArray(target)) {
                 switch (action) {
@@ -262,7 +243,7 @@ export const useScripts = (metaData: any = {}) => {
                       break;
   
                   default:
-                    console.log('unknown action:', action, handler);
+                    console.warn('unknown action:', action, handler);
                     break;
                 }
               }

@@ -8,6 +8,7 @@
     :mode="mode"
     :width="width"
     destroyOnClose
+    @close-btn-click="onCloseBtnClick"
   >
     <component :is="dialogContent" v-bind="contentProps" @ended="onEnd"></component>
   </t-dialog>
@@ -73,7 +74,7 @@ onMounted(() => {
     const { params = {} } = options;
     if (params) {
       eventParams.value = params;
-      const { action } = params;
+      // const { action } = params;
     }
 
     visible.value = params.action != ExtendAction.DialogClose;
@@ -85,13 +86,20 @@ onBeforeUnmount(() => {
 });
 
 const onEnd = (event: any, params: any) => {
-  console.log("video end: ", event, params);
+  // console.log("video end: ", event, params);
   // 通过消息实现联动逻辑
   meta2d.emit(ExtendActionEventNameMap.CustomMessage, {
     type: ExtendActionMessageTypeMap.VideoEnded,
-    key: params?.src,
+    key: params?.src || params?.url,
   })
 }
+
+const onCloseBtnClick = (event: Event) => {
+  if (eventParams.value?.action == ExtendAction.Video) {
+    onEnd(event, eventParams.value);
+  }
+}
+
 </script>
 <style lang="scss" scoped>
 :global(.extend-action__dialog.t-dialog__fullscreen) {
