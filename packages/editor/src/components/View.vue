@@ -373,7 +373,8 @@ const inactive = () => {
 
 onUnmounted(() => {
   meta2d.destroy();
-  wsClient.close();
+  wsClient && wsClient.close();
+
 });
 </script>
 <style lang="postcss" scoped>

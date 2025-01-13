@@ -127,7 +127,7 @@ export const useLogTable = (metaData: any = {}) => {
     // });
   }
 
-  let tableStyle = {};
+  let tableStyle: any = {};
   if (style) {
     const { evenRowBackgroundColor, oddRowBackgroundColor, textColor, backgroundImageUrl, } = style;
     tableStyle = {
@@ -137,8 +137,11 @@ export const useLogTable = (metaData: any = {}) => {
       '--td-text-color-placeholder': textColor || '#FFFFFF',
       '--table-background-image-url': `url(${backgroundImageUrl || ''})`,
     };
-    if (backgroundImageUrl) {
+    if (backgroundImageUrl && !evenRowBackgroundColor) {
       tableStyle['--td-bg-color-container'] = 'transparent';
+    }
+    if (backgroundImageUrl && !oddRowBackgroundColor) {
+      tableStyle['--td-bg-color-secondarycontainer'] = 'transparent';
     }
   }
 

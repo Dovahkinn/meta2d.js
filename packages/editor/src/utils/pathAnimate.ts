@@ -60,6 +60,9 @@ export function createPathAnimation(element: any, paths: any[]) {
         startY = currentY;
         startTime = null;
         animationFrameId = requestAnimationFrame(animatePath);
+      } else {
+        // console.log('********************************* Path animation completed *******************************');
+        stop();
       }
     }
   }
