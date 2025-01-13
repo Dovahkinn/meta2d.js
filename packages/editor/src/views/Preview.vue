@@ -476,9 +476,10 @@ const applyState = (msg: PenState) => {
           }else{
             // Ecomponents去掉数组第一个值 赋值给一个新的对象components
             const components = pen.Ecomponents.slice(1);
-            if(switchState > 3){
+            if(switchState >= 3){
               // 找到数组里msg.State的位置下标
-              const index = components.indexOf(msg.State);
+              // components = ['1', '0', '2', '1'] msg.State = 1 找到第一次出现1的下标
+              const index = components.indexOf(msg.State.toString());
               // 设置showChild
               _props.showChild = index;
             }
