@@ -71,8 +71,9 @@ const contentProps = computed(() => {
 onMounted(() => {
   meta2d.on(ExtendActionEventNameMap.Dialog, (options) => {
     console.log("dialog action params: ", options);
-    const { params = {} } = options;
+    const { params = {}, id, } = options;
     if (params) {
+      params.id = id;
       eventParams.value = params;
       // const { action } = params;
     }
@@ -90,7 +91,8 @@ const onEnd = (event: any, params: any) => {
   // 通过消息实现联动逻辑
   meta2d.emit(ExtendActionEventNameMap.CustomMessage, {
     type: ExtendActionMessageTypeMap.VideoEnded,
-    key: params?.src || params?.url,
+    url: params?.src || params?.url,
+    key: eventParams.value?.id,
   })
 }
 

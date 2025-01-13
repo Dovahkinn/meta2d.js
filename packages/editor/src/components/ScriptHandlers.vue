@@ -391,7 +391,7 @@ const whereValueChange = (whereMessageType?: any) => {
           if (handler.action === ExtendAction.Video) {
             res.push({
               label: handler.params?.title || handler.params?.url,
-              value: handler.params?.url,
+              value: handler.id,
             })
           }
         })
