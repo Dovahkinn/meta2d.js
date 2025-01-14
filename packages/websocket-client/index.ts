@@ -30,6 +30,7 @@ export class WebSocketClient {
   private wsOptions = null;
   private enableLog = true;
   private _subscribeTasks: any[] = [];
+  private manualClosed = false;
 
   private constructor(url: string, options: any = {}) {
     const { heartbeatInterval = 30e3 } = options;
@@ -98,8 +99,10 @@ export class WebSocketClient {
   
       this.ws.onclose = () => {
         this.isConnected = false;
-        this.stopHeartbeat();
-        this.reconnect();
+        if (!this.manualClosed) {  // 只有非手动关闭时才重连和停止心跳
+          this.stopHeartbeat();
+          this.reconnect();
+        }
         console.log('WebSocket connection closed.');
       };
   
@@ -134,8 +137,10 @@ export class WebSocketClient {
   
       this.ws.onclose = () => {
         this.isConnected = false;
-        this.stopHeartbeat();
-        this.reconnect();
+        if (!this.manualClosed) {  // 只有非手动关闭时才重连和停止心跳
+          this.stopHeartbeat();
+          this.reconnect();
+        }
         console.log('WebSocket connection closed.');
       };
   
@@ -360,10 +365,10 @@ export class WebSocketClient {
 
   // 9. 关闭 WebSocket 连接并清除单例
   close() {
+    this.manualClosed = true; // 设置手动关闭标识
     this.stopHeartbeat();
     this.ws?.close();
     this.ws = null;
-    // WebSocketClient.instance = null; // 清除单例
     WebSocketClient.InstanceMap.delete(this.url);
     this.isConnected = false;
     console.log('WebSocketClient instance closed and cleared.');
