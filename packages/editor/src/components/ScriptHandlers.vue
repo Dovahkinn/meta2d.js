@@ -204,6 +204,19 @@
             ></t-input>
           </t-form-item>
         </template>
+        <t-form-item
+          v-else-if="
+            item.action === ExtendAction.GoToView
+          "
+          label="聚焦图元"
+        >
+          <t-input
+            v-model="item.value"
+            placeholder="要聚焦的目标图元标签或ID"
+            clearable
+            @change="eventChange"
+          ></t-input>
+        </t-form-item>
 
         <t-form-item v-if="item.where" label="触发条件">
           <t-select
@@ -370,6 +383,10 @@ const eventActionOptions = [
   {
     label: '打开图纸',
     value: ExtendAction.ShowMeta2D,
+  },
+  {
+    label: '聚焦',
+    value: ExtendAction.GoToView,
   },
 ];
 

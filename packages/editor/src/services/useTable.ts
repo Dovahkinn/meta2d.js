@@ -189,6 +189,17 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
                     callExtendAction(ExtendEventSource.ExternalCall, handler);
                     break;
 
+                  case ExtendAction.GoToView:
+                    // TODO: 瞬移，缺少平滑效果，考虑如何优化
+                    if (typeof value == 'string') {
+                      const pen = meta2d.findOne(value)
+                      if (pen) {
+                        meta2d.gotoView(pen);
+                      }
+                    }
+
+                    break;
+
                   default:
                     console.warn('unknown action:', action, handler);
                     break;
@@ -220,8 +231,9 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
                     );
                   }
                 };
-              } else if (where.value === ExtendActionMessageTypeMap.ScriptEnded) {
-                
+              } else if (
+                where.value === ExtendActionMessageTypeMap.ScriptEnded
+              ) {
                 msgHandler = ({ type, key }) => {
                   if (
                     type == ExtendActionMessageTypeMap.ScriptEnded &&
@@ -233,7 +245,7 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
                       msgHandler
                     );
                   }
-                }
+                };
               }
 
               // TODO：扩展其他自定义消息

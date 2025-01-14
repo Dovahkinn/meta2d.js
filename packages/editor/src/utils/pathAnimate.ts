@@ -1,4 +1,4 @@
-import { reactive, ref, } from 'vue'
+import { reactive, ref } from 'vue';
 
 /**
  * 根据路径数组生成轨迹动画
@@ -6,7 +6,7 @@ import { reactive, ref, } from 'vue'
  * @param {Array} paths - 路径数组，每个元素包含 x, y 和 duration
  */
 export function createPathAnimation(element: any, paths: any[]) {
-  const rect = meta2d.getPenRect(element)  
+  const rect = meta2d.getPenRect(element);
 
   let originalX = rect.x;
   let originalY = rect.y;
@@ -20,6 +20,7 @@ export function createPathAnimation(element: any, paths: any[]) {
   let isPaused = ref(false);
   let isStopped = ref(false);
 
+  
   function animatePath(timestamp) {
     if (isStopped.value) {
       cancelAnimationFrame(animationFrameId);
@@ -28,27 +29,29 @@ export function createPathAnimation(element: any, paths: any[]) {
 
     if (isPaused.value) {
       startTime += timestamp - (startTime + (timestamp - startTime));
+      // startTime = timestamp;
       animationFrameId = requestAnimationFrame(animatePath);
-      const rect = meta2d.getPenRect(element)  
+      const rect = meta2d.getPenRect(element);
       startX = rect.x;
       startY = rect.y;
+      // console.log('pause ------------------- : ', startTime, timestamp);
       return;
     }
 
     if (!startTime) startTime = timestamp;
-    const elapsed = timestamp - startTime;
+    const elapsed = (timestamp - startTime);
     const path = paths[currentPathIndex];
-
+    
     const progress = Math.min(elapsed / path.duration, 1);
+    // console.log('animatePath ------------------- : ', startTime, timestamp, progress);
     const currentX = startX + (path.x || 0) * progress;
     const currentY = startY + (path.y || 0) * progress;
 
-    // console.log('animatePath ------------------- ', currentPathIndex, currentX, currentY);
     meta2d.setValue({
-        id: element.id,
-        x: currentX,
-        y: currentY,
-    })
+      id: element.id,
+      x: currentX,
+      y: currentY,
+    });
 
     if (progress < 1) {
       animationFrameId = requestAnimationFrame(animatePath);
@@ -61,7 +64,6 @@ export function createPathAnimation(element: any, paths: any[]) {
         startTime = null;
         animationFrameId = requestAnimationFrame(animatePath);
       } else {
-        // console.log('********************************* Path animation completed *******************************');
         stop();
       }
     }
@@ -79,12 +81,18 @@ export function createPathAnimation(element: any, paths: any[]) {
     isPaused.value = true;
   }
 
+  // TODO: 存在 bug，暂停后，再播放，轨迹进度貌似从 0 开始，导致位置移动超出
   function resume() {
     if (isPaused.value) {
       isPaused.value = false;
       startTime = null;
+      // console.log(
+      //   'resume ------------------- ',
+      //   startX,
+      //   startY
+      // );
       if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
+        cancelAnimationFrame(animationFrameId);
       }
       animationFrameId = requestAnimationFrame(animatePath);
     }
@@ -96,14 +104,11 @@ export function createPathAnimation(element: any, paths: any[]) {
     startY = originalY;
 
     meta2d.setValue({
-        id: element.id,
-        x: originalX,
-        y: originalY,
-    })
+      id: element.id,
+      x: originalX,
+      y: originalY,
+    });
   }
 
-  return ({ play, pause, resume, stop, isPaused, isStopped });
+  return { play, pause, resume, stop, isPaused, isStopped };
 }
-
-
-

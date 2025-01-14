@@ -83,6 +83,7 @@ export enum ExtendAction {
   Video,
   ScriptEnd,
   ShowMeta2D,
+  GoToView,
   // TODO:
 }
 
