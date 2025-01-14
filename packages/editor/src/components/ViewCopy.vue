@@ -1,9 +1,40 @@
 <template>
-  <div id="meta2dCopy" :class="{ 'is--preview': preview }"></div>
+  <div id="meta2d-sub" :class="{ 'is--preview': preview, 'is--opener': isOpener }"></div>
+
+  <t-dialog
+    :visible="visible"
+    :close-btn="true"
+    :on-confirm="onConfirmAnother"
+    cancel-btn="取消"
+    :on-close="close"
+  >
+    <template #header>设置</template>
+    <template #body>
+      <t-form ref="form" :data="formData">
+        <t-form-item label="ID" name="id" disabled>
+          <t-input placeholder="请输入内容" v-model="formData.id" disabled />
+        </t-form-item>
+        <t-form-item label="名称" name="Name">
+          <t-input placeholder="请输入内容" v-model="formData.Name" disabled />
+        </t-form-item>
+        <t-form-item
+          label="设置状态值"
+          name="State"
+          v-if="formData.State != -1"
+        >
+          <t-input
+            placeholder="请输入"
+            v-model="formData.State"
+            :disabled="formData.fault == 1"
+          />
+        </t-form-item>
+      </t-form>
+    </template>
+  </t-dialog>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, reactive } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import {
   Meta2d,
   Pen,
@@ -22,7 +53,7 @@ import { register as registerEcharts } from "@meta2d/chart-diagram";
 import { formPens } from "@meta2d/form-diagram";
 import { chartsPens } from "@meta2d/le5le-charts";
 import { ftaPens, ftaPensbyCtx, ftaAnchors } from "@meta2d/fta-diagram";
-import { useSelection } from "../services/selections";
+
 import { WebSocketClient } from "@qs/websocket-client";
 import { useWsHandlers } from "../services/useHandlers";
 
@@ -37,9 +68,14 @@ const props = defineProps({
   customWsHandler: {
     type: Function,
   },
+
+  isOpener: {
+    type: Boolean,
+    default: false,
+  },
+  
 });
 
-const { select, selections } = useSelection();
 
 const meta2dOptions: any = {
   rule: false,
@@ -47,29 +83,28 @@ const meta2dOptions: any = {
   rotateCursor: "rotate.cur",
 };
 
-const contextMenuParams = reactive({
-  x: 0,
-  y: 0,
-  visible: false,
+const visible = ref(false);
+let formData = reactive({
+  id: "",
+  Name: "",
+  fault: 0,
+  State: 0,
 });
-const showContextMenu = (event: any) => {
-  if (props.preview) return;
-  if (selections.mode === 0) return;
-  contextMenuParams.x = event.e.clientX;
-  contextMenuParams.y = event.e.clientY;
-  contextMenuParams.visible = true;
-};
-const hideContextMenu = () => {
-  contextMenuParams.visible = false;
-};
+
 
 const emit = defineEmits(["ready"]);
-let meta2dCopy: any = null;
+
+let wsClient: any;
+let _meta2d: any;
+
 
 onMounted(() => {
   // 创建实例
-  meta2dCopy = new Meta2d("meta2dCopy", meta2dOptions);
-  // meta2d.store.options.grid = true; // 开启网格
+  _meta2d = new Meta2d("meta2d-sub", meta2dOptions);
+
+  // ! 恢复主画布
+  globalThis.meta2d = globalThis.mainMeta2d;
+
   // 按需注册图形库
   // 以下为自带基础图形库
   register(flowPens());
@@ -87,19 +122,14 @@ onMounted(() => {
   registerAnchors(ftaAnchors());
   // 注册其他自定义图形库
   // ...
-  emit("ready", meta2d);
 
-  // 读取本地存储
-  let data: any = localStorage.getItem("meta2d");
-  if (props.data || data) {
-    data = props.data || JSON.parse(data);
+  const data = props.data;
+  if (data) {
     const { resolver } = useWsHandlers(data);
 
-    // 判断是否为运行查看，是-设置为预览模式
-    if (location.pathname === "/preview" || props.preview) {
+    if (props.preview) {
       data.locked = 1;
       if (data.lockState) {
-        // meta2d.lock(data.lockState);
         data.locked = data.lockState;
       }
       const msgTypes = (data.msgTypes || [])
@@ -112,13 +142,14 @@ onMounted(() => {
 
       const jsStr = data.onMessageJsCode;
       if (data.wsUrl) {
-        const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+        wsClient = WebSocketClient.getInstance(data.wsUrl, {
           busName: data.busName,
           msgTypes,
           enableLog: false,
           onReady: () => {
             console.log("%c连接成功！", "color: green; font-weight: bold;");
             wsClient.subscribe(data.busName, msgTypes, (response: any) => {
+              console.log("response: ", response);
               try {
                 if (jsStr) {
                   const fn = new Function("data", jsStr);
@@ -139,12 +170,15 @@ onMounted(() => {
           },
         });
         wsClient.connect();
+
       }
     } else {
       data.locked = 0;
     }
-    meta2dCopy.open(data);
-    meta2dCopy.fitView();
+    _meta2d.open(data as any);
+
+    emit("ready", _meta2d);
+
   }
 
 });
@@ -162,7 +196,7 @@ const reconnectWebSocket = (data: any) => {
       });
 
     const jsStr = data.onMessageJsCode;
-    const wsClient = WebSocketClient.getInstance(data.wsUrl, {
+    wsClient = WebSocketClient.getInstance(data.wsUrl, {
       busName: data.busName,
       msgTypes,
       enableLog: false,
@@ -191,33 +225,72 @@ const reconnectWebSocket = (data: any) => {
     wsClient.connect();
   }
 };
+// 发送消息设置  1设置元器件属性  2设置元器件故障分别发送消息
+const sendMessageSocket = (pen: any, type: any) => {
+  let data: any = localStorage.getItem("meta2d");
+  if (props.data || data) {
+    data = props.data || JSON.parse(data);
+  }
+
+  // 发送故障
+  if (data.wsUrl && type === "fault") {
+    wsClient.sendMessage(data.busName, 7000, {
+      Name: pen.Name,
+      Type: 28,
+      Code: pen.fault,
+    });
+    let color = pen.fault == 0 ? "" : "#FF0000";
+    _meta2d.setValue(
+      { id: pen.id, color: color, fault: pen.fault },
+      { render: false }
+    );
+  }
+  // 发送开关状态
+  if (data.wsUrl && type === "setting") {
+    wsClient.sendMessage(data.busName, 3000, {
+      Name: pen.Name,
+      Type: 28,
+      State: pen.State,
+    });
+    _meta2d.setValue({ id: pen.id, showChild: pen.State }, { render: false });
+  }
+};
+// 发送请求同步电路
+const Sendrequestsyn = () => {
+  let data: any = props.data;
+
+  if (data.wsUrl) {
+    wsClient.sendMessage(data.busName, 1002, {});
+  }
+};
+
+const close = () => {
+  visible.value = false;
+};
+const onConfirmAnother = (context: any) => {
+  visible.value = false;
+  sendMessageSocket(formData, "setting");
+  // sendMessageSocket 点击确定后发送消息
+};
 defineExpose({
-  reconnectWebSocket
+  reconnectWebSocket,
+  Sendrequestsyn,
 });
 
-const active = (pens?: Pen[]) => {
-  select(pens);
-};
-
-const inactive = () => {
-  select();
-};
 
 onUnmounted(() => {
-  meta2dCopy.destroy();
+  _meta2d.destroy(true);
+  wsClient && wsClient.close();
 });
+
 </script>
 <style lang="postcss" scoped>
-#meta2dCopy {
-  height: calc(100vh - 80px);
-  z-index: 1;
+#meta2d-sub {
   overflow: hidden;
-  background-color: white;
 
-  &.is--preview {
-    height: 100%;
-    flex: 1;
-    overflow-x: hidden;
+  &.is--opener {
+    min-height: 400px;
+    width: 100%;
   }
 }
 </style>

@@ -10,7 +10,6 @@ import { s12 } from '@meta2d/core';
 import { callExtendAction } from './useHandlers';
 import { createPathAnimation } from '../utils/pathAnimate';
 
-
 export const useLogTable = (metaData: any = {}) => {
   const { presetScriptsConfig = {} } = metaData || {};
 
@@ -53,7 +52,11 @@ export const useLogTable = (metaData: any = {}) => {
   };
 };
 
-function executeAnimate(type: string | number, target: string[]) {
+function executeAnimate(type: string | number, target: string[], meta2d: any) {
+  if (!meta2d) {
+    meta2d = globalThis.meta2d;
+  }
+
   const fnMap: any = {
     0: 'startAnimate',
     1: 'pauseAnimate',
@@ -92,7 +95,12 @@ function executeAnimate(type: string | number, target: string[]) {
   }
 }
 
-export const useScripts = (metaData: any = {}) => {
+export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
+  let meta2d = globalThis.meta2d;
+  if (meta2dInstance) {
+    meta2d = meta2dInstance;
+  }
+
   const { presetScriptsConfig = {} } = metaData || {};
   const { scripts = [] } = presetScriptsConfig || {};
 
@@ -103,6 +111,9 @@ export const useScripts = (metaData: any = {}) => {
       // 创建任务
       if (Array.isArray(handlers) && handlers.length) {
         const fn = () => {
+          if (!meta2d) {
+            meta2d = globalThis.meta2d;
+          }
           handlers.forEach((handler) => {
             const { target, action, value = {}, where } = handler;
             const executer = () => {
@@ -123,13 +134,13 @@ export const useScripts = (metaData: any = {}) => {
                     meta2d.render();
                     break;
                   case EventAction.StartAnimate:
-                    executeAnimate('0', target);
+                    executeAnimate('0', target, meta2d);
                     break;
                   case EventAction.PauseAnimate:
-                    executeAnimate('1', target);
+                    executeAnimate('1', target, meta2d);
                     break;
                   case EventAction.StopAnimate:
-                    executeAnimate('2', target);
+                    executeAnimate('2', target, meta2d);
                     break;
                   case EventAction.Dialog:
                     meta2d.canvas.dialog.show(value, handler.params);
@@ -162,21 +173,39 @@ export const useScripts = (metaData: any = {}) => {
                     callExtendAction(ExtendEventSource.ExternalCall, handler);
                     break;
 
+                  case ExtendAction.ScriptEnd:
+                    // * 没有具体行为，只是通知消息
+                    // ! 发送给主画布
+                    globalThis.meta2d.emit(
+                      ExtendActionEventNameMap.CustomMessage,
+                      {
+                        type: ExtendActionMessageTypeMap.ScriptEnded,
+                        key: handler.name || handler.id,
+                      }
+                    );
+                    break;
+
+                  case ExtendAction.ShowMeta2D:
+                    callExtendAction(ExtendEventSource.ExternalCall, handler);
+                    break;
+
                   default:
                     console.warn('unknown action:', action, handler);
                     break;
                 }
               }
             };
-            
+
             if (
               where &&
               where.type == ExtendActionEventNameMap.CustomMessage &&
               ![null, undefined, ''].includes(where.value)
             ) {
-              let msgHandler = (params?: any) => undefined;
+              // * 自定义消息: 不能跨进程
+              let msgHandler = (params?: any) => {
+                console.log('default custom message handler: ', params);
+              };
 
-              // * 自定义消息: 视频播放结束
               if (where.value === ExtendActionMessageTypeMap.VideoEnded) {
                 msgHandler = ({ type, key }) => {
                   // console.log('-------------- custom message: ', type, key);
@@ -185,15 +214,33 @@ export const useScripts = (metaData: any = {}) => {
                     key == where.key
                   ) {
                     executer();
-                    meta2d.off(ExtendActionEventNameMap.CustomMessage, msgHandler);
+                    meta2d.off(
+                      ExtendActionEventNameMap.CustomMessage,
+                      msgHandler
+                    );
+                  }
+                };
+              } else if (where.value === ExtendActionMessageTypeMap.ScriptEnded) {
+                
+                msgHandler = ({ type, key }) => {
+                  if (
+                    type == ExtendActionMessageTypeMap.ScriptEnded &&
+                    key == where.key
+                  ) {
+                    executer();
+                    globalThis.meta2d.off(
+                      ExtendActionEventNameMap.CustomMessage,
+                      msgHandler
+                    );
                   }
                 }
               }
+
               // TODO：扩展其他自定义消息
 
-              meta2d.on(
+              (meta2d || globalThis.meta2d).on(
                 ExtendActionEventNameMap.CustomMessage,
-                msgHandler,
+                msgHandler
               );
             } else {
               // 未设置条件，直接执行

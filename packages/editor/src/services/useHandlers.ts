@@ -153,11 +153,14 @@ export const useWsHandlers = (data: any) => {
 
 /**
  * @description 可供全局使用的扩展能力调用函数
- * @param sourceType 
- * @param eventOptions 
- * @returns 
+ * @param sourceType
+ * @param eventOptions
+ * @returns
  */
-export const callExtendAction = (sourceType: ExtendEventSource, eventOptions: any) => {
+export const callExtendAction = (
+  sourceType: ExtendEventSource,
+  eventOptions: any
+) => {
   // console.log('callExtendAction  ------------> ', sourceType, eventOptions);
   if (!eventOptions) {
     console.error('自定义消息参数不存在！');
@@ -165,22 +168,25 @@ export const callExtendAction = (sourceType: ExtendEventSource, eventOptions: an
   }
   const { params, ...rest } = eventOptions;
 
-  // sourceType == 0:
   if (sourceType == ExtendEventSource.ExternalCall) {
     if (params && typeof params == 'object') {
-      params.action = eventOptions.action
+      params.action = eventOptions.action;
     }
   }
-  // else rest = { pen, context, }
+  // else sourceType == 0: rest = { pen, context, }
 
   switch (eventOptions.action) {
     case ExtendAction.Video:
       // 弹窗播放视频
-      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
+      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions);
       break;
-    case ExtendAction.DialogClose: 
-      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
-      break;  
+    case ExtendAction.DialogClose:
+      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions);
+      break;
+
+    case ExtendAction.ShowMeta2D:
+      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions);
+      break;
 
     default:
       console.error('未知扩展能力调用: ', eventOptions.action);

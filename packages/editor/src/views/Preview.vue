@@ -187,7 +187,7 @@ const applyTable = (res: any) => {
     tableProps: _tableProps,
     tableStyle: _tableStyle,
   } = useLogTable(res);
-  const { tasks } = useScripts(res);
+  const { tasks } = useScripts(res, globalThis.meta2d);
   tableColumns.value = _columns;
   tableProps.value = _tableProps;
   tableStyle.value = _tableStyle;
@@ -576,6 +576,7 @@ try {
 .app-page {
   display: flex;
   height: 100%;
+  min-height: 400px;
 
   &.is--full-height {    
     height: 100vh;

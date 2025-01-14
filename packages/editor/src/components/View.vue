@@ -1,5 +1,5 @@
 <template>
-  <div id="meta2d" :class="{ 'is--preview': preview }"></div>
+  <div id="meta2d" :class="{ 'is--preview': preview, 'is--opener': isOpener }"></div>
   <ContextMenu
     v-bind="contextMenuParams"
     @hide="hideContextMenu"
@@ -85,6 +85,12 @@ const props = defineProps({
   customWsHandler: {
     type: Function,
   },
+
+  isOpener: {
+    type: Boolean,
+    default: false,
+  },
+  
 });
 
 const { select, selections } = useSelection();
@@ -387,6 +393,10 @@ onUnmounted(() => {
     height: 100%;
     flex: 1;
     overflow-x: hidden;
+  }
+
+  &.is--opener {
+    min-height: 400px;
   }
 }
 </style>

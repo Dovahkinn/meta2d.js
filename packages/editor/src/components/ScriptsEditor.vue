@@ -97,7 +97,7 @@
     <t-collapse-panel
       v-for="(script, index) in scripts"
       :key="script.sid"
-      :header="`指令-${script.sid}`"
+      :header="`指令-${index+1}-${script.sid}`"
     >
       <template #headerRightContent>
         <t-space size="small">

@@ -81,14 +81,19 @@ export enum ExtendAction {
   AnimateReverse,
   // 弹窗播放视频
   Video,
+  ScriptEnd,
+  ShowMeta2D,
   // TODO:
 }
 
 export const ExtendEventNameKey = "__extend_event__"
 
 
-export const ExtendActionJsCodeMap = {
+export const ExtendActionJsCodeMap: Record<ExtendAction, string> = {
   [ExtendAction.DialogClose]: '',
+  [ExtendAction.AnimateReverse]: '',
+  [ExtendAction.ScriptEnd]: '',
+  [ExtendAction.ShowMeta2D]: '',
   [ExtendAction.Video]: `
 const fn = globalThis.$_callExtendAction;
 if (fn) {
@@ -103,7 +108,9 @@ context,
 
 
 export enum ExtendEventSource {
+  // 基于 meta2d 内部事件 js 代码调用
   ReservedEvents,
+  // 自行扩展的逻辑代码调用
   ExternalCall,
 }
 
@@ -114,4 +121,5 @@ export enum ExtendActionEventNameMap {
 
 export enum ExtendActionMessageTypeMap {
   VideoEnded,
+  ScriptEnded,
 }

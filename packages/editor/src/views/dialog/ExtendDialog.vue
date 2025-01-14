@@ -51,28 +51,33 @@ const title = computed(() => {
   return eventParams.value?.title;
 });
 
-const dialogContent = computed(() => {
+const dialogContent = computed<any>(() => {
   switch (eventParams.value?.action) {
-    case ExtendAction.Video: {
+    case ExtendAction.Video:
       return defineAsyncComponent(() => import("./content/Video.vue"));
-    }
-    // case ExtendAction.Image: {
-    //   return () => import('./ImageDialog.vue')
-    // }
+
+    case ExtendAction.ShowMeta2D:
+      return defineAsyncComponent(() => import("../Opener.vue"));
   }
+  return null;
 });
 
 const contentProps = computed(() => {
   const { url } = eventParams.value || {};
   switch (eventParams.value?.action) {
-    case ExtendAction.Video: {
+    case ExtendAction.Video: 
       if (!url) {
         console.error("video url is required");
       }
       return {
         src: url,
       };
-    }
+
+    case ExtendAction.ShowMeta2D:
+      return {
+        url,
+      }
+
   }
 });
 
@@ -85,7 +90,8 @@ const dialogHandler = (options: any) => {
     // const { action } = params;
   }
 
-  visible.value = (params?.action || options?.action) != ExtendAction.DialogClose;
+  visible.value =
+    (params?.action || options?.action) != ExtendAction.DialogClose;
 };
 
 onMounted(() => {

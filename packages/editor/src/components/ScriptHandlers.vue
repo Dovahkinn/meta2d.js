@@ -53,7 +53,7 @@
     <t-collapse-panel
       v-for="(item, index) in handlers"
       :key="index"
-      header="脚本"
+      :header="`脚本-${item.id}`"
     >
       <t-form labelAlign="left">
         <t-form-item label="行为">
@@ -163,7 +163,7 @@
           </t-form-item>
         </template>
 
-        <template v-else-if="item.action === ExtendAction.Video">
+        <template v-else-if="[ExtendAction.Video, ExtendAction.ShowMeta2D].includes(item.action)">
           <t-form-item label="窗口标题">
             <t-input
               v-model="item.params.title"
@@ -171,7 +171,7 @@
               @change="eventChange"
             ></t-input>
           </t-form-item>
-          <t-form-item label="视频URL">
+          <t-form-item :label="item.action == ExtendAction.Video ? '视频URL' : '图纸URL'">
             <t-input
               v-model="item.params.url"
               clearable
@@ -192,6 +192,16 @@
               :options="dialogModeOptions"
               @change="eventChange"
             ></t-select>
+          </t-form-item>
+        </template>
+        <template v-else-if="item.action === ExtendAction.ScriptEnd">
+          <t-form-item label="业务名称">
+            <t-input
+              v-model="item.name"
+              placeholder="唯一标识，用于和其他业务联动"
+              clearable
+              @change="eventChange"
+            ></t-input>
           </t-form-item>
         </template>
 
@@ -225,6 +235,9 @@
               @change="eventChange"
             ></t-select>
           </t-form-item>
+          <t-form-item v-else-if="item.where.value === ExtendActionMessageTypeMap.ScriptEnded" label="业务名称">
+            <t-input v-model="item.where.key" placeholder="其他联动业务中定义的唯一标识" clearable @change="eventChange"></t-input>
+          </t-form-item>
         </template>
       </t-form>
       <template #headerRightContent>
@@ -256,7 +269,8 @@ import { s12 } from "@meta2d/core";
 
 type HandlerType = {
   id: string;
-  action: EventAction;
+  name?: string;
+  action: EventAction | ExtendAction;
   value: any;
   target: any[];
   params: any;
@@ -349,6 +363,14 @@ const eventActionOptions = [
     label: "视频",
     value: ExtendAction.Video,
   },
+  {
+    label: '执行结束',
+    value: ExtendAction.ScriptEnd,
+  },
+  {
+    label: '打开图纸',
+    value: ExtendAction.ShowMeta2D,
+  },
 ];
 
 const dialogModeOptions = [
@@ -377,6 +399,10 @@ const extendWhereMessageTypeOptions = [
   {
     label: "视频播放结束",
     value: ExtendActionMessageTypeMap.VideoEnded,
+  },
+  {
+    label: '脚本结束',
+    value: ExtendActionMessageTypeMap.ScriptEnded,
   },
 ];
 

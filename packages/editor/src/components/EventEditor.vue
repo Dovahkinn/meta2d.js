@@ -304,10 +304,7 @@ const eventActionOptions = [
     label: "对话框",
     value: EventAction.Dialog,
   },
-  // {
-  //   label: '扩展-视频',
-  //   value: ExtendAction.Video,
-  // }
+
 ];
 
 const templateCodeStringOptions = [
