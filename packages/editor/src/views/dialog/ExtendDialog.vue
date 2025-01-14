@@ -10,7 +10,11 @@
     destroyOnClose
     @close-btn-click="onCloseBtnClick"
   >
-    <component :is="dialogContent" v-bind="contentProps" @ended="onEnd"></component>
+    <component
+      :is="dialogContent"
+      v-bind="contentProps"
+      @ended="onEnd"
+    ></component>
   </t-dialog>
 </template>
 <script setup lang="ts">
@@ -22,7 +26,11 @@ import {
   computed,
   defineAsyncComponent,
 } from "vue";
-import { ExtendActionEventNameMap, ExtendAction, ExtendActionMessageTypeMap, } from "../../types/Event";
+import {
+  ExtendActionEventNameMap,
+  ExtendAction,
+  ExtendActionMessageTypeMap,
+} from "../../types/Event";
 
 type ModeValues = "full-screen" | "modal" | undefined;
 type WidthValues = Number | String | undefined;
@@ -68,22 +76,24 @@ const contentProps = computed(() => {
   }
 });
 
-onMounted(() => {
-  meta2d.on(ExtendActionEventNameMap.Dialog, (options) => {
-    console.log("dialog action params: ", options);
-    const { params = {}, id, } = options;
-    if (params) {
-      params.id = id;
-      eventParams.value = params;
-      // const { action } = params;
-    }
+const dialogHandler = (options: any) => {
+  console.log("dialog action params: ", options);
+  const { params = {}, id } = options;
+  if (params && typeof params == "object") {
+    params.id = id;
+    eventParams.value = params;
+    // const { action } = params;
+  }
 
-    visible.value = params.action != ExtendAction.DialogClose;
-  });
+  visible.value = (params?.action || options?.action) != ExtendAction.DialogClose;
+};
+
+onMounted(() => {
+  meta2d.on(ExtendActionEventNameMap.Dialog, dialogHandler);
 });
 
 onBeforeUnmount(() => {
-  meta2d.off(ExtendActionEventNameMap.Dialog);
+  meta2d.off(ExtendActionEventNameMap.Dialog, dialogHandler);
 });
 
 const onEnd = (event: any, params: any) => {
@@ -93,15 +103,14 @@ const onEnd = (event: any, params: any) => {
     type: ExtendActionMessageTypeMap.VideoEnded,
     url: params?.src || params?.url,
     key: eventParams.value?.id,
-  })
-}
+  });
+};
 
 const onCloseBtnClick = (event: Event) => {
   if (eventParams.value?.action == ExtendAction.Video) {
     onEnd(event, eventParams.value);
   }
-}
-
+};
 </script>
 <style lang="scss" scoped>
 :global(.extend-action__dialog.t-dialog__fullscreen) {

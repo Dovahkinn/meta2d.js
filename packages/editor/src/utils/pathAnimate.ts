@@ -11,7 +11,7 @@ export function createPathAnimation(element: any, paths: any[]) {
   let originalX = rect.x;
   let originalY = rect.y;
 
-  let startTime;
+  let startTime: number | null = 0;
   let currentPathIndex = 0;
   let startX = originalX;
   let startY = originalY;

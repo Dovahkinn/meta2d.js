@@ -1,103 +1,15 @@
 import { reactive, ref } from 'vue';
-import { EventAction, ExtendAction, ExtendEventSource, ExtendActionEventNameMap, ExtendActionMessageTypeMap, } from '../types/Event';
-import { s12 } from "@meta2d/core";
-import { callExtendAction } from './useHandlers'
-import { createPathAnimation } from '../utils/pathAnimate'
+import {
+  EventAction,
+  ExtendAction,
+  ExtendEventSource,
+  ExtendActionEventNameMap,
+  ExtendActionMessageTypeMap,
+} from '../types/Event';
+import { s12 } from '@meta2d/core';
+import { callExtendAction } from './useHandlers';
+import { createPathAnimation } from '../utils/pathAnimate';
 
-const testStepData = [
-  // L1 流动
-  {
-    index: 0,
-    name: 'task1',
-    description: 'text1',
-    duration: 6000,
-    privatePropList: [
-      {
-        tag: 'L1',
-        action: 2,
-      },
-    ],
-  },
-  // L2 流动
-  {
-    index: 1,
-    name: 'task2',
-    description: 'text2',
-    duration: 9000,
-
-    privatePropList: [
-      {
-        tag: 'L1',
-        action: 4,
-      },
-      {
-        tag: 'L2',
-        action: 2,
-      },
-    ],
-  },
-  // 播放视频
-  {
-    index: 2,
-    name: 'task3',
-    description: 'text3',
-    duration: 7000,
-
-    privatePropList: [
-      {
-        tag: 'video',
-        action: 1,
-        value: {
-          visible: 1,
-        },
-      },
-      {
-        tag: 'video',
-        action: 8,
-      },
-    ],
-  },
-  // 关闭视频，打开弹窗
-  {
-    index: 3,
-    name: 'task4',
-    description: 'text4',
-    duration: 7000,
-
-    privatePropList: [
-      {
-        tag: 'video',
-        action: 1,
-        value: {
-          visible: 0,
-        },
-      },
-      {
-        tag: 'video',
-        action: 10,
-      },
-      // ? 如何调用
-      {
-        tag: '',
-        action: 14,
-      },
-    ],
-  },
-  // 关闭弹窗
-  {
-    index: 4,
-    name: 'task5',
-    description: 'text5',
-    duration: 7000,
-
-    privatePropList: [
-      {
-        tag: '',
-        action: 2,
-      },
-    ],
-  },
-];
 
 export const useLogTable = (metaData: any = {}) => {
   const { presetScriptsConfig = {} } = metaData || {};
@@ -112,7 +24,12 @@ export const useLogTable = (metaData: any = {}) => {
 
   let tableStyle: any = {};
   if (style) {
-    const { evenRowBackgroundColor, oddRowBackgroundColor, textColor, backgroundImageUrl, } = style;
+    const {
+      evenRowBackgroundColor,
+      oddRowBackgroundColor,
+      textColor,
+      backgroundImageUrl,
+    } = style;
     tableStyle = {
       '--td-bg-color-secondarycontainer': oddRowBackgroundColor,
       '--td-bg-color-container': evenRowBackgroundColor,
@@ -156,8 +73,8 @@ function executeAnimate(type: string | number, target: string[]) {
         if (!control) {
           pen.pathAnimateControl = createPathAnimation(pen, pen.pathFrames);
           control = pen.pathAnimateControl;
-        } 
-        // console.log('=============> ', control, type);
+        }
+        // console.log('pathAnimateControl =============> ', control, type);
         if (type == 0) {
           if (control.isPaused.value) {
             control.resume();
@@ -170,7 +87,7 @@ function executeAnimate(type: string | number, target: string[]) {
           control.stop();
         }
       }
-    })
+    });
     meta2d[fnName](pens);
   }
 }
@@ -183,11 +100,11 @@ export const useScripts = (metaData: any = {}) => {
   if (Array.isArray(scripts)) {
     scripts.forEach((item, index) => {
       const { handlers = [], duration = 3000, rowPropList = [] } = item;
-      // TODO: 创建任务
+      // 创建任务
       if (Array.isArray(handlers) && handlers.length) {
         const fn = () => {
           handlers.forEach((handler) => {
-            const { target, action, value = {}, where, } = handler;
+            const { target, action, value = {}, where } = handler;
             const executer = () => {
               if (Array.isArray(target)) {
                 switch (action) {
@@ -220,47 +137,67 @@ export const useScripts = (metaData: any = {}) => {
                   case ExtendAction.DialogClose:
                     meta2d.canvas.dialog.hide();
                     // 复用
-                    callExtendAction(ExtendEventSource.ExternalCall, handler)
+                    callExtendAction(ExtendEventSource.ExternalCall, handler);
                     break;
                   case ExtendAction.AnimateReverse:
                     target.forEach((tag) => {
                       const pens = meta2d.find(tag);
-                      pens.forEach(pen => {
+                      pens.forEach((pen) => {
                         const { id, animateReverse } = pen;
-                        meta2d.setValue({
-                          id,
-                          animateReverse: !animateReverse,
-                        }, {
-                          render: false,
-                        })
-                      })
-                    })
-  
+                        meta2d.setValue(
+                          {
+                            id,
+                            animateReverse: !animateReverse,
+                          },
+                          {
+                            render: false,
+                          }
+                        );
+                      });
+                    });
+
                     break;
-  
-                    case ExtendAction.Video:
-                      callExtendAction(ExtendEventSource.ExternalCall, handler)
-                      break;
-  
+
+                  case ExtendAction.Video:
+                    callExtendAction(ExtendEventSource.ExternalCall, handler);
+                    break;
+
                   default:
                     console.warn('unknown action:', action, handler);
                     break;
                 }
               }
-            }
-            if (where && where.type == ExtendActionEventNameMap.CustomMessage && ![null, undefined, ''].includes(where.value)) {
-              // * 自定义消息: 视频播放结束              
+            };
+            
+            if (
+              where &&
+              where.type == ExtendActionEventNameMap.CustomMessage &&
+              ![null, undefined, ''].includes(where.value)
+            ) {
+              let msgHandler = (params?: any) => undefined;
+
+              // * 自定义消息: 视频播放结束
               if (where.value === ExtendActionMessageTypeMap.VideoEnded) {
-                meta2d.on(ExtendActionEventNameMap.CustomMessage, ({ type, key, }) => {
-                  if (type == ExtendActionMessageTypeMap.VideoEnded && key == where.key) {
-                    executer()
+                msgHandler = ({ type, key }) => {
+                  // console.log('-------------- custom message: ', type, key);
+                  if (
+                    type == ExtendActionMessageTypeMap.VideoEnded &&
+                    key == where.key
+                  ) {
+                    executer();
+                    meta2d.off(ExtendActionEventNameMap.CustomMessage, msgHandler);
                   }
-                })
+                }
               }
-              
+              // TODO：扩展其他自定义消息
+
+              meta2d.on(
+                ExtendActionEventNameMap.CustomMessage,
+                msgHandler,
+              );
             } else {
               // 未设置条件，直接执行
-              executer()
+              executer();
             }
           });
         };

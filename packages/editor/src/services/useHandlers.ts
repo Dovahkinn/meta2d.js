@@ -158,20 +158,22 @@ export const useWsHandlers = (data: any) => {
  * @returns 
  */
 export const callExtendAction = (sourceType: ExtendEventSource, eventOptions: any) => {
-  console.log('callExtendAction  ------------> ', sourceType, eventOptions);
+  // console.log('callExtendAction  ------------> ', sourceType, eventOptions);
   if (!eventOptions) {
     console.error('自定义消息参数不存在！');
     return;
   }
-  const { params = {}, ...rest } = eventOptions;
+  const { params, ...rest } = eventOptions;
 
   // sourceType == 0:
   if (sourceType == ExtendEventSource.ExternalCall) {
-    params.action = eventOptions.action
+    if (params && typeof params == 'object') {
+      params.action = eventOptions.action
+    }
   }
   // else rest = { pen, context, }
 
-  switch (params.action) {
+  switch (eventOptions.action) {
     case ExtendAction.Video:
       // 弹窗播放视频
       meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions)
@@ -181,7 +183,7 @@ export const callExtendAction = (sourceType: ExtendEventSource, eventOptions: an
       break;  
 
     default:
-      console.error('未知扩展能力调用: ', params.action);
+      console.error('未知扩展能力调用: ', eventOptions.action);
       break;
   }
 };
