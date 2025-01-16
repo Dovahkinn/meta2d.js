@@ -95,6 +95,7 @@ export const ExtendActionJsCodeMap: Record<ExtendAction, string> = {
   [ExtendAction.AnimateReverse]: '',
   [ExtendAction.ScriptEnd]: '',
   [ExtendAction.ShowMeta2D]: '',
+  [ExtendAction.GoToView]: '',
   [ExtendAction.Video]: `
 const fn = globalThis.$_callExtendAction;
 if (fn) {

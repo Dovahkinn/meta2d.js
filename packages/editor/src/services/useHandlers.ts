@@ -172,8 +172,10 @@ export const callExtendAction = (
     if (params && typeof params == 'object') {
       params.action = eventOptions.action;
     }
+  } else if (sourceType == ExtendEventSource.ReservedEvents) {
+    // sourceType == 0: rest = { pen, context, }
+    eventOptions.action = params?.action
   }
-  // else sourceType == 0: rest = { pen, context, }
 
   switch (eventOptions.action) {
     case ExtendAction.Video:
