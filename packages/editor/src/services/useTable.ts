@@ -73,7 +73,7 @@ function executeAnimate(type: string | number, target: string[], meta2d: any) {
     pens.forEach((pen) => {
       if (Array.isArray(pen.pathFrames)) {
         let control = pen.pathAnimateControl;
-        if (!control) {
+        if (!control || !control.play) {
           pen.pathAnimateControl = createPathAnimation(pen, pen.pathFrames);
           control = pen.pathAnimateControl;
         }

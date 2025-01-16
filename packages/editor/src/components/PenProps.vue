@@ -535,7 +535,7 @@ const animate = (play: boolean = false) => {
   // 自定义的路径动画
   if (pen.value.animateType == 'x-custom' && pen.value.pathFrames) {
     let control = pen.value.pathAnimateControl
-    if (!control) {
+    if (!control || !control.play) {
       pen.value.pathAnimateControl = createPathAnimation(pen.value, pen.value.pathFrames)
       control = pen.value.pathAnimateControl
     }
