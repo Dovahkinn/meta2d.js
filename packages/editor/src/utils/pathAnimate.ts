@@ -20,6 +20,7 @@ export function createPathAnimation(element: any, paths: any[]) {
   let isPaused = ref(false);
   let isStopped = ref(false);
 
+  let elapsed = 0;
   
   function animatePath(timestamp) {
     if (isStopped.value) {
@@ -28,22 +29,18 @@ export function createPathAnimation(element: any, paths: any[]) {
     }
 
     if (isPaused.value) {
-      startTime += timestamp - (startTime + (timestamp - startTime));
-      // startTime = timestamp;
+      // * 暂停期间，timestamp 会一直增加，所以需要减去已经执行的时间
+      startTime = timestamp - elapsed;
       animationFrameId = requestAnimationFrame(animatePath);
-      const rect = meta2d.getPenRect(element);
-      startX = rect.x;
-      startY = rect.y;
-      // console.log('pause ------------------- : ', startTime, timestamp);
       return;
     }
 
     if (!startTime) startTime = timestamp;
-    const elapsed = (timestamp - startTime);
+    elapsed = (timestamp - startTime);
     const path = paths[currentPathIndex];
     
     const progress = Math.min(elapsed / path.duration, 1);
-    // console.log('animatePath ------------------- : ', startTime, timestamp, progress);
+    // console.log('animatePath >>>>>>>>>>>>>>>>>>>>>> : ', startTime, '|', elapsed, '|', progress);
     const currentX = startX + (path.x || 0) * progress;
     const currentY = startY + (path.y || 0) * progress;
 
@@ -85,12 +82,7 @@ export function createPathAnimation(element: any, paths: any[]) {
   function resume() {
     if (isPaused.value) {
       isPaused.value = false;
-      startTime = null;
-      // console.log(
-      //   'resume ------------------- ',
-      //   startX,
-      //   startY
-      // );
+
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
