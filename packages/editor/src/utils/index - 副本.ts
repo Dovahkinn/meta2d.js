@@ -3,8 +3,6 @@ import { Pen, deepClone, s8 } from '@meta2d/core';
 import { electricSvgList } from './svgConfigList.ts';
 import { loadSvg } from './svgParser.ts';
 import SwitchCombinesData from './switch-combines.json';
-
-// 旋转角度映射表
 const rotateAngelMap: {
   [key: string]: number;
 } = {
@@ -14,7 +12,6 @@ const rotateAngelMap: {
   3: 270,
 };
 
-// 非对称元件列表
 const asymmetries = [
   'Vdc',
   'MultipleContact',
@@ -31,21 +28,13 @@ const asymmetries = [
   'DoubleCoil',
   'TransformerNew',
 ];
-
-// 初始位置在右边的图形列表
+// 初始位置在右边
 const sideRightShapes = [
   'Btn_SelfReset',
   'Btn_SelfLock',
   'Knob_SelfReset',
   'Knob_SelfLock',
 ];
-
-/**
- * 修正元件位置
- * @param pen 画笔对象
- * @param config 配置信息
- * @param item 元件项
- */
 function patchPosition(pen: Pen, config: any, item: any) {
   let rotate = rotateAngelMap[item.rotateAngel] || 0;
   // 特殊处理，和电路编辑器默认角度保持一致
@@ -220,8 +209,6 @@ function patchPosition(pen: Pen, config: any, item: any) {
       break;
   }
 }
-
-// 需要特殊状态处理的元件类型
 const StatusTypes = [
   'Btn_SelfLock',
   'Knob_SelfReset',
@@ -232,11 +219,6 @@ const StatusTypes = [
   'Btn_SelfReset',
 ];
 
-/**
- * 获取子元素索引
- * @param item 元件项
- * @returns 子元素索引
- */
 function getChildIndex(item: any) {
   if (item.type == 'MultipleContact') {
     if (item.v10 > '3') {
@@ -258,13 +240,6 @@ function getChildIndex(item: any) {
     }
   }
 }
-
-/**
- * 查找所有子元素
- * @param parent 父元素
- * @param list 元素列表
- * @returns 包含父元素和所有子元素的数组
- */
 function findChildren(parent: any, list: any[]) {
   if (!parent) return;
   if (!list) return;
@@ -282,11 +257,6 @@ function findChildren(parent: any, list: any[]) {
   return result;
 }
 
-/**
- * 克隆画笔对象列表
- * @param list 画笔对象列表
- * @returns 克隆后的新画笔对象列表
- */
 function clonePens(list: any[]) {
   const uuid = '-' + s8();
   const copy = deepClone(list);
@@ -310,10 +280,7 @@ function clonePens(list: any[]) {
   return copy;
 }
 
-/**
- * 加载电路图JSON数据
- * @param data JSON数据
- */
+// json 解析
 export const loadElectricJson = (data: any) => {
   readJSONFile((res: any) => {
     console.log('readJSONFile: ', res, SwitchCombinesData);
@@ -352,7 +319,6 @@ export const loadElectricJson = (data: any) => {
 
           // 判断是否有三路或者四路开关 StatusTypes数组'Btn_SelfLock','Knob_SelfReset','Switch','Knob_SelfLock','duanluqi_wx','MultipleContact','Btn_SelfReset',
           if (StatusTypes.includes(item.type)) {
-            
             // 查找是否有组合开关 处理组合开关
             let parent = deepClone(
               SwitchCombinesData.pens.find((v) => {
@@ -366,12 +332,6 @@ export const loadElectricJson = (data: any) => {
                 }
               }),
             );
-            // 查找item中带v开头的参数 
-            const vParams = Object.keys(item).filter(key => key.startsWith('v'));
-            if (vParams.length > 0) {
-              parent.Ecomponents = vParams.map(key => item[key]);
-            }
-            console.log('Ecomponents=====: ', parent.Ecomponents);
             //查看自己的组合开关JSON 根据父节点查找自己的组合开关的子节点
             //返回的三路开关的父节点和子节点
             const list = clonePens(
@@ -400,6 +360,7 @@ export const loadElectricJson = (data: any) => {
                 fault:0,
                 titleFnJs: 'return `${pen.text}  ${pen.description}`;',
                 color:'rgba(0, 0, 128, 1)',
+                lineWidth:2,
               });
               // 添加tag
               if (parent.tags && !parent.tags?.includes(item.name)) {
@@ -439,6 +400,7 @@ export const loadElectricJson = (data: any) => {
                 width: cWidth || parent.width,
                 height: cHeight || parent.height,
                 color:'rgba(0, 0, 128, 1)',
+                lineWidth:2,
                 fault:0,
                 titleFnJs: 'return `${pen.text}  ${pen.description}`;'
               });
@@ -513,7 +475,9 @@ export const loadElectricJson = (data: any) => {
             fontSize: 14,
             color:'rgb(0, 0, 128)',
             textColor:"#000",
+            lineWidth:2,
             lineAnimateType:1,
+            animateLineWidth:3,
             animateColor:'rgb(255, 0, 0)',
             textBaseline:'bottom'
           };
@@ -551,12 +515,6 @@ export const loadElectricJson = (data: any) => {
     }
   });
 };
-
-/**
- * 从字符串中提取前缀
- * @param name 包含"CenterLineName"的字符串
- * @returns 提取的前缀或空字符串
- */
 function extractPrefixOrEmpty(name: string) {
   if (name.includes("CenterLineName")) {
     const parts = name.split("_");
@@ -566,12 +524,6 @@ function extractPrefixOrEmpty(name: string) {
     return "";
   }
 }
-
-/**
- * 计算连接线位置信息
- * @param item 连接线数据
- * @returns 包含长度和锚点信息的对象
- */
 function calcLinePos(item: any) {
   const { startX, startY, endX, endY } = item;
   const length = Math.sqrt(
@@ -590,10 +542,6 @@ function calcLinePos(item: any) {
   return { length, anchors };
 }
 
-/**
- * 读取JSON文件
- * @param callback 回调函数
- */
 export const readJSONFile = (callback: Function | null = null) => {
   const input = document.createElement('input');
   input.type = 'file';
@@ -618,10 +566,6 @@ export const readJSONFile = (callback: Function | null = null) => {
   input.click();
 };
 
-/**
- * 读取SVG文件
- * @param callback 回调函数
- */
 export const readSVGFile = (callback: Function | null = null) => {
   const input = document.createElement('input');
   input.type = 'file';
@@ -646,11 +590,7 @@ export const readSVGFile = (callback: Function | null = null) => {
   input.click();
 };
 
-/**
- * 复制文本到剪贴板
- * @param text 要复制的文本
- * @returns Promise
- */
+// 复制文本
 export function copyToClipboard(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
     // 使用现代API
@@ -681,9 +621,6 @@ export function copyToClipboard(text: string) {
   }
 }
 
-/**
- * 切换全屏显示
- */
 export const toggleFullScreen = () => {
   // 检查当前是否已经在全屏模式
   if (
