@@ -78,7 +78,6 @@ export function createPathAnimation(element: any, paths: any[]) {
     isPaused.value = true;
   }
 
-  // TODO: 存在 bug，暂停后，再播放，轨迹进度貌似从 0 开始，导致位置移动超出
   function resume() {
     if (isPaused.value) {
       isPaused.value = false;
