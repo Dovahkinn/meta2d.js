@@ -8,6 +8,7 @@
     :mode="mode"
     :width="width"
     destroyOnClose
+    :style="styleObject"
     @close-btn-click="onCloseBtnClick"
   >
     <component
@@ -38,7 +39,7 @@ type WidthValues = Number | String | undefined;
 const props = defineProps({});
 
 const visible = ref(false);
-const eventParams = ref();
+const eventParams = ref({});
 
 const mode = computed(() => {
   return eventParams.value?.mode as ModeValues;
@@ -65,7 +66,7 @@ const dialogContent = computed<any>(() => {
 const contentProps = computed(() => {
   const { url } = eventParams.value || {};
   switch (eventParams.value?.action) {
-    case ExtendAction.Video: 
+    case ExtendAction.Video:
       if (!url) {
         console.error("video url is required");
       }
@@ -76,8 +77,7 @@ const contentProps = computed(() => {
     case ExtendAction.ShowMeta2D:
       return {
         url,
-      }
-
+      };
   }
 });
 
@@ -117,7 +117,19 @@ const onCloseBtnClick = (event: Event) => {
     onEnd(event, eventParams.value);
   }
 };
+
+// * 样式定制
+const styleObject = computed(() => {
+  return {
+    '--td-bg-color-container': eventParams.value?.backgroundColor || "white",
+    '--td-text-color-primary': eventParams.value?.textColor || "black",
+    '--td-text-color-secondary': eventParams.value?.textColor || "black",
+    '--extend-dialog-bg-image': `url(${eventParams.value?.backgroundImageUrl || ""})`,
+  }
+})
+
 </script>
+
 <style lang="scss" scoped>
 :global(.extend-action__dialog.t-dialog__fullscreen) {
   --td-comp-paddingTB-xl: 0;
@@ -127,4 +139,11 @@ const onCloseBtnClick = (event: Event) => {
 :global(.t-dialog__position_fullscreen) {
   height: 100%;
 }
+
+:global(.extend-action__dialog.t-dialog) {
+  background-image: var(--extend-dialog-bg-image);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
 </style>

@@ -165,8 +165,40 @@
               ></t-input>
             </t-form-item>
             <t-form-item v-if="item.params" label="对话框类型">
-              <t-select v-model="item.params.mode" clearable :options="dialogModeOptions"></t-select>
+              <t-select
+                v-model="item.params.mode"
+                clearable
+                :options="dialogModeOptions"
+              ></t-select>
             </t-form-item>
+
+            <t-form-item label="背景颜色">
+              <t-color-picker
+                class="w-full"
+                v-model="item.params.backgroundColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="eventChange"
+              />
+            </t-form-item> 
+            <t-form-item label="背景图片">
+              <t-input v-model="item.params.backgroundImageUrl" clearable @change="eventChange"></t-input>
+            </t-form-item>           
+            
+            <t-form-item label="标题颜色">
+              <t-color-picker
+                class="w-full"
+                v-model="item.params.textColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="eventChange"
+              />
+            </t-form-item>
+
           </template>
         </template>
       </t-form>
@@ -185,7 +217,7 @@
   </t-collapse>
 </template>
 <script setup lang="ts">
-import { defineProps, ref, watch, } from "vue";
+import { defineProps, ref, watch } from "vue";
 import { MessagePlugin } from "tdesign-vue-next";
 import {
   EventAction,
@@ -204,13 +236,16 @@ const events = ref<Array<EventConfig>>(
   props.defaultEventsValue as EventConfig[]
 );
 
-watch(() => props.defaultEventsValue, (val) => {
-  if (val) {
-    events.value = val as EventConfig[];
-  } else {
-    events.value = [];
+watch(
+  () => props.defaultEventsValue,
+  (val) => {
+    if (val) {
+      events.value = val as EventConfig[];
+    } else {
+      events.value = [];
+    }
   }
-})
+);
 
 const eventTypeOptions = [
   {
@@ -304,7 +339,6 @@ const eventActionOptions = [
     label: "对话框",
     value: EventAction.Dialog,
   },
-
 ];
 
 const templateCodeStringOptions = [
@@ -328,10 +362,10 @@ const dialogModeOptions = [
     value: "modal",
   },
   {
-    label: '全屏',
-    value: 'full-screen'
-  }
-]
+    label: "全屏",
+    value: "full-screen",
+  },
+];
 
 const insert = () => {
   events.value.push({
@@ -427,7 +461,7 @@ const propChange = (event: EventConfig) => {
 
 const updatePropList = (index: number[]) => {
   const event = events.value[Number(index)];
-  if (!event) return
+  if (!event) return;
   if (event.value && typeof event.value === "object") {
     propList.value = Object.keys(event.value).map((key: string) => {
       return {
@@ -438,4 +472,10 @@ const updatePropList = (index: number[]) => {
   }
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+:deep(.t-form) .t-input--auto-width {
+  width: 100%;
+}
+
+</style>
