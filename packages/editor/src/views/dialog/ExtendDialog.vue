@@ -39,7 +39,7 @@ type WidthValues = Number | String | undefined;
 const props = defineProps({});
 
 const visible = ref(false);
-const eventParams = ref({});
+const eventParams = ref<any>({});
 
 const mode = computed(() => {
   return eventParams.value?.mode as ModeValues;
@@ -121,13 +121,23 @@ const onCloseBtnClick = (event: Event) => {
 // * 样式定制
 const styleObject = computed(() => {
   return {
-    '--td-bg-color-container': eventParams.value?.backgroundColor || "white",
-    '--td-text-color-primary': eventParams.value?.textColor || "black",
-    '--td-text-color-secondary': eventParams.value?.textColor || "black",
-    '--extend-dialog-bg-image': `url(${eventParams.value?.backgroundImageUrl || ""})`,
-  }
-})
-
+    "--td-bg-color-container": eventParams.value?.backgroundColor || "white",
+    "--td-text-color-primary": eventParams.value?.textColor || "black",
+    "--td-text-color-secondary": eventParams.value?.textColor || "black",
+    "--extend-dialog-bg-image": `url(${
+      eventParams.value?.backgroundImageUrl || ""
+    })`,
+    '--extend-dialog-header-margin-top': eventParams.value?.headerMarginTop || '0px',
+    // 控制栏
+    "--vjs-control-bar-background-color":
+      eventParams.value?.controlBarBackgroundColor || "black",
+    "--vjs-play-control-color": eventParams.value?.controlColor || "white",
+    "--vjs-play-progress-bar-color":
+      eventParams.value?.controlPlayProgressBarColor || "white",
+    "--vjs-load-progress-bar-color":
+      eventParams.value?.controlLoadProgressBarColor || "#73859f80",
+  };
+});
 </script>
 
 <style lang="scss" scoped>
@@ -146,4 +156,24 @@ const styleObject = computed(() => {
   background-repeat: no-repeat;
 }
 
+:global(.extend-action__dialog.t-dialog .t-dialog__header) {
+  margin-top: var(--extend-dialog-header-margin-top);
+}
+
+:deep(.video-js) .vjs-control-bar {
+  background-color: var(--vjs-control-bar-background-color) !important;
+  color: var(--vjs-play-control-color);
+
+  .vjs-play-progress {
+    background-color: var(--vjs-play-progress-bar-color);
+  }
+
+  .vjs-load-progress {
+    background-color: var(--vjs-load-progress-bar-color);
+
+    > div {
+      background: none;
+    }
+  }
+}
 </style>

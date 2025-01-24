@@ -172,6 +172,15 @@
               ></t-select>
             </t-form-item>
 
+            <t-form-item v-if="item.params" label="标题栏上间距">
+              <t-input
+                v-model="item.params.headerMarginTop"
+                placeholder="示例：'10px'"
+                clearable
+                @change="eventChange"
+              ></t-input>
+            </t-form-item>
+
             <t-form-item label="背景颜色">
               <t-color-picker
                 class="w-full"
@@ -199,6 +208,50 @@
               />
             </t-form-item>
 
+            <t-form-item label="控制栏背景颜色">
+              <t-color-picker
+                class="w-full"
+                v-model="item.params.controlBarBackgroundColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="eventChange"
+              />
+            </t-form-item>
+            <t-form-item label="控制栏按钮颜色">
+              <t-color-picker
+                class="w-full"
+                v-model="item.params.controlColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="eventChange"
+              />
+            </t-form-item>
+            <t-form-item label="已播放进度颜色">
+              <t-color-picker
+                class="w-full"
+                v-model="item.params.controlPlayProgressBarColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="eventChange"
+              />
+            </t-form-item>
+            <t-form-item label="已加载进度颜色">
+              <t-color-picker
+                class="w-full"
+                v-model="item.params.controlLoadProgressBarColor"
+                :show-primary-color-preview="false"
+                format="CSS"
+                :color-modes="['monochrome']"
+                clearable
+                @change="eventChange"
+              />
+            </t-form-item>
           </template>
         </template>
       </t-form>
