@@ -8,8 +8,10 @@
 <script setup lang="ts">
 import { computed, CSSProperties, onMounted, ref } from 'vue'
 import videojs from 'video.js'
-import type { VideoJsPlayerOptions } from 'video.js'
 import 'video.js/dist/video-js.min.css'
+import type Player from 'video.js/dist/types/player'
+
+type VideoJsPlayerOptions = Parameters<typeof videojs>[1]
 
 type MyVideoProps = {
   src: string
@@ -23,7 +25,7 @@ const emit = defineEmits(['ready', 'ended'])
 // video标签
 const videoRef = ref<HTMLElement | null>(null)
 // video实例对象
-let videoPlayer: videojs.Player | null = null
+let videoPlayer: Player | null = null
 const videoWrapStyles = computed<CSSProperties>(() => {
   return {
     width: props.width || '100%',
@@ -37,6 +39,7 @@ const initVideo = () => {
     language: 'zh-CN', // 设置语言
     controls: true, // 是否显示控制条
     preload: 'auto', // 预加载
+    muted: true, // 是否静音
     autoplay: true, // 是否自动播放
     fluid: true, // 自适应宽高
     src: props.src // 要嵌入的视频源的源 URL

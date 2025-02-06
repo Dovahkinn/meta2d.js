@@ -1,6 +1,12 @@
 <template>
   <t-collapse defaultExpandAll class="meta-collapse">
     <t-collapse-panel header="表格列">
+      <template #headerRightContent>
+        <t-space size="small">
+          <t-checkbox v-model="tableProps.show" @change="change">显示</t-checkbox>
+        </t-space>
+      </template>
+
       <t-row justify="start">
         <t-col :span="5">
           <div>名称</div>
@@ -138,6 +144,7 @@
 import { defineProps, reactive, computed, defineEmits } from "vue";
 import { s8 } from "@meta2d/core";
 import ScriptHandlers from "./ScriptHandlers.vue";
+import { table } from "console";
 
 const props = defineProps({});
 
@@ -192,6 +199,7 @@ const deleteColumn = (index: number) => {
 };
 
 const tableProps = reactive({
+  show: false,
   bordered: false,
   height: null,
   hover: false,
@@ -212,6 +220,7 @@ if (presetScriptsConfig) {
   tableProps.showHeader = presetScriptsConfig.showHeader;
   tableProps.stripe = presetScriptsConfig.stripe;
   tableProps.style = presetScriptsConfig.style;
+  tableProps.show = presetScriptsConfig.show;
 }
 
 const scripts = reactive(
