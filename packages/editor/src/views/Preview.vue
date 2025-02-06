@@ -1,78 +1,40 @@
 <template>
-  <div class="app-page is--preview">
-    <transition
-      name="sidebar-transition"
-      @after-leave="afterLeave"
-      @after-enter="afterEnter"
-    >
+  <div class="app-page is--preview" :style="{
+    paddingTop: props.multipleDataConfig ? '50px' : '0px',
+  }">
+    <MultipleDataForm :config="multipleDataConfig" @submit="multipleDataSubmit" @reset="multipleDataReset">
+    </MultipleDataForm>
+    <transition name="sidebar-transition" @after-leave="afterLeave" @after-enter="afterEnter">
       <div v-if="!isCollapsed" class="left__panel">
         <t-row justify="end" style="cursor: pointer">
           <t-col :span="2">
-            <t-icon
-              name="fullscreen"
-              size="large"
-              @click="handleToolClick('fullscreen')"
-            ></t-icon>
+            <t-icon name="fullscreen" size="large" @click="handleToolClick('fullscreen')"></t-icon>
           </t-col>
           <t-col :span="2">
-            <t-icon
-              name="rectangle"
-              size="large"
-              @click="handleToolClick('fit')"
-            ></t-icon>
+            <t-icon name="rectangle" size="large" @click="handleToolClick('fit')"></t-icon>
           </t-col>
           <t-col :span="2">
-            <t-icon
-              name="refresh"
-              size="large"
-              @click="handleToolClick('refresh')"
-            ></t-icon>
+            <t-icon name="refresh" size="large" @click="handleToolClick('refresh')"></t-icon>
           </t-col>
         </t-row>
         <t-divider></t-divider>
         <t-tree :data="treeData" expandAll activable @click="changeData" />
       </div>
     </transition>
-
-    <View
-      v-bind="$attrs"
-      preview
-      :data="data"
-      :customWsHandler="customWsHandler"
-      @ready="emit('ready', $event)"
-      ref="childComponentRef"
-    />
+    <View v-bind="$attrs" preview :data="data" :customWsHandler="customWsHandler" @ready="emit('ready', $event)"
+      ref="childComponentRef" />
 
     <div v-if="showRightPanel" class="right__panel">
       <slot name="right-panel">
-        <t-table
-          v-if="tableColumns.length"
-          ref="tableRef"
-          class="table-flex-right"
-          row-key="sid"
-          :data="tableLogData"
-          :columns="tableColumns"
-          active-row-type="single"
-          v-bind="tableProps"
-          :style="tableStyle"
-        ></t-table>
+        <t-table v-if="tableColumns.length" ref="tableRef" class="table-flex-right" row-key="sid" :data="tableLogData"
+          :columns="tableColumns" active-row-type="single" v-bind="tableProps" :style="tableStyle"></t-table>
       </slot>
     </div>
 
-    <t-sticky-tool
-      v-if="showStickyTool"
-      type="compact"
-      placement="left-bottom"
-      style="z-index: 999"
-      @click="handleClick"
-    >
+    <t-sticky-tool v-if="showStickyTool" type="compact" placement="left-bottom" style="z-index: 999"
+      @click="handleClick">
       <template v-for="tool in sidebarTools" :key="tool.label">
-        <t-sticky-item
-          v-if="tool.show()"
-          :label="tool.label"
-          :icon="renderIcon(tool.icon)"
-          :popup="tool.popup"
-        >
+        <t-sticky-item v-if="tool.show()" :label="tool.label" :icon="renderIcon(tool.icon)" :popup="tool.popup">
         </t-sticky-item>
       </template>
     </t-sticky-tool>
@@ -96,10 +58,11 @@ import { toggleFullScreen } from "../utils";
 import { EventAction } from "../types/Event.ts";
 import { deepClone } from "@meta2d/core";
 import { useRoute } from "vue-router";
-import { usePlayer } from "../services/usePlayer.ts";
+// import { usePlayer } from "../services/usePlayer.ts";
 import { useLogTable, useScripts } from "../services/useTable.ts";
 import { useExtendEvent } from "../services/useHandlers.ts";
 import ExtendDialog from "./dialog/ExtendDialog.vue";
+import MultipleDataForm from "./widgets/MultipleDataForm.vue";
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -122,6 +85,13 @@ const props = defineProps({
   rightPanelWidth: {
     type: Number,
     default: 400,
+  },
+
+  // 内置的多系统切换下拉框
+  // * 不设置则不启用
+  multipleDataConfig: {
+    type: Object || undefined,
+    // default: { label: string, options: [] },
   },
 
   // * 后台更新模式，用于一个项目包含多张电路的情形
@@ -177,9 +147,10 @@ const tableRef = ref(null);
 const route = useRoute();
 
 const tableColumns = ref([]);
-const tableLogData = ref([]);
+const tableLogData = ref<Array<any>>([]);
 const tableProps = ref({});
 const tableStyle = ref({});
+const clearTasksQueue = ref<any[]>([]);
 
 const applyTable = (res: any) => {
   const {
@@ -195,12 +166,38 @@ const applyTable = (res: any) => {
   setTimeout(async () => {
     for (const task of tasks) {
       const r = await task();
-      if (r) {
+      if (r && tasks.length) {
         tableLogData.value.push(r);
       }
     }
   });
+
+  return function clearTasks() {
+    tasks.length = 0;
+  }
 };
+
+const multipleDataSubmit = (value: string, data: any) => {
+   if (data) {
+    multipleDataReset()
+    // 上一个执行中的 task 如何清空？
+    applyStateSet();
+    const clearTask = applyTable(data);
+    clearTasksQueue.value.push(clearTask);
+  }
+
+};
+
+const multipleDataReset = () => {
+  if (clearTasksQueue.value.length > 0) {
+    for (const task of clearTasksQueue.value) {
+      task();
+    }
+    clearTasksQueue.value.length = 0;
+  }
+  tableLogData.value = [];
+}
+
 
 const { extendOn } = useExtendEvent();
 
@@ -466,14 +463,14 @@ const applyState = (msg: PenState) => {
             let arr;
             if (needReverse) {
               arr = [1, 0];
-            }else{
+            } else {
               arr = [0, 1];
             }
             _props.showChild = arr.indexOf(msg.State);
-          }else{
+          } else {
             // Ecomponents去掉数组第一个值 赋值给一个新的对象components
             const components = pen.Ecomponents.slice(1);
-            if(switchState >= 3){
+            if (switchState >= 3) {
               // 找到数组里msg.State的位置下标
               // components = ['1', '0', '2', '1'] msg.State = 1 找到第一次出现1的下标
               const index = components.indexOf(msg.State.toString());
@@ -553,7 +550,7 @@ try {
   if (!isInElectron() && !route?.query?.["open-file"]) {
     applyTable(props.data || meta2dData);
   }
-} catch (error) {}
+} catch (error) { }
 </script>
 
 <style lang="scss" scoped>
@@ -577,8 +574,9 @@ try {
   display: flex;
   height: 100%;
   min-height: 400px;
+  position: relative;
 
-  &.is--full-height {    
+  &.is--full-height {
     height: 100vh;
   }
 
@@ -594,10 +592,10 @@ try {
     width: v-bind(cssRightPanelWidth);
     max-width: 50%;
     height: 100%;
-    // border-left: 2px solid #f5f5f5;
     padding: 0;
     overflow-y: auto;
     z-index: 999;
+    margin-left: 10px;
 
     .t-table {
       background-image: var(--table-background-image-url);
