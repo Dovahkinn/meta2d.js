@@ -84,7 +84,6 @@ export class WebSocketClient {
         this.register();
         this.startHeartbeat();
         this.subscribe(this.wsOptions.busName, this.wsOptions.msgTypes);
-        console.log('========= WebSocket connection established. =========');
         // 清空队列
         this._subscribeTasks.forEach((task) => {
           task();
@@ -114,7 +113,7 @@ export class WebSocketClient {
       };
     } else if (this.ws.readyState === WebSocket.OPEN) {
       this.wsOptions.onReady && this.wsOptions.onReady();
-    } else {
+    } else if ([WebSocket.CLOSING, WebSocket.CLOSED].includes(this.ws.readyState as any)) {
       console.error('连接已断开：', this.url)
       this.ws = new WebSocket(this.url);
       this.ws.onopen = () => {
@@ -122,7 +121,6 @@ export class WebSocketClient {
         this.register();
         this.startHeartbeat();
         this.subscribe(this.wsOptions.busName, this.wsOptions.msgTypes);
-        console.log('========= WebSocket connection established. =========');
         // 清空队列
         this._subscribeTasks.forEach((task) => {
           task();
@@ -150,6 +148,8 @@ export class WebSocketClient {
         this.stopHeartbeat();
         this.reconnect();
       };
+    } else {
+      console.log('WebSocket connecting:', this.ws.readyState);
     }
     
   }
@@ -341,14 +341,14 @@ export class WebSocketClient {
   private reconnect() {
     if (this.reconnectTimer) return;
 
-    // if (this.maxReconnectTimes <= 0) {
-    //   console.log('Max reconnect times reached.');
-    //   return;
-    // }
+    if (this.maxReconnectTimes <= 0) {
+      console.log('Max reconnect times reached.');
+      return;
+    }
 
     this.reconnectTimer = setTimeout(() => {
-      // console.log('Reconnecting...', this.maxReconnectTimes);
-      // this.maxReconnectTimes--;
+      console.log('Reconnecting...', this.maxReconnectTimes);
+      this.maxReconnectTimes--;
       this.connect();
       this.reconnectTimer = null;
     }, this.reconnectInterval);
