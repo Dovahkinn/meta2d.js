@@ -141,11 +141,15 @@
     </t-tooltip>
     <t-tooltip content="直线">
       <span :draggable="true" @dragstart="onAddShape($event, 'line')" @click="onAddShape($event, 'line')">
+        <span style="margin-right: -8px;">直线</span>
         <t-icon name="slash" />
       </span>
     </t-tooltip>
     <t-tooltip content="文字">
       <span :draggable="true" @dragstart="onAddShape($event, 'text')" @click="onAddShape($event, 'text')">
+        <!-- <span>          
+          文字
+        </span> -->
         <svg class="l-icon" aria-hidden="true">
           <use xlink:href="#l-text"></use>
         </svg>
@@ -156,6 +160,7 @@
       <a :style="{
         color: isDrawLine ? ' #1677ff' : '',
       }" @click="drawLine">
+        钢笔
         <t-icon name="pen" />
       </a>
     </t-tooltip>
@@ -232,11 +237,16 @@
       <a @click="onScaleDefault"><t-icon name="refresh" /></a>
     </t-tooltip>
     <t-tooltip content="窗口大小" placement="bottom">
-      <a @click="onScaleWindow" style="margin-left: -16px"><t-icon name="fullscreen-exit" /></a>
+      <a @click="onScaleWindow" style="margin-left: -16px">
+        窗口大小
+        <t-icon name="fullscreen-exit" /></a>
     </t-tooltip>
     <div style="width: 36px"></div>
-    <t-tooltip content="运行查看">
-      <t-icon name="play-circle-stroke" @click="onView" />
+    <t-tooltip content="运行">
+      <a @click="onView">
+        运行查看
+        <t-icon name="play-circle-stroke" />
+      </a>
     </t-tooltip>
   </div>
 </template>
