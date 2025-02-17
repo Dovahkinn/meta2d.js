@@ -1,0 +1,20 @@
+[
+  {
+    "label": "Electron Test",
+    "value": "",
+    "children": [
+      {
+        "label": "test1",
+        "value": "./dir1/test11.json"
+      },
+      {
+        "label": "test2",
+        "value": "./dir1/test22.json"
+      },
+      {
+        "label": "test3",
+        "value": "./dir1/test33.json"
+      }
+    ]
+  }
+]

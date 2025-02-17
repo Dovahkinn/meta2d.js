@@ -8,7 +8,8 @@
     "build": "vite build",
     "build:lib": "vite build --mode lib",
     "preview": "vite preview",
-    "rel": "pnpm publish --registry=http://10.0.0.170:4873/ --no-git-checks"
+    "rel": "pnpm publish --registry=http://10.0.0.170:4873/ --no-git-checks",
+    "link": "pnpm link --global"
   },
   "files": [
     "lib"

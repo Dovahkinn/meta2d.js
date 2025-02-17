@@ -189,7 +189,9 @@ export const callExtendAction = (
     case ExtendAction.ShowMeta2D:
       meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions);
       break;
-
+    case ExtendAction.ShowText:
+      meta2d.emit(ExtendActionEventNameMap.Dialog, eventOptions);
+      break;
     default:
       console.error('未知扩展能力调用: ', eventOptions.action);
       break;

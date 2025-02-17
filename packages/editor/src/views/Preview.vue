@@ -241,7 +241,7 @@ onMounted(() => {
           meta2d.clear();
         });
     } else {
-      meta2d.clear();
+      // meta2d.clear();
     }
   } else {
     try {

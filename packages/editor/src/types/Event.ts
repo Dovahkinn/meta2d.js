@@ -84,6 +84,8 @@ export enum ExtendAction {
   ScriptEnd,
   ShowMeta2D,
   GoToView,
+  // 弹窗展示文字
+  ShowText, 
   // TODO:
 }
 

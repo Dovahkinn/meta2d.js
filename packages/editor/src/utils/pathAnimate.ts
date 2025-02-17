@@ -94,11 +94,12 @@ export function createPathAnimation(element: any, paths: any[]) {
     startX = originalX;
     startY = originalY;
 
-    meta2d.setValue({
-      id: element.id,
-      x: originalX,
-      y: originalY,
-    });
+    // 实际业务中不需要重置
+    // meta2d.setValue({
+    //   id: element.id,
+    //   x: originalX,
+    //   y: originalY,
+    // });
   }
 
   return { play, pause, resume, stop, isPaused, isStopped };

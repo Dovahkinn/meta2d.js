@@ -65,7 +65,10 @@ function executeAnimate(type: string | number, target: string[], meta2d: any) {
   const pens: any[] = [];
   if (target?.length) {
     target.forEach((tag) => {
-      pens.push(...meta2d.find(tag));
+      const res = meta2d.find(tag);
+      if (res) {
+        pens.push(...res);
+      }
     });
   }
   const fnName = fnMap[type];

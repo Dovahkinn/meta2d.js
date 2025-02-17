@@ -1,21 +1,7 @@
 <template>
-  <t-dialog
-    v-model:visible="visible"
-    dialogClassName="extend-action__dialog"
-    :header="title"
-    closeOnEscKeydown
-    :footer="false"
-    :mode="mode"
-    :width="width"
-    destroyOnClose
-    :style="styleObject"
-    @close-btn-click="onCloseBtnClick"
-  >
-    <component
-      :is="dialogContent"
-      v-bind="contentProps"
-      @ended="onEnd"
-    ></component>
+  <t-dialog v-model:visible="visible" dialogClassName="extend-action__dialog" :header="title" closeOnEscKeydown
+    :footer="false" :mode="mode" :width="width" destroyOnClose :style="styleObject" @close-btn-click="onCloseBtnClick">
+    <component :is="dialogContent" v-bind="contentProps" @ended="onEnd"></component>
   </t-dialog>
 </template>
 <script setup lang="ts">
@@ -59,12 +45,14 @@ const dialogContent = computed<any>(() => {
 
     case ExtendAction.ShowMeta2D:
       return defineAsyncComponent(() => import("../Opener.vue"));
+    case ExtendAction.ShowText:
+      return defineAsyncComponent(() => import("./content/Text.vue"));
   }
   return null;
 });
 
 const contentProps = computed(() => {
-  const { url } = eventParams.value || {};
+  const { url, text, textColor, ...rest } = eventParams.value || {};
   switch (eventParams.value?.action) {
     case ExtendAction.Video:
       if (!url) {
@@ -78,6 +66,14 @@ const contentProps = computed(() => {
       return {
         url,
       };
+    case ExtendAction.ShowText:
+      return {
+        text,
+        textColor,
+        height: rest.height,
+      }
+
+
   }
 });
 
@@ -122,11 +118,10 @@ const onCloseBtnClick = (event: Event) => {
 const styleObject = computed(() => {
   return {
     "--td-bg-color-container": eventParams.value?.backgroundColor || "white",
-    "--td-text-color-primary": eventParams.value?.textColor || "black",
-    "--td-text-color-secondary": eventParams.value?.textColor || "black",
-    "--extend-dialog-bg-image": `url(${
-      eventParams.value?.backgroundImageUrl || ""
-    })`,
+    "--td-text-color-primary": eventParams.value?.titleColor || eventParams.value?.textColor || "black",
+    "--td-text-color-secondary": eventParams.value?.titleColor || eventParams.value?.textColor || "black",
+    "--extend-dialog-bg-image": `url(${eventParams.value?.backgroundImageUrl || ""
+      })`,
     '--extend-dialog-header-margin-top': eventParams.value?.headerMarginTop || '0px',
     // 控制栏
     "--vjs-control-bar-background-color":
@@ -171,7 +166,7 @@ const styleObject = computed(() => {
   .vjs-load-progress {
     background-color: var(--vjs-load-progress-bar-color);
 
-    > div {
+    >div {
       background: none;
     }
   }

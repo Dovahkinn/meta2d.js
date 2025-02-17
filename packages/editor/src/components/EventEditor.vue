@@ -5,34 +5,17 @@
     <t-collapse-panel v-for="item in events" header="事件">
       <t-form labelAlign="left">
         <t-form-item label="事件类型">
-          <t-select
-            v-model="item.name"
-            :options="eventTypeOptions"
-            @change="eventChange"
-          ></t-select>
+          <t-select v-model="item.name" :options="eventTypeOptions" @change="eventChange"></t-select>
         </t-form-item>
         <t-form-item label="事件行为">
-          <t-select
-            v-model="item.action"
-            :options="eventActionOptions"
-            @change="actionChange(item)"
-          ></t-select>
+          <t-select v-model="item.action" :options="eventActionOptions" @change="actionChange(item)"></t-select>
         </t-form-item>
         <t-form-item v-if="item.action === EventAction.Link" label="链接地址">
-          <t-input
-            v-model="item.value"
-            clearable
-            @change="eventChange"
-          ></t-input>
+          <t-input v-model="item.value" clearable @change="eventChange"></t-input>
         </t-form-item>
         <template v-if="item.action === EventAction.SetProps">
           <t-form-item label="目标">
-            <t-input
-              v-model="item.params"
-              placeholder="可输入目标图元的ID/Tag"
-              clearable
-              @change="eventChange"
-            ></t-input>
+            <t-input v-model="item.params" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
           </t-form-item>
           <!-- 属性列表修改 -->
           <t-row justify="start">
@@ -48,25 +31,13 @@
               </t-button>
             </t-col>
           </t-row>
-          <t-row
-            v-for="(propItem, index) in propList"
-            :key="index"
-            justify="start"
-            :gutter="4"
-            style="margin-bottom: 4px"
-          >
+          <t-row v-for="(propItem, index) in propList" :key="index" justify="start" :gutter="4"
+            style="margin-bottom: 4px">
             <t-col :span="5">
-              <t-select
-                v-model="propItem.prop"
-                :options="propOptions"
-                @change="propChange(item)"
-              ></t-select>
+              <t-select v-model="propItem.prop" :options="propOptions" @change="propChange(item)"></t-select>
             </t-col>
             <t-col :span="5">
-              <t-input
-                v-model="propItem.value"
-                @change="propChange(item)"
-              ></t-input>
+              <t-input v-model="propItem.value" @change="propChange(item)"></t-input>
             </t-col>
             <t-col :span="2">
               <t-button variant="text" @click="deleteProp(propItem)">
@@ -75,194 +46,112 @@
             </t-col>
           </t-row>
         </template>
-        <t-form-item
-          v-if="
-            [
-              EventAction.PauseAnimate,
-              EventAction.StopAnimate,
-              EventAction.StartAnimate,
-            ].includes(item.action)
-          "
-          label="目标"
-        >
-          <t-input
-            v-model="item.value"
-            placeholder="可输入目标图元的ID/Tag"
-            clearable
-            @change="eventChange"
-          ></t-input>
+        <t-form-item v-if="
+          [
+            EventAction.PauseAnimate,
+            EventAction.StopAnimate,
+            EventAction.StartAnimate,
+          ].includes(item.action)
+        " label="目标">
+          <t-input v-model="item.value" placeholder="可输入目标图元的ID/Tag" clearable @change="eventChange"></t-input>
         </t-form-item>
 
         <template v-if="item.action === EventAction.Dialog">
           <t-form-item label="窗口标题">
-            <t-input
-              v-model="item.value"
-              clearable
-              @change="eventChange"
-            ></t-input>
+            <t-input v-model="item.value" clearable @change="eventChange"></t-input>
           </t-form-item>
           <t-form-item label="URL">
-            <t-input
-              v-model="item.params"
-              clearable
-              @change="eventChange"
-            ></t-input>
+            <t-input v-model="item.params" clearable @change="eventChange"></t-input>
           </t-form-item>
           <t-form-item v-if="item.extend" label="窗口宽度">
-            <t-input-number
-              v-model="item.extend.width"
-              @change="eventChange"
-            ></t-input-number>
+            <t-input-number v-model="item.extend.width" @change="eventChange"></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="窗口高度">
-            <t-input-number
-              v-model="item.extend.height"
-              @change="eventChange"
-            ></t-input-number>
+            <t-input-number v-model="item.extend.height" @change="eventChange"></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="X偏移">
-            <t-input-number
-              v-model="item.extend.x"
-              @change="eventChange"
-            ></t-input-number>
+            <t-input-number v-model="item.extend.x" @change="eventChange"></t-input-number>
           </t-form-item>
           <t-form-item v-if="item.extend" label="Y偏移">
-            <t-input-number
-              v-model="item.extend.y"
-              @change="eventChange"
-            ></t-input-number>
+            <t-input-number v-model="item.extend.y" @change="eventChange"></t-input-number>
           </t-form-item>
         </template>
 
         <template v-else-if="item.action === EventAction.JS">
           <t-form-item label="扩展行为">
-            <t-select
-              v-model="item.params.action"
-              :options="templateCodeStringOptions"
-              @change="codeJsChange($event, item)"
-            ></t-select>
+            <t-select v-model="item.params.action" :options="templateCodeStringOptions"
+              @change="codeJsChange($event, item)"></t-select>
           </t-form-item>
-          <template v-if="item.params.action === ExtendAction.Video">
+          <template v-if="[ExtendAction.Video, ExtendAction.ShowText].includes(item.params.action)">
             <t-form-item label="窗口标题">
-              <t-input
-                v-model="item.params.title"
-                clearable
-                @change="eventChange"
-              ></t-input>
+              <t-input v-model="item.params.title" clearable @change="eventChange"></t-input>
             </t-form-item>
-            <t-form-item label="视频URL">
-              <t-input
-                v-model="item.params.url"
-                clearable
-                @change="eventChange"
-              ></t-input>
+            <t-form-item v-if="item.params.action === ExtendAction.Video" label="视频URL">
+              <t-input v-model="item.params.url" clearable @change="eventChange"></t-input>
             </t-form-item>
+
+            <t-form-item v-if="item.params.action === ExtendAction.ShowText" label="文本">
+              <t-textarea v-model="item.params.text"></t-textarea>
+            </t-form-item>
+
             <t-form-item v-if="item.params" label="窗口宽度">
-              <t-input
-                v-model="item.params.width"
-                placeholder="示例：320, '500px', '80%'"
-                @change="eventChange"
-              ></t-input>
+              <t-input v-model="item.params.width" placeholder="示例：320, '500px', '80%'" @change="eventChange"></t-input>
             </t-form-item>
+
+            <t-form-item v-if="item.params && item.params.action == ExtendAction.ShowText" label="文本高度">
+              <t-input v-model="item.params.height" placeholder="示例：320, '500px', '80%'" @change="eventChange"></t-input>
+            </t-form-item>
+
             <t-form-item v-if="item.params" label="对话框类型">
-              <t-select
-                v-model="item.params.mode"
-                clearable
-                :options="dialogModeOptions"
-              ></t-select>
+              <t-select v-model="item.params.mode" clearable :options="dialogModeOptions"></t-select>
             </t-form-item>
 
             <t-form-item v-if="item.params" label="标题栏上间距">
-              <t-input
-                v-model="item.params.headerMarginTop"
-                placeholder="示例：'10px'"
-                clearable
-                @change="eventChange"
-              ></t-input>
+              <t-input v-model="item.params.headerMarginTop" placeholder="示例：'10px'" clearable
+                @change="eventChange"></t-input>
             </t-form-item>
 
             <t-form-item label="背景颜色">
-              <t-color-picker
-                class="w-full"
-                v-model="item.params.backgroundColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                clearable
-                @change="eventChange"
-              />
-            </t-form-item> 
+              <t-color-picker class="w-full" v-model="item.params.backgroundColor" :show-primary-color-preview="false"
+                format="CSS" :color-modes="['monochrome']" clearable @change="eventChange" />
+            </t-form-item>
             <t-form-item label="背景图片">
               <t-input v-model="item.params.backgroundImageUrl" clearable @change="eventChange"></t-input>
-            </t-form-item>           
-            
-            <t-form-item label="标题颜色">
-              <t-color-picker
-                class="w-full"
-                v-model="item.params.textColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                clearable
-                @change="eventChange"
-              />
             </t-form-item>
 
+            <t-form-item label="标题颜色">
+              <t-color-picker class="w-full" v-model="item.params.titleColor" :show-primary-color-preview="false"
+                format="CSS" :color-modes="['monochrome']" clearable @change="eventChange" />
+            </t-form-item>
+            <t-form-item v-if="item.params.action === ExtendAction.ShowText" label="文本颜色">
+              <t-color-picker class="w-full" v-model="item.params.textColor" :show-primary-color-preview="false"
+                format="CSS" :color-modes="['monochrome']" clearable @change="eventChange" />
+            </t-form-item>
             <t-form-item label="控制栏背景颜色">
-              <t-color-picker
-                class="w-full"
-                v-model="item.params.controlBarBackgroundColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                clearable
-                @change="eventChange"
-              />
+              <t-color-picker class="w-full" v-model="item.params.controlBarBackgroundColor"
+                :show-primary-color-preview="false" format="CSS" :color-modes="['monochrome']" clearable
+                @change="eventChange" />
             </t-form-item>
             <t-form-item label="控制栏按钮颜色">
-              <t-color-picker
-                class="w-full"
-                v-model="item.params.controlColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                clearable
-                @change="eventChange"
-              />
+              <t-color-picker class="w-full" v-model="item.params.controlColor" :show-primary-color-preview="false"
+                format="CSS" :color-modes="['monochrome']" clearable @change="eventChange" />
             </t-form-item>
             <t-form-item label="已播放进度颜色">
-              <t-color-picker
-                class="w-full"
-                v-model="item.params.controlPlayProgressBarColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                clearable
-                @change="eventChange"
-              />
+              <t-color-picker class="w-full" v-model="item.params.controlPlayProgressBarColor"
+                :show-primary-color-preview="false" format="CSS" :color-modes="['monochrome']" clearable
+                @change="eventChange" />
             </t-form-item>
             <t-form-item label="已加载进度颜色">
-              <t-color-picker
-                class="w-full"
-                v-model="item.params.controlLoadProgressBarColor"
-                :show-primary-color-preview="false"
-                format="CSS"
-                :color-modes="['monochrome']"
-                clearable
-                @change="eventChange"
-              />
+              <t-color-picker class="w-full" v-model="item.params.controlLoadProgressBarColor"
+                :show-primary-color-preview="false" format="CSS" :color-modes="['monochrome']" clearable
+                @change="eventChange" />
             </t-form-item>
           </template>
         </template>
       </t-form>
       <template #headerRightContent>
-        <t-button
-          size="small"
-          variant="outline"
-          theme="danger"
-          :style="{ marginLeft: '8px' }"
-          @click="deleteEvent(item)"
-        >
+        <t-button size="small" variant="outline" theme="danger" :style="{ marginLeft: '8px' }"
+          @click="deleteEvent(item)">
           <t-icon name="delete"></t-icon>
         </t-button>
       </template>
@@ -399,10 +288,10 @@ const templateCodeStringOptions = [
     label: "视频",
     value: ExtendAction.Video,
   },
-  // {
-  //   label: '',
-  //   value: '',
-  // },
+  {
+    label: '弹窗文字',
+    value: ExtendAction.ShowText,
+  },
   // {
   //   label: '',
   //   value: '',
@@ -526,9 +415,7 @@ const updatePropList = (index: number[]) => {
 };
 </script>
 <style lang="scss" scoped>
-
 :deep(.t-form) .t-input--auto-width {
   width: 100%;
 }
-
 </style>
