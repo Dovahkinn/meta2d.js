@@ -120,9 +120,13 @@ const styleObject = computed(() => {
     "--td-bg-color-container": eventParams.value?.backgroundColor || "white",
     "--td-text-color-primary": eventParams.value?.titleColor || eventParams.value?.textColor || "black",
     "--td-text-color-secondary": eventParams.value?.titleColor || eventParams.value?.textColor || "black",
+
+    // 自定义的变量
     "--extend-dialog-bg-image": `url(${eventParams.value?.backgroundImageUrl || ""
       })`,
     '--extend-dialog-header-margin-top': eventParams.value?.headerMarginTop || '0px',
+    '--extend-dialog-content-padding-bottom': eventParams.value?.contentPaddingBottom || '16px',
+
     // 控制栏
     "--vjs-control-bar-background-color":
       eventParams.value?.controlBarBackgroundColor || "black",
@@ -153,6 +157,10 @@ const styleObject = computed(() => {
 
 :global(.extend-action__dialog.t-dialog .t-dialog__header) {
   margin-top: var(--extend-dialog-header-margin-top);
+}
+
+:global(.extend-action__dialog.t-dialog .t-dialog__body) {
+  padding-bottom: var(--extend-dialog-content-padding-bottom);
 }
 
 :deep(.video-js) .vjs-control-bar {

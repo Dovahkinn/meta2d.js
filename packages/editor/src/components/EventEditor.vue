@@ -111,6 +111,11 @@
                 @change="eventChange"></t-input>
             </t-form-item>
 
+            <t-form-item v-if="item.params" label="内容下间距">
+              <t-input v-model="item.params.contentPaddingBottom" placeholder="示例：'10px'" clearable
+                @change="eventChange"></t-input>
+            </t-form-item>
+
             <t-form-item label="背景颜色">
               <t-color-picker class="w-full" v-model="item.params.backgroundColor" :show-primary-color-preview="false"
                 format="CSS" :color-modes="['monochrome']" clearable @change="eventChange" />
