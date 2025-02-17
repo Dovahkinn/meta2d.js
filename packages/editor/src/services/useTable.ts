@@ -113,12 +113,55 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
       const { handlers = [], duration = 3000, rowPropList = [] } = item;
       // 创建任务
       if (Array.isArray(handlers) && handlers.length) {
-        const fn = () => {
+        //
+        // * 自定义消息: 不能跨进程
+        // ! 实际的调用时间是不可预测的，只能被动接收
+        let msgHandler = (params?: any) => {
+          console.log(
+            'default custom message handler: ',
+            params,
+            item,
+            msgHandler._cbs
+          );
+          msgHandler._cache = params;
+          // ! 可能没有值，因为靠后的队列还没执行到
+          if (msgHandler._cbs.length) {
+            msgHandler._cbs.forEach((cb: any) => {
+              setTimeout(() => {
+                cb(params);
+              }, duration);
+            });
+            msgHandler._cbs = []
+          }
+        };
+        msgHandler._cbs = [];
+
+        // * 消息监听
+        if (meta2d || globalThis.meta2d) {
+          (meta2d || globalThis.meta2d).on(
+            ExtendActionEventNameMap.CustomMessage,
+            msgHandler
+          );
+        } else {
+          setTimeout(() => {
+            (meta2d || globalThis.meta2d).on(
+              ExtendActionEventNameMap.CustomMessage,
+              msgHandler
+            );
+          }, 1000);
+        }
+
+        // 一个步骤下有多个动作, 统一处理为一个 Promise
+        const fnQueue = () => {
           if (!meta2d) {
             meta2d = globalThis.meta2d;
           }
+          const syncQueue = [];
+          const asyncQueue = [];
+
           handlers.forEach((handler) => {
             const { target, action, value = {}, where } = handler;
+            // 配置解析执行，同步
             const executer = () => {
               if (Array.isArray(target)) {
                 switch (action) {
@@ -195,7 +238,7 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
                   case ExtendAction.GoToView:
                     // TODO: 瞬移，缺少平滑效果，考虑如何优化
                     if (typeof value == 'string') {
-                      const pen = meta2d.findOne(value)
+                      const pen = meta2d.findOne(value);
                       if (pen) {
                         meta2d.gotoView(pen);
                       }
@@ -210,61 +253,92 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
               }
             };
 
+            // * 设置了触发条件，异步
             if (
               where &&
               where.type == ExtendActionEventNameMap.CustomMessage &&
-              ![null, undefined, ''].includes(where.value)
+              ![null, undefined, ''].includes(where.value) && where.key
             ) {
-              // * 自定义消息: 不能跨进程
-              let msgHandler = (params?: any) => {
-                console.log('default custom message handler: ', params);
-              };
+              // - 消息触发是异步的，封装成 Promise，等待完成
+              const p = new Promise((resolve) => {
 
-              if (where.value === ExtendActionMessageTypeMap.VideoEnded) {
-                msgHandler = ({ type, key }) => {
-                  // console.log('-------------- custom message: ', type, key);
-                  if (
-                    type == ExtendActionMessageTypeMap.VideoEnded &&
-                    key == where.key
-                  ) {
-                    executer();
-                    meta2d.off(
-                      ExtendActionEventNameMap.CustomMessage,
-                      msgHandler
+                // * 根据具体参数生成消息处理器
+                if (where.value === ExtendActionMessageTypeMap.VideoEnded) {
+                  const _msgHandler = ({ type, key }) => {
+                    console.log(
+                      '-------------- custom message: ',
+                      type,
+                      key,
+                      handler
                     );
-                  }
-                };
-              } else if (
-                where.value === ExtendActionMessageTypeMap.ScriptEnded
-              ) {
-                msgHandler = ({ type, key }) => {
-                  if (
-                    type == ExtendActionMessageTypeMap.ScriptEnded &&
-                    key == where.key
-                  ) {
-                    executer();
-                    globalThis.meta2d.off(
-                      ExtendActionEventNameMap.CustomMessage,
-                      msgHandler
-                    );
-                  }
-                };
-              }
+                    if (
+                      type == ExtendActionMessageTypeMap.VideoEnded &&
+                      key == where.key
+                    ) {
+                      resolve(executer());
+                      meta2d.off(
+                        ExtendActionEventNameMap.CustomMessage,
+                        msgHandler
+                      );
+                    }
+                  };
+                  msgHandler._cbs.push(_msgHandler);
+                } else if (
+                  where.value === ExtendActionMessageTypeMap.ScriptEnded
+                ) {
+                  const _msgHandler = ({ type, key }) => {
+                    if (
+                      type == ExtendActionMessageTypeMap.ScriptEnded &&
+                      key == where.key
+                    ) {
+                      resolve(executer());
+                      meta2d.off(
+                        ExtendActionEventNameMap.CustomMessage,
+                        msgHandler
+                      );
+                    }
+                  };
+                  msgHandler._cbs.push(_msgHandler);
+                }
 
-              // TODO：扩展其他自定义消息
+                // TODO：扩展其他自定义消息
+              });
 
-              (meta2d || globalThis.meta2d).on(
-                ExtendActionEventNameMap.CustomMessage,
-                msgHandler
+              asyncQueue.push(p);
+
+              console.log(
+                'asasas ----------------',
+                handler,
+                msgHandler._cbs
               );
             } else {
-              // 未设置条件，直接执行
-              executer();
+              // * 未设置条件，直接执行
+              // executer();
+              syncQueue.push(Promise.resolve(executer()));
             }
           });
+
+          return [syncQueue, asyncQueue];
         };
 
+        // 生成任务, 按照步骤
+        
         const task = () => {
+          const [syncQueue, asyncQueue] = fnQueue();
+          console.group('task')
+          console.log("sync queue: ", syncQueue)
+          console.log('async queue: ', asyncQueue)
+          console.log('msgHandler._cache: ', msgHandler._cache, msgHandler._cbs)
+          console.groupEnd()
+          if (msgHandler._cache && msgHandler._cbs.length) {
+            msgHandler._cbs.forEach((cb: any) => {
+              setTimeout(() => {
+                cb(msgHandler._cache);
+              }, duration);
+            });
+            msgHandler._cbs = []
+          }
+
           return new Promise((resolve) => {
             setTimeout(() => {
               const row: any = {
@@ -278,8 +352,14 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
                   }
                 });
               }
-              fn();
-              resolve(row);
+
+              if (asyncQueue.length) {
+                
+              }
+
+              Promise.race([...syncQueue, ...asyncQueue]).then((res) => {
+                resolve(row);
+              });
             }, duration);
           });
         };

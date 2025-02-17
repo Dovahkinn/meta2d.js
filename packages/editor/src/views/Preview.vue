@@ -173,7 +173,7 @@ const applyTable = (res: any) => {
   });
 
   return function clearTasks() {
-    tasks.length = 0;
+    // tasks.length = 0;
   }
 };
 
