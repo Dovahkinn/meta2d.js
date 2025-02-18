@@ -107,7 +107,18 @@ params,
 context,
 })
 }
-`
+`,
+
+  [ExtendAction.ShowText]: `
+const fn = globalThis.$_callExtendAction;
+if (fn) {
+  fn(0, {
+pen,
+params,
+context,
+})
+}
+`,
 }
 
 
