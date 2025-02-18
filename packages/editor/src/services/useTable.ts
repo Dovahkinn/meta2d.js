@@ -325,18 +325,19 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
         
         const task = () => {
           const [syncQueue, asyncQueue] = fnQueue();
-          console.group('task')
-          console.log("sync queue: ", syncQueue)
-          console.log('async queue: ', asyncQueue)
-          console.log('msgHandler._cache: ', msgHandler._cache, msgHandler._cbs)
-          console.groupEnd()
+          // console.group('task')
+          // console.log("sync queue: ", syncQueue)
+          // console.log('async queue: ', asyncQueue)
+          // console.log('msgHandler._cache: ', msgHandler._cache, msgHandler._cbs, duration)
+          // console.log('---------------', item)
+          // console.groupEnd()
           if (msgHandler._cache && msgHandler._cbs.length) {
             msgHandler._cbs.forEach((cb: any) => {
               setTimeout(() => {
                 cb(msgHandler._cache);
               }, duration);
             });
-            msgHandler._cbs = []
+            // msgHandler._cbs = []
           }
 
           return new Promise((resolve) => {
@@ -353,11 +354,7 @@ export const useScripts = (metaData: any = {}, meta2dInstance?: any) => {
                 });
               }
 
-              if (asyncQueue.length) {
-                
-              }
-
-              Promise.race([...syncQueue, ...asyncQueue]).then((res) => {
+              Promise.all([...syncQueue, ...asyncQueue]).then((res) => {
                 resolve(row);
               });
             }, duration);

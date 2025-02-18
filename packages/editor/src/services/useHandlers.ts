@@ -161,7 +161,7 @@ export const callExtendAction = (
   sourceType: ExtendEventSource,
   eventOptions: any
 ) => {
-  // console.log('callExtendAction  ------------> ', sourceType, eventOptions);
+  console.log('callExtendAction  ------------> ', sourceType, eventOptions);
   if (!eventOptions) {
     console.error('自定义消息参数不存在！');
     return;

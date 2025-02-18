@@ -144,7 +144,6 @@
 import { defineProps, reactive, computed, defineEmits } from "vue";
 import { s8 } from "@meta2d/core";
 import ScriptHandlers from "./ScriptHandlers.vue";
-import { table } from "console";
 
 const props = defineProps({});
 
