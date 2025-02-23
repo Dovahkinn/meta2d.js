@@ -63,6 +63,7 @@ import { useLogTable, useScripts } from "../services/useTable.ts";
 import { useExtendEvent } from "../services/useHandlers.ts";
 import ExtendDialog from "./dialog/ExtendDialog.vue";
 import MultipleDataForm from "./widgets/MultipleDataForm.vue";
+import { table } from "console";
 
 const childComponentRef = ref(null);
 const emit = defineEmits(["ready"]);
@@ -173,7 +174,7 @@ const applyTable = (res: any) => {
   });
 
   return function clearTasks() {
-    // tasks.length = 0;
+    tasks.length = 0;
   }
 };
 
@@ -196,6 +197,8 @@ const multipleDataReset = () => {
     clearTasksQueue.value.length = 0;
   }
   tableLogData.value = [];
+  tableProps.value = {};
+  tableColumns.value = [];
 }
 
 
