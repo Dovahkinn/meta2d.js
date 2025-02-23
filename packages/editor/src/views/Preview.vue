@@ -27,7 +27,7 @@
     <div v-if="showRightPanel || tableProps.show" class="right__panel">
       <slot name="right-panel">
         <t-table v-if="tableColumns.length" ref="tableRef" class="table-flex-right" row-key="sid" :data="tableLogData"
-          :columns="tableColumns" active-row-type="single" v-bind="tableProps" :style="tableStyle"></t-table>
+          :columns="tableColumns"  v-bind="tableProps" :style="tableStyle"></t-table>
       </slot>
     </div>
 
