@@ -379,7 +379,7 @@
       </template>
 
       <template #event>
-        <EventEditor :defaultEventsValue="pen.events" @change="eventsChange" />
+        <EventEditor :key="pen.id" :defaultEventsValue="pen.events" @change="eventsChange" />
       </template>
     </PropsTab>
 
